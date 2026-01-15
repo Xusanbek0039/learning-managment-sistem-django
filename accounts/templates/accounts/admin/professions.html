@@ -1,0 +1,66 @@
+{% extends 'accounts/admin/base_admin.html' %}
+
+{% block title %}Kasblar - Admin Panel{% endblock %}
+
+{% block admin_content %}
+<div class="top-bar">
+    <h1 class="page-title"><i class="bi bi-briefcase me-2"></i>Kasblar</h1>
+    <a href="{% url 'admin_profession_add' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-2"></i>Kasb qo'shish
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-list me-2"></i>Barcha kasblar ({{ professions.count }})
+    </div>
+    <div class="card-body">
+        {% if professions %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Rasm</th>
+                        <th>Kasb nomi</th>
+                        <th>Tavsif</th>
+                        <th>Yaratilgan</th>
+                        <th>Amallar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for profession in professions %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>
+                            <img src="{{ profession.photo.url }}" alt="{{ profession.name }}" class="profession-img">
+                        </td>
+                        <td><strong>{{ profession.name }}</strong></td>
+                        <td>{{ profession.description|truncatewords:10 }}</td>
+                        <td>{{ profession.created_at|date:"d.m.Y" }}</td>
+                        <td class="action-btns">
+                            <a href="{% url 'admin_profession_edit' profession.pk %}" class="btn btn-sm btn-outline-primary" title="Tahrirlash">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'admin_profession_delete' profession.pk %}" class="btn btn-sm btn-outline-danger" title="O'chirish">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+            <h4 class="mt-3">Hozircha kasblar mavjud emas</h4>
+            <p style="color: #6c757d;">Yangi kasb qo'shish uchun yuqoridagi tugmani bosing</p>
+            <a href="{% url 'admin_profession_add' %}" class="btn btn-primary mt-2">
+                <i class="bi bi-plus-lg me-2"></i>Kasb qo'shish
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

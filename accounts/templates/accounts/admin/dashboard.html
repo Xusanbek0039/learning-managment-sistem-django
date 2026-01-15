@@ -1,0 +1,96 @@
+{% extends 'accounts/admin/base_admin.html' %}
+
+{% block title %}Dashboard - Admin Panel{% endblock %}
+
+{% block admin_content %}
+<div class="top-bar">
+    <h1 class="page-title"><i class="bi bi-speedometer2 me-2"></i>Dashboard</h1>
+    <div>
+        <span style="color: #6c757d;">Bugun: {{ "now"|date:"d.m.Y" }}</span>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3 mb-4">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon blue me-3">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ total_users }}</div>
+                    <div class="stat-label">Jami foydalanuvchilar</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon green me-3">
+                    <i class="bi bi-person-workspace"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ total_teachers }}</div>
+                    <div class="stat-label">O'qituvchilar</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon orange me-3">
+                    <i class="bi bi-mortarboard"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ total_students }}</div>
+                    <div class="stat-label">O'quvchilar</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon purple me-3">
+                    <i class="bi bi-briefcase"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ total_professions }}</div>
+                    <div class="stat-label">Kasblar</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-briefcase me-2"></i>Kasblar</span>
+                <a href="{% url 'admin_professions' %}" class="btn btn-primary btn-sm">
+                    Barchasini ko'rish
+                </a>
+            </div>
+            <div class="card-body">
+                <p style="color: #6c757d;">Kasblarni boshqarish uchun "Kasblar" bo'limiga o'ting.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-people me-2"></i>Foydalanuvchilar</span>
+                <a href="{% url 'admin_users' %}" class="btn btn-primary btn-sm">
+                    Barchasini ko'rish
+                </a>
+            </div>
+            <div class="card-body">
+                <p style="color: #6c757d;">Foydalanuvchilarni boshqarish uchun "Foydalanuvchilar" bo'limiga o'ting.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
