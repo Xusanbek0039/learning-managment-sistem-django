@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="auth-container">
-    <div class="auth-card">
+    <div class="auth-card" style="max-width: 500px;">
         <div class="logo-section">
             <i class="bi bi-mortarboard-fill"></i>
         </div>
@@ -41,6 +41,11 @@
             <div class="mb-3">
                 <label class="form-label">Telefon raqam</label>
                 {{ form.phone }}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Rol</label>
+                {{ form.role }}
             </div>
 
             <div class="mb-3">
