@@ -1,0 +1,213 @@
+{% extends 'accounts/admin/base_admin.html' %}
+
+{% block title %}Statistika - Admin Panel{% endblock %}
+
+{% block admin_content %}
+<div class="top-bar">
+    <h1 class="page-title"><i class="bi bi-graph-up me-2"></i>Statistika</h1>
+    <a href="{% url 'admin_export_pdf' %}" class="btn btn-primary">
+        <i class="bi bi-file-pdf me-2"></i>PDF yuklab olish
+    </a>
+</div>
+
+<!-- Umumiy statistika -->
+<div class="row mb-4">
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="stat-card text-center">
+            <div class="stat-icon blue mx-auto mb-2">
+                <i class="bi bi-people"></i>
+            </div>
+            <div class="stat-number">{{ total_users }}</div>
+            <div class="stat-label">Jami foydalanuvchilar</div>
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="stat-card text-center">
+            <div class="stat-icon orange mx-auto mb-2">
+                <i class="bi bi-mortarboard"></i>
+            </div>
+            <div class="stat-number">{{ total_students }}</div>
+            <div class="stat-label">O'quvchilar</div>
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="stat-card text-center">
+            <div class="stat-icon green mx-auto mb-2">
+                <i class="bi bi-person-workspace"></i>
+            </div>
+            <div class="stat-number">{{ total_teachers }}</div>
+            <div class="stat-label">O'qituvchilar</div>
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="stat-card text-center">
+            <div class="stat-icon purple mx-auto mb-2">
+                <i class="bi bi-shield-check"></i>
+            </div>
+            <div class="stat-number">{{ total_admins }}</div>
+            <div class="stat-label">Adminlar</div>
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="stat-card text-center">
+            <div class="stat-icon cyan mx-auto mb-2">
+                <i class="bi bi-circle-fill"></i>
+            </div>
+            <div class="stat-number">{{ online_users }}</div>
+            <div class="stat-label">Hozir online</div>
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="stat-card text-center">
+            <div class="stat-icon red mx-auto mb-2">
+                <i class="bi bi-slash-circle"></i>
+            </div>
+            <div class="stat-number">{{ blocked_users }}</div>
+            <div class="stat-label">Bloklangan</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Yo'nalishlar statistikasi -->
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-briefcase me-2"></i>Yo'nalishlar bo'yicha statistika
+            </div>
+            <div class="card-body">
+                {% if profession_stats %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Yo'nalish nomi</th>
+                                <th class="text-center">O'quvchilar</th>
+                                <th class="text-center">O'qituvchilar</th>
+                                <th class="text-center">Jami</th>
+                                <th>Foiz</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in profession_stats %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td><strong>{{ p.name }}</strong></td>
+                                <td class="text-center">
+                                    <span class="badge bg-primary" style="min-width: 40px;">{{ p.student_count }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-success" style="min-width: 40px;">{{ p.teacher_count }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-secondary" style="min-width: 40px;">{{ p.total }}</span>
+                                </td>
+                                <td>
+                                    {% if total_users > 0 %}
+                                        {% widthratio p.total total_users 100 as percent %}
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ percent }}%;">
+                                                {{ percent }}%
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        0%
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                    <p class="text-muted mt-2">Yo'nalishlar mavjud emas</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Kunlik ro'yxatdan o'tish -->
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-calendar-week me-2"></i>Oxirgi 7 kun
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Sana</th>
+                                <th class="text-center">Yangi foydalanuvchilar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for day in daily_registrations %}
+                            <tr>
+                                <td>{{ day.date|date:"d.m.Y" }}</td>
+                                <td class="text-center">
+                                    <span class="badge {% if day.count > 0 %}bg-success{% else %}bg-secondary{% endif %}">
+                                        {{ day.count }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Rollar bo'yicha -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <i class="bi bi-pie-chart me-2"></i>Rollar bo'yicha
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span style="color: var(--text-color);">O'quvchilar</span>
+                        <span style="color: var(--text-color);">{{ total_students }}</span>
+                    </div>
+                    {% if total_users > 0 %}
+                    {% widthratio total_students total_users 100 as student_percent %}
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar bg-primary" style="width: {{ student_percent }}%;"></div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span style="color: var(--text-color);">O'qituvchilar</span>
+                        <span style="color: var(--text-color);">{{ total_teachers }}</span>
+                    </div>
+                    {% if total_users > 0 %}
+                    {% widthratio total_teachers total_users 100 as teacher_percent %}
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar bg-success" style="width: {{ teacher_percent }}%;"></div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span style="color: var(--text-color);">Adminlar</span>
+                        <span style="color: var(--text-color);">{{ total_admins }}</span>
+                    </div>
+                    {% if total_users > 0 %}
+                    {% widthratio total_admins total_users 100 as admin_percent %}
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar bg-danger" style="width: {{ admin_percent }}%;"></div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

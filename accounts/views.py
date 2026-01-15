@@ -3,7 +3,8 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpResponse
-from django.db.models import Count
+from django.db.models import Count, Q
+from django.db import models
 from django.utils import timezone
 from .forms import RegisterForm, LoginForm, ProfessionForm, UserProfileForm, AdminUserEditForm, ChangePasswordForm
 from .models import Profession, CustomUser
