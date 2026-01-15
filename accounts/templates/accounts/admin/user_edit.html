@@ -1,0 +1,140 @@
+{% extends 'accounts/admin/base_admin.html' %}
+
+{% block title %}Foydalanuvchini tahrirlash - Admin Panel{% endblock %}
+
+{% block admin_content %}
+<a href="{% url 'admin_users' %}" class="back-link">
+    <i class="bi bi-arrow-left me-2"></i>Orqaga qaytish
+</a>
+
+<div class="top-bar">
+    <h1 class="page-title"><i class="bi bi-pencil-square me-2"></i>Foydalanuvchini tahrirlash</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-person-gear me-2"></i>{{ user_obj.full_name }} ma'lumotlari
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: var(--text-color);">Ism</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: var(--text-color);">Familiya</label>
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: var(--text-color);">Username</label>
+                            {{ form.username }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: var(--text-color);">Telefon</label>
+                            {{ form.phone }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: var(--text-color);">Rol</label>
+                            {{ form.role }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: var(--text-color);">Yo'nalish</label>
+                            {{ form.profession }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label" style="color: var(--text-color);">Profil rasmi</label>
+                        {{ form.photo }}
+                        {% if user_obj.photo %}
+                        <div class="mt-2">
+                            <small class="text-muted">Hozirgi rasm:</small>
+                            <br>
+                            <img src="{{ user_obj.photo.url }}" style="width: 80px; height: 80px; border-radius: 10px; object-fit: cover; margin-top: 5px;">
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label" style="color: var(--text-color);">O'zi haqida</label>
+                        {{ form.bio }}
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="mb-3">
+                        <label class="form-label" style="color: var(--text-color);">
+                            <i class="bi bi-key me-2"></i>Yangi parol
+                        </label>
+                        <input type="password" name="new_password" class="form-control" placeholder="Yangi parol (o'zgartirish uchun)">
+                        <small class="text-muted">Bo'sh qoldiring agar parolni o'zgartirmoqchi bo'lmasangiz</small>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="form-check">
+                            {{ form.is_blocked }}
+                            <label class="form-check-label" style="color: var(--text-color);">
+                                Foydalanuvchini bloklash
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-2"></i>Saqlash
+                        </button>
+                        <a href="{% url 'admin_users' %}" class="btn btn-outline-secondary">
+                            Bekor qilish
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card text-center p-4">
+            {% if user_obj.photo %}
+                <img src="{{ user_obj.photo.url }}" alt="{{ user_obj.full_name }}" 
+                     style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin: 0 auto 15px; border: 3px solid var(--primary-blue);">
+            {% else %}
+                <div style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue)); display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 2.5rem; color: white; font-weight: 700;">
+                    {{ user_obj.get_initials }}
+                </div>
+            {% endif %}
+            <h5 style="color: var(--text-color);">{{ user_obj.full_name }}</h5>
+            <p class="text-muted">@{{ user_obj.username }}</p>
+            <span class="badge 
+                {% if user_obj.role == 'admin' %}bg-danger
+                {% elif user_obj.role == 'teacher' %}bg-success
+                {% else %}bg-primary{% endif %}">
+                {% if user_obj.role == 'admin' %}Admin{% elif user_obj.role == 'teacher' %}O'qituvchi{% else %}O'quvchi{% endif %}
+            </span>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <i class="bi bi-info-circle me-2"></i>Ma'lumot
+            </div>
+            <div class="card-body">
+                <ul style="color: #6c757d; padding-left: 20px; font-size: 0.9rem;">
+                    <li class="mb-2">Rolni o'zgartirish foydalanuvchi huquqlarini o'zgartiradi</li>
+                    <li class="mb-2">Parol maydonini bo'sh qoldiring agar o'zgartirmoqchi bo'lmasangiz</li>
+                    <li>Bloklangan foydalanuvchi tizimga kira olmaydi</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
