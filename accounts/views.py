@@ -2,12 +2,21 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import HttpResponse
-from django.db.models import Count, Q
+from django.http import HttpResponse, JsonResponse
+from django.db.models import Count, Q, Sum, Avg
 from django.db import models
 from django.utils import timezone
-from .forms import RegisterForm, LoginForm, ProfessionForm, UserProfileForm, AdminUserEditForm, ChangePasswordForm
-from .models import Profession, CustomUser
+from datetime import timedelta
+from .forms import (
+    RegisterForm, LoginForm, ProfessionForm, UserProfileForm, 
+    AdminUserEditForm, ChangePasswordForm, VideoLessonForm, HomeworkForm,
+    HomeworkSubmissionForm, HomeworkGradeForm, TestForm, TestQuestionForm, CertificateForm
+)
+from .models import (
+    Profession, CustomUser, CourseEnrollment, Lesson, VideoLesson, VideoProgress,
+    Homework, HomeworkSubmission, Test, TestQuestion, TestAnswer, TestResult,
+    TestUserAnswer, Certificate, CoinTransaction
+)
 
 
 def register_view(request):
@@ -38,9 +47,7 @@ def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request, data=request.POST)
         if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
+            user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
             if user is not None:
                 if user.is_blocked:
                     messages.error(request, "Sizning akkauntingiz bloklangan!")
@@ -72,12 +79,221 @@ def home_view(request):
 @login_required
 def professions_view(request):
     professions = Profession.objects.all()
-    return render(request, 'accounts/professions.html', {'professions': professions})
+    enrolled_ids = []
+    if request.user.is_student:
+        enrolled_ids = request.user.enrollments.values_list('profession_id', flat=True)
+    return render(request, 'accounts/professions.html', {'professions': professions, 'enrolled_ids': enrolled_ids})
 
 
 @login_required
+def profession_detail(request, pk):
+    profession = get_object_or_404(Profession, pk=pk)
+    is_enrolled = False
+    if request.user.is_student:
+        is_enrolled = CourseEnrollment.objects.filter(user=request.user, profession=profession).exists()
+    
+    lessons = profession.lessons.all() if is_enrolled or request.user.is_teacher or request.user.is_admin else []
+    
+    return render(request, 'accounts/profession_detail.html', {
+        'profession': profession,
+        'is_enrolled': is_enrolled,
+        'lessons': lessons,
+    })
+
+
+@login_required
+def enroll_course(request, pk):
+    if not request.user.is_student:
+        messages.error(request, "Faqat o'quvchilar kursga yozilishi mumkin!")
+        return redirect('professions')
+    
+    profession = get_object_or_404(Profession, pk=pk)
+    
+    if request.method == 'POST':
+        enrollment, created = CourseEnrollment.objects.get_or_create(user=request.user, profession=profession)
+        if created:
+            messages.success(request, f"Siz '{profession.name}' kursiga muvaffaqiyatli yozildingiz!")
+        return redirect('profession_detail', pk=pk)
+    
+    return render(request, 'accounts/enroll_confirm.html', {'profession': profession})
+
+
+# Lesson views
+@login_required
+def lesson_view(request, pk):
+    lesson = get_object_or_404(Lesson, pk=pk)
+    profession = lesson.profession
+    
+    if request.user.is_student:
+        if not CourseEnrollment.objects.filter(user=request.user, profession=profession).exists():
+            messages.error(request, "Avval kursga yoziling!")
+            return redirect('profession_detail', pk=profession.pk)
+    
+    context = {'lesson': lesson, 'profession': profession}
+    
+    if lesson.lesson_type == 'video':
+        video = lesson.video
+        progress, _ = VideoProgress.objects.get_or_create(user=request.user, video=video)
+        context['video'] = video
+        context['progress'] = progress
+        return render(request, 'accounts/lessons/video_lesson.html', context)
+    
+    elif lesson.lesson_type == 'homework':
+        homework = lesson.homework
+        submission = HomeworkSubmission.objects.filter(homework=homework, student=request.user).first()
+        context['homework'] = homework
+        context['submission'] = submission
+        context['form'] = HomeworkSubmissionForm()
+        return render(request, 'accounts/lessons/homework_lesson.html', context)
+    
+    elif lesson.lesson_type == 'test':
+        test = lesson.test
+        result = TestResult.objects.filter(test=test, student=request.user).order_by('-completed_at').first()
+        context['test'] = test
+        context['result'] = result
+        return render(request, 'accounts/lessons/test_lesson.html', context)
+    
+    return redirect('profession_detail', pk=profession.pk)
+
+
+@login_required
+def mark_video_watched(request, pk):
+    video = get_object_or_404(VideoLesson, pk=pk)
+    progress, _ = VideoProgress.objects.get_or_create(user=request.user, video=video)
+    
+    if not progress.watched:
+        progress.watched = True
+        progress.watched_at = timezone.now()
+        progress.save()
+        
+        if not progress.coin_awarded:
+            request.user.add_coins(1, f"Video darslik ko'rildi: {video.lesson.title}")
+            progress.coin_awarded = True
+            progress.save()
+            messages.success(request, "Tabriklaymiz! Siz 1 coin qo'lga kiritdingiz!")
+    
+    return JsonResponse({'success': True})
+
+
+@login_required
+def submit_homework(request, pk):
+    homework = get_object_or_404(Homework, pk=pk)
+    
+    if request.method == 'POST':
+        form = HomeworkSubmissionForm(request.POST, request.FILES)
+        if form.is_valid():
+            submission = form.save(commit=False)
+            submission.homework = homework
+            submission.student = request.user
+            submission.save()
+            messages.success(request, "Vazifa muvaffaqiyatli yuborildi!")
+    
+    return redirect('lesson_view', pk=homework.lesson.pk)
+
+
+@login_required
+def start_test(request, pk):
+    test = get_object_or_404(Test, pk=pk)
+    
+    if request.user.is_student:
+        profession = test.lesson.profession
+        if not CourseEnrollment.objects.filter(user=request.user, profession=profession).exists():
+            messages.error(request, "Avval kursga yoziling!")
+            return redirect('profession_detail', pk=profession.pk)
+    
+    questions = test.questions.all()
+    request.session[f'test_{test.pk}_start'] = timezone.now().isoformat()
+    
+    return render(request, 'accounts/lessons/test_take.html', {
+        'test': test,
+        'questions': questions,
+    })
+
+
+@login_required
+def submit_test(request, pk):
+    test = get_object_or_404(Test, pk=pk)
+    
+    if request.method != 'POST':
+        return redirect('start_test', pk=pk)
+    
+    start_time = request.session.get(f'test_{test.pk}_start')
+    started_at = timezone.now()
+    if start_time:
+        from datetime import datetime
+        started_at = datetime.fromisoformat(start_time)
+    
+    questions = test.questions.all()
+    correct = 0
+    total = questions.count()
+    
+    result = TestResult.objects.create(
+        test=test,
+        student=request.user,
+        score=0,
+        total_questions=total,
+        correct_answers=0,
+        started_at=started_at,
+        passed=False
+    )
+    
+    for question in questions:
+        answer_id = request.POST.get(f'question_{question.pk}')
+        selected_answer = None
+        is_correct = False
+        
+        if answer_id:
+            try:
+                selected_answer = TestAnswer.objects.get(pk=answer_id)
+                is_correct = selected_answer.is_correct
+                if is_correct:
+                    correct += 1
+            except TestAnswer.DoesNotExist:
+                pass
+        
+        TestUserAnswer.objects.create(
+            result=result,
+            question=question,
+            selected_answer=selected_answer,
+            is_correct=is_correct
+        )
+    
+    score = int((correct / total) * 100) if total > 0 else 0
+    result.score = score
+    result.correct_answers = correct
+    result.passed = score >= test.passing_score
+    result.save()
+    
+    if result.passed and not result.coin_awarded:
+        request.user.add_coins(1, f"Test muvaffaqiyatli topshirildi: {test.lesson.title}")
+        result.coin_awarded = True
+        result.save()
+        messages.success(request, "Tabriklaymiz! Siz testni muvaffaqiyatli topshirdingiz va 1 coin oldingiz!")
+    
+    return redirect('test_result', pk=result.pk)
+
+
+@login_required
+def test_result(request, pk):
+    result = get_object_or_404(TestResult, pk=pk)
+    user_answers = result.user_answers.all().select_related('question', 'selected_answer')
+    
+    return render(request, 'accounts/lessons/test_result.html', {
+        'result': result,
+        'user_answers': user_answers,
+    })
+
+
+# Profile views
+@login_required
 def profile_view(request):
-    return render(request, 'accounts/profile.html')
+    certificates = Certificate.objects.filter(student=request.user)
+    enrollments = request.user.enrollments.all()
+    
+    return render(request, 'accounts/profile.html', {
+        'certificates': certificates,
+        'enrollments': enrollments,
+    })
 
 
 @login_required
@@ -99,13 +315,10 @@ def change_password_view(request):
     if request.method == 'POST':
         form = ChangePasswordForm(request.POST)
         if form.is_valid():
-            old_password = form.cleaned_data['old_password']
-            new_password = form.cleaned_data['new_password1']
-            
-            if not request.user.check_password(old_password):
+            if not request.user.check_password(form.cleaned_data['old_password']):
                 messages.error(request, "Joriy parol noto'g'ri!")
             else:
-                request.user.set_password(new_password)
+                request.user.set_password(form.cleaned_data['new_password1'])
                 request.user.save()
                 login(request, request.user)
                 messages.success(request, "Parol muvaffaqiyatli o'zgartirildi!")
@@ -114,6 +327,421 @@ def change_password_view(request):
         form = ChangePasswordForm()
     
     return render(request, 'accounts/change_password.html', {'form': form})
+
+
+@login_required
+def student_statistics(request, pk=None):
+    if pk and (request.user.is_admin or request.user.is_teacher):
+        student = get_object_or_404(CustomUser, pk=pk)
+    else:
+        student = request.user
+    
+    period = request.GET.get('period', 'all')
+    now = timezone.now()
+    
+    if period == 'week':
+        start_date = now - timedelta(days=7)
+    elif period == 'month':
+        start_date = now - timedelta(days=30)
+    else:
+        start_date = None
+    
+    # Videos watched
+    videos_query = VideoProgress.objects.filter(user=student, watched=True)
+    if start_date:
+        videos_query = videos_query.filter(watched_at__gte=start_date)
+    videos_watched = videos_query.count()
+    
+    # Test results
+    tests_query = TestResult.objects.filter(student=student)
+    if start_date:
+        tests_query = tests_query.filter(completed_at__gte=start_date)
+    test_results = tests_query
+    avg_score = tests_query.aggregate(avg=Avg('score'))['avg'] or 0
+    
+    # Homework submissions
+    hw_query = HomeworkSubmission.objects.filter(student=student)
+    if start_date:
+        hw_query = hw_query.filter(submitted_at__gte=start_date)
+    homework_count = hw_query.count()
+    
+    context = {
+        'student': student,
+        'period': period,
+        'videos_watched': videos_watched,
+        'test_results': test_results,
+        'avg_score': round(avg_score, 1),
+        'homework_count': homework_count,
+        'coins': student.coins,
+    }
+    
+    return render(request, 'accounts/student_statistics.html', context)
+
+
+@login_required
+def export_student_pdf(request, pk=None):
+    if pk and (request.user.is_admin or request.user.is_teacher):
+        student = get_object_or_404(CustomUser, pk=pk)
+    else:
+        student = request.user
+    
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.styles import getSampleStyleSheet
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+    from io import BytesIO
+    
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4)
+    elements = []
+    styles = getSampleStyleSheet()
+    
+    elements.append(Paragraph(f"O'quvchi statistikasi: {student.full_name}", styles['Heading1']))
+    elements.append(Paragraph(f"Sana: {timezone.now().strftime('%d.%m.%Y')}", styles['Normal']))
+    elements.append(Spacer(1, 20))
+    
+    # General info
+    info_data = [
+        ['Ko\'rsatkich', 'Qiymat'],
+        ['Jami coinlar', str(student.coins)],
+        ['Ko\'rilgan videolar', str(VideoProgress.objects.filter(user=student, watched=True).count())],
+        ['Test natijalari', str(TestResult.objects.filter(student=student).count())],
+        ['Topshirilgan vazifalar', str(HomeworkSubmission.objects.filter(student=student).count())],
+    ]
+    
+    table = Table(info_data, colWidths=[250, 150])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0d6efd')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
+        ('PADDING', (0, 0), (-1, -1), 8),
+    ]))
+    elements.append(table)
+    
+    doc.build(elements)
+    buffer.seek(0)
+    
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="student_stats_{student.username}.pdf"'
+    return response
+
+
+@login_required
+def leaderboard(request):
+    students = CustomUser.objects.filter(role='student').order_by('-coins')[:50]
+    return render(request, 'accounts/leaderboard.html', {'students': students})
+
+
+# Teacher/Admin: Manage lessons
+@login_required
+def manage_lessons(request, pk):
+    if not (request.user.is_admin or request.user.is_teacher):
+        messages.error(request, "Sizda bu sahifaga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    profession = get_object_or_404(Profession, pk=pk)
+    lessons = profession.lessons.all()
+    
+    return render(request, 'accounts/manage/lessons.html', {
+        'profession': profession,
+        'lessons': lessons,
+    })
+
+
+@login_required
+def add_lesson(request, pk):
+    if not (request.user.is_admin or request.user.is_teacher):
+        return redirect('home')
+    
+    profession = get_object_or_404(Profession, pk=pk)
+    lesson_type = request.GET.get('type', 'video')
+    
+    if request.method == 'POST':
+        if lesson_type == 'video':
+            form = VideoLessonForm(request.POST)
+            if form.is_valid():
+                lesson = Lesson.objects.create(
+                    profession=profession,
+                    title=form.cleaned_data['title'],
+                    lesson_type='video',
+                    created_by=request.user
+                )
+                VideoLesson.objects.create(
+                    lesson=lesson,
+                    youtube_url=form.cleaned_data['youtube_url'],
+                    duration=form.cleaned_data.get('duration') or 0
+                )
+                messages.success(request, "Video darslik qo'shildi!")
+                return redirect('manage_lessons', pk=pk)
+        
+        elif lesson_type == 'homework':
+            form = HomeworkForm(request.POST)
+            if form.is_valid():
+                lesson = Lesson.objects.create(
+                    profession=profession,
+                    title=form.cleaned_data['title'],
+                    lesson_type='homework',
+                    created_by=request.user
+                )
+                Homework.objects.create(
+                    lesson=lesson,
+                    description=form.cleaned_data['description']
+                )
+                messages.success(request, "Uyga vazifa qo'shildi!")
+                return redirect('manage_lessons', pk=pk)
+        
+        elif lesson_type == 'test':
+            form = TestForm(request.POST)
+            if form.is_valid():
+                lesson = Lesson.objects.create(
+                    profession=profession,
+                    title=form.cleaned_data['title'],
+                    lesson_type='test',
+                    created_by=request.user
+                )
+                Test.objects.create(
+                    lesson=lesson,
+                    time_limit=form.cleaned_data['time_limit'],
+                    passing_score=form.cleaned_data['passing_score']
+                )
+                messages.success(request, "Test qo'shildi! Endi savollarni qo'shing.")
+                return redirect('manage_test_questions', pk=lesson.test.pk)
+    else:
+        if lesson_type == 'video':
+            form = VideoLessonForm()
+        elif lesson_type == 'homework':
+            form = HomeworkForm()
+        else:
+            form = TestForm()
+    
+    return render(request, 'accounts/manage/add_lesson.html', {
+        'profession': profession,
+        'lesson_type': lesson_type,
+        'form': form,
+    })
+
+
+@login_required
+def edit_lesson(request, pk):
+    if not (request.user.is_admin or request.user.is_teacher):
+        return redirect('home')
+    
+    lesson = get_object_or_404(Lesson, pk=pk)
+    
+    if request.method == 'POST':
+        if lesson.lesson_type == 'video':
+            form = VideoLessonForm(request.POST)
+            if form.is_valid():
+                lesson.title = form.cleaned_data['title']
+                lesson.save()
+                lesson.video.youtube_url = form.cleaned_data['youtube_url']
+                lesson.video.duration = form.cleaned_data.get('duration') or 0
+                lesson.video.save()
+                messages.success(request, "Dars yangilandi!")
+                return redirect('manage_lessons', pk=lesson.profession.pk)
+        elif lesson.lesson_type == 'homework':
+            form = HomeworkForm(request.POST)
+            if form.is_valid():
+                lesson.title = form.cleaned_data['title']
+                lesson.save()
+                lesson.homework.description = form.cleaned_data['description']
+                lesson.homework.save()
+                messages.success(request, "Vazifa yangilandi!")
+                return redirect('manage_lessons', pk=lesson.profession.pk)
+    else:
+        if lesson.lesson_type == 'video':
+            form = VideoLessonForm(initial={
+                'title': lesson.title,
+                'youtube_url': lesson.video.youtube_url,
+                'duration': lesson.video.duration,
+            })
+        elif lesson.lesson_type == 'homework':
+            form = HomeworkForm(initial={
+                'title': lesson.title,
+                'description': lesson.homework.description,
+            })
+        else:
+            return redirect('manage_test_questions', pk=lesson.test.pk)
+    
+    return render(request, 'accounts/manage/edit_lesson.html', {
+        'lesson': lesson,
+        'form': form,
+    })
+
+
+@login_required
+def delete_lesson(request, pk):
+    if not (request.user.is_admin or request.user.is_teacher):
+        return redirect('home')
+    
+    lesson = get_object_or_404(Lesson, pk=pk)
+    profession_pk = lesson.profession.pk
+    
+    if request.method == 'POST':
+        lesson.delete()
+        messages.success(request, "Dars o'chirildi!")
+        return redirect('manage_lessons', pk=profession_pk)
+    
+    return render(request, 'accounts/manage/delete_lesson.html', {'lesson': lesson})
+
+
+# Test management
+@login_required
+def manage_test_questions(request, pk):
+    if not (request.user.is_admin or request.user.is_teacher):
+        return redirect('home')
+    
+    test = get_object_or_404(Test, pk=pk)
+    questions = test.questions.all()
+    
+    return render(request, 'accounts/manage/test_questions.html', {
+        'test': test,
+        'questions': questions,
+    })
+
+
+@login_required
+def add_test_question(request, pk):
+    if not (request.user.is_admin or request.user.is_teacher):
+        return redirect('home')
+    
+    test = get_object_or_404(Test, pk=pk)
+    
+    if request.method == 'POST':
+        form = TestQuestionForm(request.POST, request.FILES)
+        if form.is_valid():
+            question = TestQuestion.objects.create(
+                test=test,
+                question_text=form.cleaned_data['question_text'],
+                question_image=form.cleaned_data.get('question_image')
+            )
+            
+            answers = [
+                form.cleaned_data['answer1'],
+                form.cleaned_data['answer2'],
+                form.cleaned_data['answer3'],
+            ]
+            correct = int(form.cleaned_data['correct_answer'])
+            
+            for i, answer_text in enumerate(answers, 1):
+                TestAnswer.objects.create(
+                    question=question,
+                    answer_text=answer_text,
+                    is_correct=(i == correct)
+                )
+            
+            messages.success(request, "Savol qo'shildi!")
+            
+            if 'add_another' in request.POST:
+                return redirect('add_test_question', pk=pk)
+            return redirect('manage_test_questions', pk=pk)
+    else:
+        form = TestQuestionForm()
+    
+    return render(request, 'accounts/manage/add_question.html', {
+        'test': test,
+        'form': form,
+    })
+
+
+@login_required
+def delete_test_question(request, pk):
+    if not (request.user.is_admin or request.user.is_teacher):
+        return redirect('home')
+    
+    question = get_object_or_404(TestQuestion, pk=pk)
+    test_pk = question.test.pk
+    
+    if request.method == 'POST':
+        question.delete()
+        messages.success(request, "Savol o'chirildi!")
+    
+    return redirect('manage_test_questions', pk=test_pk)
+
+
+# Homework submissions for teachers
+@login_required
+def homework_submissions(request):
+    if not (request.user.is_admin or request.user.is_teacher):
+        return redirect('home')
+    
+    submissions = HomeworkSubmission.objects.filter(status='pending').select_related(
+        'homework__lesson__profession', 'student'
+    )
+    
+    return render(request, 'accounts/manage/homework_submissions.html', {
+        'submissions': submissions,
+    })
+
+
+@login_required
+def grade_homework(request, pk):
+    if not (request.user.is_admin or request.user.is_teacher):
+        return redirect('home')
+    
+    submission = get_object_or_404(HomeworkSubmission, pk=pk)
+    
+    if request.method == 'POST':
+        form = HomeworkGradeForm(request.POST)
+        if form.is_valid():
+            submission.grade = form.cleaned_data['grade']
+            submission.feedback = form.cleaned_data.get('feedback', '')
+            submission.status = 'graded'
+            submission.graded_by = request.user
+            submission.graded_at = timezone.now()
+            submission.save()
+            messages.success(request, "Vazifa baholandi!")
+            return redirect('homework_submissions')
+    else:
+        form = HomeworkGradeForm()
+    
+    return render(request, 'accounts/manage/grade_homework.html', {
+        'submission': submission,
+        'form': form,
+    })
+
+
+# Test results for teachers
+@login_required
+def all_test_results(request):
+    if not (request.user.is_admin or request.user.is_teacher):
+        return redirect('home')
+    
+    results = TestResult.objects.all().select_related('test__lesson__profession', 'student')
+    
+    return render(request, 'accounts/manage/test_results.html', {'results': results})
+
+
+# Certificates
+@login_required
+def issue_certificate(request, pk):
+    if not request.user.is_admin:
+        return redirect('home')
+    
+    student = get_object_or_404(CustomUser, pk=pk)
+    professions = Profession.objects.all()
+    
+    if request.method == 'POST':
+        form = CertificateForm(request.POST, request.FILES)
+        profession_id = request.POST.get('profession')
+        
+        if form.is_valid() and profession_id:
+            profession = get_object_or_404(Profession, pk=profession_id)
+            cert = form.save(commit=False)
+            cert.student = student
+            cert.profession = profession
+            cert.issued_by = request.user
+            cert.save()
+            messages.success(request, "Sertifikat berildi!")
+            return redirect('admin_user_view', pk=pk)
+    else:
+        form = CertificateForm()
+    
+    return render(request, 'accounts/manage/issue_certificate.html', {
+        'student': student,
+        'professions': professions,
+        'form': form,
+    })
 
 
 # Admin Panel Views
@@ -130,13 +758,11 @@ def admin_dashboard(request):
     blocked_users = CustomUser.objects.filter(is_blocked=True).count()
     online_users = sum(1 for u in CustomUser.objects.all() if u.is_online)
     
-    # Yo'nalishlar bo'yicha statistika
     profession_stats = Profession.objects.annotate(
-        student_count=Count('students', filter=models.Q(students__role='student')),
-        teacher_count=Count('students', filter=models.Q(students__role='teacher'))
+        student_count=Count('enrollments', filter=Q(enrollments__user__role='student')),
+        teacher_count=Count('students', filter=Q(students__role='teacher'))
     )
     
-    # Oxirgi faol foydalanuvchilar
     recent_users = CustomUser.objects.filter(last_activity__isnull=False).order_by('-last_activity')[:10]
     
     context = {
@@ -155,12 +781,11 @@ def admin_dashboard(request):
 @login_required
 def admin_professions(request):
     if not request.user.is_admin:
-        messages.error(request, "Sizda admin paneliga kirish huquqi yo'q!")
         return redirect('home')
     
     professions = Profession.objects.annotate(
-        student_count=Count('students', filter=models.Q(students__role='student')),
-        teacher_count=Count('students', filter=models.Q(students__role='teacher'))
+        student_count=Count('enrollments', filter=Q(enrollments__user__role='student')),
+        teacher_count=Count('students', filter=Q(students__role='teacher'))
     )
     return render(request, 'accounts/admin/professions.html', {'professions': professions})
 
@@ -168,7 +793,6 @@ def admin_professions(request):
 @login_required
 def admin_profession_add(request):
     if not request.user.is_admin:
-        messages.error(request, "Sizda admin paneliga kirish huquqi yo'q!")
         return redirect('home')
     
     if request.method == 'POST':
@@ -186,7 +810,6 @@ def admin_profession_add(request):
 @login_required
 def admin_profession_edit(request, pk):
     if not request.user.is_admin:
-        messages.error(request, "Sizda admin paneliga kirish huquqi yo'q!")
         return redirect('home')
     
     profession = get_object_or_404(Profession, pk=pk)
@@ -206,7 +829,6 @@ def admin_profession_edit(request, pk):
 @login_required
 def admin_profession_delete(request, pk):
     if not request.user.is_admin:
-        messages.error(request, "Sizda admin paneliga kirish huquqi yo'q!")
         return redirect('home')
     
     profession = get_object_or_404(Profession, pk=pk)
@@ -222,7 +844,6 @@ def admin_profession_delete(request, pk):
 @login_required
 def admin_users(request):
     if not request.user.is_admin:
-        messages.error(request, "Sizda admin paneliga kirish huquqi yo'q!")
         return redirect('home')
     
     role_filter = request.GET.get('role', '')
@@ -242,30 +863,32 @@ def admin_users(request):
     
     professions = Profession.objects.all()
     
-    context = {
+    return render(request, 'accounts/admin/users.html', {
         'users': users,
         'professions': professions,
         'role_filter': role_filter,
         'profession_filter': profession_filter,
         'status_filter': status_filter,
-    }
-    return render(request, 'accounts/admin/users.html', context)
+    })
 
 
 @login_required
 def admin_user_view(request, pk):
     if not request.user.is_admin:
-        messages.error(request, "Sizda admin paneliga kirish huquqi yo'q!")
         return redirect('home')
     
     user = get_object_or_404(CustomUser, pk=pk)
-    return render(request, 'accounts/admin/user_view.html', {'user_obj': user})
+    certificates = Certificate.objects.filter(student=user)
+    
+    return render(request, 'accounts/admin/user_view.html', {
+        'user_obj': user,
+        'certificates': certificates,
+    })
 
 
 @login_required
 def admin_user_edit(request, pk):
     if not request.user.is_admin:
-        messages.error(request, "Sizda admin paneliga kirish huquqi yo'q!")
         return redirect('home')
     
     user = get_object_or_404(CustomUser, pk=pk)
@@ -289,7 +912,6 @@ def admin_user_edit(request, pk):
 @login_required
 def admin_user_block(request, pk):
     if not request.user.is_admin:
-        messages.error(request, "Sizda admin paneliga kirish huquqi yo'q!")
         return redirect('home')
     
     user = get_object_or_404(CustomUser, pk=pk)
@@ -301,18 +923,13 @@ def admin_user_block(request, pk):
     user.is_blocked = not user.is_blocked
     user.save()
     
-    if user.is_blocked:
-        messages.success(request, f"{user.full_name} bloklandi!")
-    else:
-        messages.success(request, f"{user.full_name} blokdan chiqarildi!")
-    
+    messages.success(request, f"{user.full_name} {'bloklandi' if user.is_blocked else 'blokdan chiqarildi'}!")
     return redirect('admin_users')
 
 
 @login_required
 def admin_user_delete(request, pk):
     if not request.user.is_admin:
-        messages.error(request, "Sizda admin paneliga kirish huquqi yo'q!")
         return redirect('home')
     
     user = get_object_or_404(CustomUser, pk=pk)
@@ -332,10 +949,8 @@ def admin_user_delete(request, pk):
 @login_required
 def admin_statistics(request):
     if not request.user.is_admin:
-        messages.error(request, "Sizda admin paneliga kirish huquqi yo'q!")
         return redirect('home')
     
-    # Umumiy statistika
     total_users = CustomUser.objects.count()
     total_teachers = CustomUser.objects.filter(role='teacher').count()
     total_students = CustomUser.objects.filter(role='student').count()
@@ -343,14 +958,12 @@ def admin_statistics(request):
     blocked_users = CustomUser.objects.filter(is_blocked=True).count()
     online_users = sum(1 for u in CustomUser.objects.all() if u.is_online)
     
-    # Yo'nalishlar bo'yicha
     profession_stats = Profession.objects.annotate(
-        student_count=Count('students', filter=models.Q(students__role='student')),
-        teacher_count=Count('students', filter=models.Q(students__role='teacher')),
-        total=Count('students')
+        student_count=Count('enrollments', filter=Q(enrollments__user__role='student')),
+        teacher_count=Count('students', filter=Q(students__role='teacher')),
+        total=Count('enrollments')
     )
     
-    # Kunlik ro'yxatdan o'tish (oxirgi 7 kun)
     from datetime import timedelta
     today = timezone.now().date()
     daily_registrations = []
@@ -359,7 +972,7 @@ def admin_statistics(request):
         count = CustomUser.objects.filter(date_joined__date=day).count()
         daily_registrations.append({'date': day, 'count': count})
     
-    context = {
+    return render(request, 'accounts/admin/statistics.html', {
         'total_users': total_users,
         'total_teachers': total_teachers,
         'total_students': total_students,
@@ -368,139 +981,52 @@ def admin_statistics(request):
         'online_users': online_users,
         'profession_stats': profession_stats,
         'daily_registrations': daily_registrations,
-    }
-    
-    return render(request, 'accounts/admin/statistics.html', context)
+    })
 
 
 @login_required
 def admin_export_pdf(request):
     if not request.user.is_admin:
-        messages.error(request, "Sizda admin paneliga kirish huquqi yo'q!")
         return redirect('home')
     
     from reportlab.lib import colors
     from reportlab.lib.pagesizes import A4
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib.units import inch
+    from reportlab.lib.styles import getSampleStyleSheet
     from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-    from reportlab.pdfbase import pdfmetrics
-    from reportlab.pdfbase.ttfonts import TTFont
     from io import BytesIO
     
     buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
+    doc = SimpleDocTemplate(buffer, pagesize=A4)
     elements = []
     styles = getSampleStyleSheet()
     
-    # Title
-    title_style = ParagraphStyle(
-        'CustomTitle',
-        parent=styles['Heading1'],
-        fontSize=20,
-        spaceAfter=30,
-        alignment=1
-    )
-    elements.append(Paragraph("LMS Statistika Hisoboti", title_style))
+    elements.append(Paragraph("LMS Statistika Hisoboti", styles['Heading1']))
     elements.append(Paragraph(f"Sana: {timezone.now().strftime('%d.%m.%Y %H:%M')}", styles['Normal']))
     elements.append(Spacer(1, 20))
-    
-    # Umumiy statistika
-    elements.append(Paragraph("Umumiy Statistika", styles['Heading2']))
-    elements.append(Spacer(1, 10))
     
     total_users = CustomUser.objects.count()
     total_teachers = CustomUser.objects.filter(role='teacher').count()
     total_students = CustomUser.objects.filter(role='student').count()
-    total_admins = CustomUser.objects.filter(role='admin').count()
-    blocked_users = CustomUser.objects.filter(is_blocked=True).count()
     
     stats_data = [
         ['Ko\'rsatkich', 'Soni'],
         ['Jami foydalanuvchilar', str(total_users)],
         ['O\'quvchilar', str(total_students)],
         ['O\'qituvchilar', str(total_teachers)],
-        ['Adminlar', str(total_admins)],
-        ['Bloklangan', str(blocked_users)],
     ]
     
-    stats_table = Table(stats_data, colWidths=[3*inch, 2*inch])
-    stats_table.setStyle(TableStyle([
+    table = Table(stats_data, colWidths=[250, 150])
+    table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0d6efd')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTSIZE', (0, 0), (-1, 0), 12),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8f9fa')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
         ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
-        ('FONTSIZE', (0, 1), (-1, -1), 10),
         ('PADDING', (0, 0), (-1, -1), 8),
     ]))
-    elements.append(stats_table)
-    elements.append(Spacer(1, 30))
-    
-    # Yo'nalishlar statistikasi
-    elements.append(Paragraph("Yo'nalishlar bo'yicha", styles['Heading2']))
-    elements.append(Spacer(1, 10))
-    
-    profession_data = [['Yo\'nalish', 'O\'quvchilar', 'O\'qituvchilar', 'Jami']]
-    
-    professions = Profession.objects.annotate(
-        student_count=Count('students', filter=models.Q(students__role='student')),
-        teacher_count=Count('students', filter=models.Q(students__role='teacher')),
-        total=Count('students')
-    )
-    
-    for p in professions:
-        profession_data.append([p.name, str(p.student_count), str(p.teacher_count), str(p.total)])
-    
-    if len(profession_data) > 1:
-        prof_table = Table(profession_data, colWidths=[2.5*inch, 1.2*inch, 1.2*inch, 1*inch])
-        prof_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#198754')),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('FONTSIZE', (0, 0), (-1, 0), 11),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8f9fa')),
-            ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
-            ('FONTSIZE', (0, 1), (-1, -1), 10),
-            ('PADDING', (0, 0), (-1, -1), 8),
-        ]))
-        elements.append(prof_table)
-    
-    elements.append(Spacer(1, 30))
-    
-    # Foydalanuvchilar ro'yxati
-    elements.append(Paragraph("Foydalanuvchilar ro'yxati", styles['Heading2']))
-    elements.append(Spacer(1, 10))
-    
-    users_data = [['#', 'Ism Familiya', 'Username', 'Rol', 'Yo\'nalish', 'Status']]
-    
-    for i, user in enumerate(CustomUser.objects.all()[:50], 1):
-        role = 'Admin' if user.role == 'admin' else ('O\'qituvchi' if user.role == 'teacher' else 'O\'quvchi')
-        status = 'Bloklangan' if user.is_blocked else 'Faol'
-        profession_name = user.profession.name if user.profession else '-'
-        users_data.append([str(i), user.full_name, user.username, role, profession_name, status])
-    
-    users_table = Table(users_data, colWidths=[0.4*inch, 1.5*inch, 1.2*inch, 1*inch, 1.3*inch, 0.8*inch])
-    users_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#6f42c1')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTSIZE', (0, 0), (-1, 0), 9),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8f9fa')),
-        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
-        ('FONTSIZE', (0, 1), (-1, -1), 8),
-        ('PADDING', (0, 0), (-1, -1), 6),
-    ]))
-    elements.append(users_table)
+    elements.append(table)
     
     doc.build(elements)
-    
     buffer.seek(0)
-    response = HttpResponse(buffer, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="LMS_Statistika_{timezone.now().strftime("%Y%m%d_%H%M")}.pdf"'
     
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="LMS_Stats_{timezone.now().strftime("%Y%m%d")}.pdf"'
     return response
