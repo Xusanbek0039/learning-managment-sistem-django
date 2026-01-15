@@ -158,6 +158,9 @@ def lesson_view(request, pk):
 
 @login_required
 def mark_video_watched(request, pk):
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'POST only'})
+    
     video = get_object_or_404(VideoLesson, pk=pk)
     progress, _ = VideoProgress.objects.get_or_create(user=request.user, video=video)
     
@@ -170,9 +173,8 @@ def mark_video_watched(request, pk):
             request.user.add_coins(1, f"Video darslik ko'rildi: {video.lesson.title}")
             progress.coin_awarded = True
             progress.save()
-            messages.success(request, "Tabriklaymiz! Siz 1 coin qo'lga kiritdingiz!")
     
-    return JsonResponse({'success': True})
+    return JsonResponse({'success': True, 'coins': request.user.coins})
 
 
 @login_required

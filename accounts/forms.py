@@ -122,8 +122,10 @@ class VideoLessonForm(forms.Form):
         widget=forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://www.youtube.com/watch?v=...'})
     )
     duration = forms.IntegerField(
-        required=False, initial=0,
-        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Davomiyligi (daqiqa)'})
+        min_value=1,
+        initial=10,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Davomiyligi (daqiqa)'}),
+        help_text="Video davomiyligi (daqiqada). O'quvchi shu vaqtning yarmini ko'rishi kerak."
     )
 
 

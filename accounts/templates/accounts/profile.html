@@ -109,33 +109,49 @@
             </div>
             {% endif %}
             
-            <!-- Sertifikatlar -->
-            {% if certificates %}
+            <!-- Sertifikatlarim -->
             <div class="card">
                 <div class="card-header" style="background: transparent;">
                     <h5 style="color: var(--text-color); margin: 0;">
-                        <i class="bi bi-award me-2"></i>Sertifikatlar
+                        <i class="bi bi-award me-2"></i>Sertifikatlarim
                     </h5>
                 </div>
                 <div class="card-body">
+                    {% if certificates %}
                     <div class="row">
                         {% for cert in certificates %}
                         <div class="col-md-6 mb-3">
-                            <div class="d-flex align-items-center justify-content-between p-3" style="background: var(--bg-color); border-radius: 10px;">
-                                <div>
-                                    <strong style="color: var(--text-color);">{{ cert.profession.name }}</strong>
-                                    <br><small class="text-muted">{{ cert.issued_at|date:"d.m.Y" }}</small>
+                            <div class="p-3" style="background: var(--bg-color); border-radius: 15px; border: 2px solid var(--border-color);">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div style="width: 50px; height: 50px; border-radius: 10px; background: linear-gradient(135deg, #198754, #157347); display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                                        <i class="bi bi-award text-white" style="font-size: 1.5rem;"></i>
+                                    </div>
+                                    <div>
+                                        <strong style="color: var(--text-color);">{{ cert.profession.name }}</strong>
+                                        <br><small class="text-muted">Berilgan: {{ cert.issued_at|date:"d.m.Y" }}</small>
+                                    </div>
                                 </div>
-                                <a href="{{ cert.file.url }}" class="btn btn-sm btn-success" target="_blank">
-                                    <i class="bi bi-download"></i>
-                                </a>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="bi bi-person me-1"></i>{{ cert.issued_by.full_name }}
+                                    </small>
+                                    <a href="{{ cert.file.url }}" class="btn btn-success btn-sm" target="_blank" download>
+                                        <i class="bi bi-file-pdf me-1"></i>Yuklab olish
+                                    </a>
+                                </div>
                             </div>
                         </div>
                         {% endfor %}
                     </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-award text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-2">Hozircha sertifikatlar mavjud emas</p>
+                        <small class="text-muted">Kurslarni muvaffaqiyatli tamomlaganingizda sertifikat olasiz</small>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
-            {% endif %}
         </div>
     </div>
 </div>

@@ -2,6 +2,49 @@
 
 {% block title %}{{ lesson.title }} - LMS{% endblock %}
 
+{% block extra_css %}
+<style>
+    .video-timer {
+        background: linear-gradient(135deg, #6c757d, #495057);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 15px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .video-timer.ready {
+        background: linear-gradient(135deg, #198754, #157347);
+    }
+    
+    .video-timer.paused {
+        background: linear-gradient(135deg, #fd7e14, #e85d04);
+    }
+    
+    .progress-bar-custom {
+        height: 8px;
+        border-radius: 4px;
+        background: var(--border-color);
+        overflow: hidden;
+        margin-top: 15px;
+    }
+    
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+        transition: width 1s linear;
+    }
+    
+    .btn-watch:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-5">
     <a href="{% url 'profession_detail' profession.pk %}" class="btn btn-outline-secondary mb-4">
@@ -21,14 +64,31 @@
         </div>
         <div class="card-body">
             <div class="ratio ratio-16x9 mb-4">
-                <iframe src="{{ video.get_embed_url }}" title="{{ lesson.title }}" allowfullscreen 
+                <iframe id="videoFrame" src="{{ video.get_embed_url }}" title="{{ lesson.title }}" allowfullscreen 
                         style="border-radius: 15px;"></iframe>
             </div>
             
             {% if not progress.watched %}
             <div class="text-center">
-                <button class="btn btn-success btn-lg" id="markWatched">
-                    <i class="bi bi-check-circle me-2"></i>Videoni ko'rdim (+1 coin)
+                <!-- Timer -->
+                <div class="mb-4">
+                    <div class="video-timer" id="timerDisplay">
+                        <i class="bi bi-clock"></i>
+                        <span id="timerText">Tayyor bo'lishiga: <span id="countdown">{{ video.duration|default:1 }}:00</span></span>
+                    </div>
+                    
+                    <div class="progress-bar-custom" style="max-width: 400px; margin: 15px auto 0;">
+                        <div class="progress-bar-fill" id="progressBar" style="width: 0%;"></div>
+                    </div>
+                    
+                    <p class="text-muted mt-2" id="statusText">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Videoni kamida {{ video.duration|default:1|divisibleby:2 }} daqiqa ko'ring
+                    </p>
+                </div>
+                
+                <button class="btn btn-success btn-lg btn-watch" id="markWatched" disabled>
+                    <i class="bi bi-check-circle me-2"></i>Ko'rdim (+1 coin)
                 </button>
             </div>
             {% else %}
@@ -43,20 +103,87 @@
 
 {% block extra_js %}
 <script>
-document.getElementById('markWatched')?.addEventListener('click', function() {
-    fetch('{% url "mark_video_watched" video.pk %}', {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-            'Content-Type': 'application/json'
+{% if not progress.watched %}
+    const videoDuration = {{ video.duration|default:1 }} * 60; // sekundlarda
+    const requiredTime = Math.floor(videoDuration / 2); // 50% ko'rish kerak
+    let watchedTime = 0;
+    let isPaused = false;
+    let timerInterval;
+    
+    const timerDisplay = document.getElementById('timerDisplay');
+    const countdownEl = document.getElementById('countdown');
+    const progressBar = document.getElementById('progressBar');
+    const statusText = document.getElementById('statusText');
+    const markWatchedBtn = document.getElementById('markWatched');
+    
+    function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+    
+    function updateTimer() {
+        if (isPaused) return;
+        
+        watchedTime++;
+        const remaining = Math.max(0, requiredTime - watchedTime);
+        const progress = Math.min(100, (watchedTime / requiredTime) * 100);
+        
+        countdownEl.textContent = formatTime(remaining);
+        progressBar.style.width = progress + '%';
+        
+        if (watchedTime >= requiredTime) {
+            // Tayyor
+            clearInterval(timerInterval);
+            timerDisplay.classList.add('ready');
+            timerDisplay.innerHTML = '<i class="bi bi-check-circle"></i><span>Tayyor! Tugmani bosishingiz mumkin</span>';
+            statusText.innerHTML = '<i class="bi bi-check-circle text-success me-1"></i>Video yetarlicha ko\'rildi';
+            markWatchedBtn.disabled = false;
+            markWatchedBtn.classList.add('pulse');
         }
-    }).then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            location.reload();
+    }
+    
+    // Sahifa ko'rinishini kuzatish
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            // Boshqa oynaga o'tdi
+            isPaused = true;
+            if (!timerDisplay.classList.contains('ready')) {
+                timerDisplay.classList.add('paused');
+                statusText.innerHTML = '<i class="bi bi-pause-circle text-warning me-1"></i>Timer to\'xtatildi. Videoga qayting!';
+            }
+        } else {
+            // Qaytdi
+            isPaused = false;
+            timerDisplay.classList.remove('paused');
+            if (!timerDisplay.classList.contains('ready')) {
+                const remaining = Math.max(0, requiredTime - watchedTime);
+                statusText.innerHTML = `<i class="bi bi-info-circle me-1"></i>Qolgan vaqt: ${formatTime(remaining)}`;
+            }
         }
     });
-});
+    
+    // Timerni boshlash
+    timerInterval = setInterval(updateTimer, 1000);
+    
+    // Ko'rdim tugmasi
+    markWatchedBtn.addEventListener('click', function() {
+        if (this.disabled) return;
+        
+        fetch('{% url "mark_video_watched" video.pk %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        }).then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    });
+{% endif %}
 </script>
 {% endblock %}
 {% endblock %}
