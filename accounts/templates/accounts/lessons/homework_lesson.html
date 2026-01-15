@@ -1,0 +1,78 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}{{ lesson.title }} - LMS{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <a href="{% url 'profession_detail' profession.pk %}" class="btn btn-outline-secondary mb-4">
+        <i class="bi bi-arrow-left me-2"></i>Orqaga
+    </a>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header" style="background: transparent; border-bottom: 1px solid var(--border-color);">
+                    <h4 style="color: var(--primary-blue); margin: 0;">
+                        <i class="bi bi-file-earmark-text me-2"></i>{{ lesson.title }}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <h5 style="color: var(--text-color);">Vazifa tavsifi:</h5>
+                    <div style="color: var(--text-color); line-height: 1.8;">
+                        {{ homework.description|linebreaks }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header" style="background: transparent;">
+                    <h5 style="color: var(--text-color); margin: 0;">
+                        <i class="bi bi-upload me-2"></i>Vazifani topshirish
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if submission %}
+                        <div class="alert {% if submission.status == 'graded' %}alert-success{% else %}alert-info{% endif %}">
+                            <strong>Status:</strong> {{ submission.get_status_display }}
+                            {% if submission.grade %}
+                            <br><strong>Baho:</strong> {{ submission.grade }}/100
+                            {% endif %}
+                            {% if submission.feedback %}
+                            <br><strong>Izoh:</strong> {{ submission.feedback }}
+                            {% endif %}
+                        </div>
+                        <p class="text-muted">
+                            <i class="bi bi-clock me-1"></i>Yuborilgan: {{ submission.submitted_at|date:"d.m.Y H:i" }}
+                        </p>
+                        <a href="{{ submission.file.url }}" class="btn btn-outline-primary w-100" target="_blank">
+                            <i class="bi bi-download me-2"></i>Yuborilgan faylni ko'rish
+                        </a>
+                    {% else %}
+                        <form method="POST" action="{% url 'submit_homework' homework.pk %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label" style="color: var(--text-color);">Faylingizni yuklang</label>
+                                {{ form.file }}
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-send me-2"></i>Yuborish
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

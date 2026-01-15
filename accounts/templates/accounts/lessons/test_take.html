@@ -1,0 +1,155 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}{{ test.lesson.title }} - Test{% endblock %}
+
+{% block extra_css %}
+<style>
+    .question-card {
+        background: var(--card-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+    
+    .question-card:hover {
+        border-color: var(--primary-blue);
+    }
+    
+    .question-number {
+        background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+    }
+    
+    .answer-option {
+        background: var(--bg-color);
+        border: 2px solid var(--border-color);
+        border-radius: 10px;
+        padding: 15px 20px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+    }
+    
+    .answer-option:hover {
+        border-color: var(--primary-blue);
+        background: rgba(13, 110, 253, 0.1);
+    }
+    
+    .answer-option input[type="radio"] {
+        width: 20px;
+        height: 20px;
+        margin-right: 15px;
+    }
+    
+    .answer-option input[type="radio"]:checked + label {
+        color: var(--primary-blue);
+        font-weight: 600;
+    }
+    
+    .timer {
+        position: fixed;
+        top: 100px;
+        right: 30px;
+        background: linear-gradient(135deg, #dc3545, #b02a37);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 15px;
+        font-size: 1.5rem;
+        font-weight: 700;
+        z-index: 1000;
+        box-shadow: 0 5px 20px rgba(220, 53, 69, 0.4);
+    }
+    
+    .question-image {
+        max-width: 100%;
+        border-radius: 10px;
+        margin: 15px 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="timer" id="timer">
+        <i class="bi bi-clock me-2"></i>
+        <span id="timerDisplay">{{ test.time_limit }}:00</span>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body text-center">
+            <h3 style="color: var(--primary-blue);">{{ test.lesson.title }}</h3>
+            <p class="text-muted">Barcha savollarga javob bering va "Yakunlash" tugmasini bosing</p>
+        </div>
+    </div>
+
+    <form method="POST" action="{% url 'submit_test' test.pk %}" id="testForm">
+        {% csrf_token %}
+        
+        {% for question in questions %}
+        <div class="question-card">
+            <div class="d-flex align-items-start mb-3">
+                <div class="question-number me-3">{{ forloop.counter }}</div>
+                <div style="color: var(--text-color); font-size: 1.1rem; font-weight: 500;">
+                    {{ question.question_text }}
+                </div>
+            </div>
+            
+            {% if question.question_image %}
+            <div class="text-center">
+                <img src="{{ question.question_image.url }}" alt="Savol rasmi" class="question-image">
+            </div>
+            {% endif %}
+            
+            <div class="mt-3">
+                {% for answer in question.answers.all %}
+                <label class="answer-option">
+                    <input type="radio" name="question_{{ question.pk }}" value="{{ answer.pk }}">
+                    <span style="color: var(--text-color);">{{ answer.answer_text }}</span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+        
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary btn-lg px-5">
+                <i class="bi bi-check-circle me-2"></i>Yakunlash
+            </button>
+        </div>
+    </form>
+</div>
+
+{% block extra_js %}
+<script>
+    let timeLeft = {{ test.time_limit }} * 60;
+    const timerDisplay = document.getElementById('timerDisplay');
+    const testForm = document.getElementById('testForm');
+    
+    function updateTimer() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (timeLeft <= 0) {
+            testForm.submit();
+        } else {
+            timeLeft--;
+            setTimeout(updateTimer, 1000);
+        }
+    }
+    
+    updateTimer();
+</script>
+{% endblock %}
+{% endblock %}

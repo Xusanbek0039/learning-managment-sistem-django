@@ -1,0 +1,76 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Reyting - LMS{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h3 style="color: var(--primary-blue);" class="mb-4">
+        <i class="bi bi-trophy me-2"></i>O'quvchilar reytingi
+    </h3>
+
+    <div class="card">
+        <div class="card-body">
+            {% if students %}
+            <div class="table-responsive">
+                <table class="table" style="color: var(--text-color);">
+                    <thead>
+                        <tr>
+                            <th class="text-center">#</th>
+                            <th>O'quvchi</th>
+                            <th>Yo'nalish</th>
+                            <th class="text-center">Coinlar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr {% if student == request.user %}style="background: rgba(13, 110, 253, 0.1);"{% endif %}>
+                            <td class="text-center">
+                                {% if forloop.counter == 1 %}
+                                <span style="font-size: 1.5rem;">🥇</span>
+                                {% elif forloop.counter == 2 %}
+                                <span style="font-size: 1.5rem;">🥈</span>
+                                {% elif forloop.counter == 3 %}
+                                <span style="font-size: 1.5rem;">🥉</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ forloop.counter }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if student.photo %}
+                                    <img src="{{ student.photo.url }}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 10px;">
+                                    {% else %}
+                                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue)); display: flex; align-items: center; justify-content: center; margin-right: 10px; color: white; font-weight: 600;">
+                                        {{ student.get_initials }}
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        <strong>{{ student.full_name }}</strong>
+                                        {% if student == request.user %}<span class="badge bg-primary ms-2">Siz</span>{% endif %}
+                                        <br><small class="text-muted">@{{ student.username }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% if student.profession %}{{ student.profession.name }}{% else %}<span class="text-muted">-</span>{% endif %}
+                            </td>
+                            <td class="text-center">
+                                <span class="coin-badge">
+                                    <i class="bi bi-coin me-1"></i>{{ student.coins }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-trophy text-muted" style="font-size: 4rem;"></i>
+                <h4 class="mt-3" style="color: var(--text-color);">Hozircha o'quvchilar yo'q</h4>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Test natijasi - LMS{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card text-center p-5">
+                {% if result.passed %}
+                <div class="mb-4">
+                    <i class="bi bi-trophy-fill text-success" style="font-size: 5rem;"></i>
+                </div>
+                <h2 class="text-success">Tabriklaymiz!</h2>
+                <p class="lead">Siz testni muvaffaqiyatli topshirdingiz!</p>
+                {% else %}
+                <div class="mb-4">
+                    <i class="bi bi-emoji-frown text-danger" style="font-size: 5rem;"></i>
+                </div>
+                <h2 class="text-danger">Afsuski...</h2>
+                <p class="lead">Siz testdan o'ta olmadingiz. Qayta urinib ko'ring!</p>
+                {% endif %}
+                
+                <div class="row justify-content-center my-4">
+                    <div class="col-md-4">
+                        <div class="card" style="background: var(--bg-color);">
+                            <div class="card-body">
+                                <h1 style="color: {% if result.passed %}#198754{% else %}#dc3545{% endif %};">{{ result.score }}%</h1>
+                                <small class="text-muted">Sizning balingiz</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card" style="background: var(--bg-color);">
+                            <div class="card-body">
+                                <h1 style="color: var(--primary-blue);">{{ result.correct_answers }}/{{ result.total_questions }}</h1>
+                                <small class="text-muted">To'g'ri javoblar</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if result.coin_awarded %}
+                <div class="alert alert-warning">
+                    <i class="bi bi-coin me-2"></i>
+                    Siz 1 coin qo'lga kiritdingiz!
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header" style="background: transparent;">
+                    <h5 style="color: var(--text-color); margin: 0;">
+                        <i class="bi bi-list-check me-2"></i>Javoblar tahlili
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for ua in user_answers %}
+                    <div class="mb-4 p-3" style="background: var(--bg-color); border-radius: 10px;">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <strong style="color: var(--text-color);">{{ forloop.counter }}. {{ ua.question.question_text }}</strong>
+                            {% if ua.is_correct %}
+                            <span class="badge bg-success"><i class="bi bi-check"></i></span>
+                            {% else %}
+                            <span class="badge bg-danger"><i class="bi bi-x"></i></span>
+                            {% endif %}
+                        </div>
+                        
+                        {% if ua.question.question_image %}
+                        <img src="{{ ua.question.question_image.url }}" style="max-width: 200px; border-radius: 10px;" class="mb-2">
+                        {% endif %}
+                        
+                        <div class="ms-3">
+                            {% if ua.selected_answer %}
+                            <p class="mb-1">
+                                <span class="text-muted">Sizning javobingiz:</span>
+                                <span style="color: {% if ua.is_correct %}#198754{% else %}#dc3545{% endif %};">
+                                    {{ ua.selected_answer.answer_text }}
+                                </span>
+                            </p>
+                            {% else %}
+                            <p class="text-muted mb-1">Javob tanlanmagan</p>
+                            {% endif %}
+                            
+                            {% if not ua.is_correct %}
+                            <p class="mb-0">
+                                <span class="text-muted">To'g'ri javob:</span>
+                                <span class="text-success">
+                                    {% for ans in ua.question.answers.all %}
+                                        {% if ans.is_correct %}{{ ans.answer_text }}{% endif %}
+                                    {% endfor %}
+                                </span>
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{% url 'lesson_view' result.test.lesson.pk %}" class="btn btn-primary">
+                    <i class="bi bi-arrow-left me-2"></i>Testga qaytish
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

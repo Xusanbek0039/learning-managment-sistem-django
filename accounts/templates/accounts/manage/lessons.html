@@ -1,0 +1,107 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Darslarni boshqarish - LMS{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <a href="{% url 'profession_detail' profession.pk %}" class="btn btn-outline-secondary mb-4">
+        <i class="bi bi-arrow-left me-2"></i>Orqaga
+    </a>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 style="color: var(--primary-blue);">
+            <i class="bi bi-gear me-2"></i>{{ profession.name }} - Darslar
+        </h3>
+        
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                <i class="bi bi-plus-lg me-2"></i>Qo'shish
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <a class="dropdown-item" href="{% url 'add_lesson' profession.pk %}?type=video">
+                        <i class="bi bi-play-circle me-2 text-primary"></i>Video darslik
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{% url 'add_lesson' profession.pk %}?type=homework">
+                        <i class="bi bi-file-earmark-text me-2 text-warning"></i>Uyga vazifa
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{% url 'add_lesson' profession.pk %}?type=test">
+                        <i class="bi bi-question-circle me-2 text-success"></i>Test
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {% if lessons %}
+            <div class="table-responsive">
+                <table class="table" style="color: var(--text-color);">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nomi</th>
+                            <th>Turi</th>
+                            <th>Yaratilgan</th>
+                            <th>Amallar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lesson in lessons %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                {% if lesson.lesson_type == 'video' %}
+                                    <i class="bi bi-play-circle text-primary me-2"></i>
+                                {% elif lesson.lesson_type == 'homework' %}
+                                    <i class="bi bi-file-earmark-text text-warning me-2"></i>
+                                {% else %}
+                                    <i class="bi bi-question-circle text-success me-2"></i>
+                                {% endif %}
+                                {{ lesson.title }}
+                            </td>
+                            <td><span class="badge bg-secondary">{{ lesson.get_lesson_type_display }}</span></td>
+                            <td>{{ lesson.created_at|date:"d.m.Y" }}</td>
+                            <td>
+                                {% if lesson.lesson_type == 'test' %}
+                                <a href="{% url 'manage_test_questions' lesson.test.pk %}" class="btn btn-sm btn-outline-success" title="Savollar">
+                                    <i class="bi bi-list-ol"></i>
+                                </a>
+                                {% endif %}
+                                <a href="{% url 'edit_lesson' lesson.pk %}" class="btn btn-sm btn-outline-primary" title="Tahrirlash">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="{% url 'delete_lesson' lesson.pk %}" class="btn btn-sm btn-outline-danger" title="O'chirish">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+                <h4 class="mt-3" style="color: var(--text-color);">Hozircha darslar mavjud emas</h4>
+                <p class="text-muted">Yangi dars qo'shish uchun yuqoridagi "Qo'shish" tugmasini bosing</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

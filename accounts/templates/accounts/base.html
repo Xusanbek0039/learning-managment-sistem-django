@@ -11,8 +11,6 @@
             --primary-blue: #0d6efd;
             --dark-blue: #0a58ca;
             --primary-black: #212529;
-            --dark-bg: #1a1a2e;
-            --dark-card: #16213e;
         }
 
         [data-bs-theme="light"] {
@@ -36,13 +34,7 @@
             transition: all 0.3s ease;
         }
 
-        .auth-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
+        .auth-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
 
         .auth-card {
             background-color: var(--card-bg);
@@ -54,14 +46,9 @@
             border: 1px solid var(--border-color);
         }
 
-        .auth-card h2 {
-            color: var(--primary-blue);
-            font-weight: 700;
-            margin-bottom: 30px;
-            text-align: center;
-        }
+        .auth-card h2 { color: var(--primary-blue); font-weight: 700; margin-bottom: 30px; text-align: center; }
 
-        .form-control {
+        .form-control, .form-select {
             background-color: var(--bg-color);
             border: 2px solid var(--border-color);
             color: var(--text-color);
@@ -70,15 +57,11 @@
             transition: all 0.3s ease;
         }
 
-        .form-control:focus {
+        .form-control:focus, .form-select:focus {
             background-color: var(--bg-color);
             border-color: var(--primary-blue);
             box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
             color: var(--text-color);
-        }
-
-        .form-control::placeholder {
-            color: #6c757d;
         }
 
         .btn-primary {
@@ -116,59 +99,13 @@
             transition: all 0.3s ease;
         }
 
-        .theme-toggle .btn:hover {
-            background-color: var(--primary-blue);
-            color: white;
-            transform: rotate(180deg);
-        }
-
-        .form-label {
-            color: var(--text-color);
-            font-weight: 500;
-            margin-bottom: 8px;
-        }
-
-        .auth-link {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .auth-link a {
-            color: var(--primary-blue);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .auth-link a:hover {
-            text-decoration: underline;
-        }
-
-        .alert {
-            border-radius: 10px;
-            border: none;
-        }
-
-        .logo-section {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .logo-section i {
-            font-size: 3rem;
-            color: var(--primary-blue);
-        }
-
         .navbar {
             background-color: var(--card-bg) !important;
             border-bottom: 1px solid var(--border-color);
             padding: 15px 0;
         }
 
-        .navbar-brand {
-            color: var(--primary-blue) !important;
-            font-weight: 700;
-            font-size: 1.5rem;
-        }
+        .navbar-brand { color: var(--primary-blue) !important; font-weight: 700; font-size: 1.5rem; }
 
         .navbar-nav .nav-link {
             color: var(--text-color) !important;
@@ -178,12 +115,7 @@
             transition: all 0.3s ease;
         }
 
-        .navbar-nav .nav-link:hover {
-            background-color: var(--primary-blue);
-            color: white !important;
-        }
-
-        .navbar-nav .nav-link.active {
+        .navbar-nav .nav-link:hover, .navbar-nav .nav-link.active {
             background-color: var(--primary-blue);
             color: white !important;
         }
@@ -200,37 +132,26 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
-        .card-img-top {
-            border-radius: 15px 15px 0 0;
-            height: 200px;
-            object-fit: cover;
-        }
+        .card-img-top { border-radius: 15px 15px 0 0; height: 200px; object-fit: cover; }
 
-        .role-badge {
-            padding: 5px 15px;
+        .role-badge { padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+        .role-admin { background-color: #dc3545; color: white; }
+        .role-teacher { background-color: #198754; color: white; }
+        .role-student { background-color: #0d6efd; color: white; }
+
+        .coin-badge {
+            background: linear-gradient(135deg, #ffc107, #ff9800);
+            color: #000;
+            padding: 5px 12px;
             border-radius: 20px;
-            font-size: 0.85rem;
             font-weight: 600;
         }
 
-        .role-admin {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .role-teacher {
-            background-color: #198754;
-            color: white;
-        }
-
-        .role-student {
-            background-color: #0d6efd;
-            color: white;
-        }
+        .alert { border-radius: 10px; border: none; }
     </style>
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Theme Toggle Button -->
     <div class="theme-toggle">
         <button class="btn" id="themeToggle" title="Rejimni o'zgartirish">
             <i class="bi bi-moon-fill" id="themeIcon"></i>
@@ -254,8 +175,13 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'professions' %}active{% endif %}" href="{% url 'professions' %}">
+                        <a class="nav-link {% if 'profession' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'professions' %}">
                             <i class="bi bi-briefcase me-1"></i>Kasblar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'leaderboard' %}active{% endif %}" href="{% url 'leaderboard' %}">
+                            <i class="bi bi-trophy me-1"></i>Reyting
                         </a>
                     </li>
                     <li class="nav-item">
@@ -263,20 +189,27 @@
                             <i class="bi bi-person me-1"></i>Profil
                         </a>
                     </li>
+                    {% if user.is_teacher or user.is_admin %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'homework_submissions' %}active{% endif %}" href="{% url 'homework_submissions' %}">
+                            <i class="bi bi-file-earmark-check me-1"></i>Vazifalar
+                        </a>
+                    </li>
+                    {% endif %}
                     {% if user.is_admin %}
                     <li class="nav-item">
                         <a class="nav-link {% if 'dashboard' in request.path %}active{% endif %}" href="{% url 'admin_dashboard' %}">
-                            <i class="bi bi-speedometer2 me-1"></i>Admin Panel
+                            <i class="bi bi-speedometer2 me-1"></i>Admin
                         </a>
                     </li>
                     {% endif %}
                 </ul>
                 <div class="d-flex align-items-center">
+                    <span class="coin-badge me-3">
+                        <i class="bi bi-coin me-1"></i>{{ user.coins }}
+                    </span>
                     <span class="role-badge role-{{ user.role }} me-3">
                         {% if user.role == 'admin' %}Admin{% elif user.role == 'teacher' %}O'qituvchi{% else %}O'quvchi{% endif %}
-                    </span>
-                    <span class="me-3" style="color: var(--text-color);">
-                        <i class="bi bi-person-circle me-1"></i>{{ user.first_name }}
                     </span>
                     <a href="{% url 'logout' %}" class="btn btn-outline-primary btn-sm">
                         <i class="bi bi-box-arrow-right"></i>
@@ -302,21 +235,16 @@
         themeToggle.addEventListener('click', () => {
             const currentTheme = html.getAttribute('data-bs-theme');
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            
             html.setAttribute('data-bs-theme', newTheme);
             localStorage.setItem('theme', newTheme);
             updateIcon(newTheme);
         });
 
         function updateIcon(theme) {
-            if (theme === 'dark') {
-                themeIcon.classList.remove('bi-moon-fill');
-                themeIcon.classList.add('bi-sun-fill');
-            } else {
-                themeIcon.classList.remove('bi-sun-fill');
-                themeIcon.classList.add('bi-moon-fill');
-            }
+            themeIcon.classList.toggle('bi-moon-fill', theme === 'light');
+            themeIcon.classList.toggle('bi-sun-fill', theme === 'dark');
         }
     </script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

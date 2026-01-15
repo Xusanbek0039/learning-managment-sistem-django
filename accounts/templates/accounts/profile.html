@@ -6,7 +6,7 @@
 <div class="container mt-5">
     {% if messages %}
         {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
                 {{ message }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
@@ -18,107 +18,124 @@
             <div class="card text-center p-4">
                 <div class="mb-3">
                     {% if user.photo %}
-                        <img src="{{ user.photo.url }}" alt="{{ user.full_name }}" 
-                             style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-blue);">
+                    <img src="{{ user.photo.url }}" alt="{{ user.full_name }}" 
+                         style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-blue);">
                     {% else %}
-                        <div style="width: 150px; height: 150px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue)); display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 3rem; color: white; font-weight: 700;">
-                            {{ user.get_initials }}
-                        </div>
+                    <div style="width: 150px; height: 150px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue)); display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 3rem; color: white; font-weight: 700;">
+                        {{ user.get_initials }}
+                    </div>
                     {% endif %}
                 </div>
                 <h4 style="color: var(--text-color);">{{ user.full_name }}</h4>
-                <p style="color: #6c757d;">@{{ user.username }}</p>
-                <span class="role-badge role-{{ user.role }} mb-3">
-                    {% if user.role == 'admin' %}Admin{% elif user.role == 'teacher' %}O'qituvchi{% else %}O'quvchi{% endif %}
-                </span>
+                <p class="text-muted">@{{ user.username }}</p>
                 
-                <div class="d-grid gap-2 mt-3">
+                <div class="mb-3">
+                    <span class="role-badge role-{{ user.role }}">
+                        {% if user.role == 'admin' %}Admin{% elif user.role == 'teacher' %}O'qituvchi{% else %}O'quvchi{% endif %}
+                    </span>
+                </div>
+                
+                <div class="coin-badge mb-3">
+                    <i class="bi bi-coin me-1"></i>{{ user.coins }} coin
+                </div>
+                
+                <div class="d-grid gap-2">
                     <a href="{% url 'profile_edit' %}" class="btn btn-primary">
                         <i class="bi bi-pencil me-2"></i>Tahrirlash
                     </a>
                     <a href="{% url 'change_password' %}" class="btn btn-outline-primary">
                         <i class="bi bi-key me-2"></i>Parolni o'zgartirish
                     </a>
+                    <a href="{% url 'my_statistics' %}" class="btn btn-outline-success">
+                        <i class="bi bi-graph-up me-2"></i>Statistika
+                    </a>
                 </div>
             </div>
         </div>
         
         <div class="col-md-8">
-            <div class="card p-4">
-                <h5 style="color: var(--primary-blue); margin-bottom: 20px;">
-                    <i class="bi bi-person-lines-fill me-2"></i>Profil ma'lumotlari
-                </h5>
-                
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label style="color: #6c757d; font-size: 0.85rem;">Ism</label>
-                        <p style="color: var(--text-color); font-weight: 500;">{{ user.first_name }}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <label style="color: #6c757d; font-size: 0.85rem;">Familiya</label>
-                        <p style="color: var(--text-color); font-weight: 500;">{{ user.last_name }}</p>
-                    </div>
+            <!-- Ma'lumotlar -->
+            <div class="card mb-4">
+                <div class="card-header" style="background: transparent;">
+                    <h5 style="color: var(--text-color); margin: 0;">
+                        <i class="bi bi-person-lines-fill me-2"></i>Ma'lumotlar
+                    </h5>
                 </div>
-                
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label style="color: #6c757d; font-size: 0.85rem;">Username</label>
-                        <p style="color: var(--text-color); font-weight: 500;">{{ user.username }}</p>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="text-muted">Telefon</label>
+                            <p style="color: var(--text-color);">{{ user.phone }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted">Ro'yxatdan o'tgan</label>
+                            <p style="color: var(--text-color);">{{ user.date_joined|date:"d.m.Y" }}</p>
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <label style="color: #6c757d; font-size: 0.85rem;">Telefon</label>
-                        <p style="color: var(--text-color); font-weight: 500;">{{ user.phone }}</p>
+                    {% if user.bio %}
+                    <div>
+                        <label class="text-muted">O'zi haqida</label>
+                        <p style="color: var(--text-color);">{{ user.bio }}</p>
                     </div>
+                    {% endif %}
                 </div>
-                
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label style="color: #6c757d; font-size: 0.85rem;">Yo'nalish</label>
-                        <p style="color: var(--text-color); font-weight: 500;">
-                            {% if user.profession %}{{ user.profession.name }}{% else %}<span class="text-muted">Tanlanmagan</span>{% endif %}
-                        </p>
-                    </div>
-                    <div class="col-md-6">
-                        <label style="color: #6c757d; font-size: 0.85rem;">Ro'yxatdan o'tgan</label>
-                        <p style="color: var(--text-color); font-weight: 500;">{{ user.date_joined|date:"d.m.Y" }}</p>
-                    </div>
+            </div>
+            
+            <!-- Kurslarim -->
+            {% if enrollments %}
+            <div class="card mb-4">
+                <div class="card-header" style="background: transparent;">
+                    <h5 style="color: var(--text-color); margin: 0;">
+                        <i class="bi bi-book me-2"></i>Mening kurslarim
+                    </h5>
                 </div>
-                
-                {% if user.bio %}
-                <div class="mb-3">
-                    <label style="color: #6c757d; font-size: 0.85rem;">O'zi haqida</label>
-                    <p style="color: var(--text-color);">{{ user.bio }}</p>
-                </div>
-                {% endif %}
-                
-                <hr>
-                
-                <div class="row">
-                    <div class="col-md-6">
-                        <label style="color: #6c757d; font-size: 0.85rem;">Oxirgi faollik</label>
-                        <p style="color: var(--text-color); font-weight: 500;">
-                            {% if user.last_activity %}
-                                {{ user.last_activity|date:"d.m.Y H:i" }}
-                                {% if user.is_online %}
-                                    <span class="badge bg-success ms-2">Online</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="text-muted">Ma'lumot yo'q</span>
-                            {% endif %}
-                        </p>
-                    </div>
-                    <div class="col-md-6">
-                        <label style="color: #6c757d; font-size: 0.85rem;">Status</label>
-                        <p>
-                            {% if user.is_blocked %}
-                                <span class="badge bg-danger">Bloklangan</span>
-                            {% else %}
-                                <span class="badge bg-success">Faol</span>
-                            {% endif %}
-                        </p>
+                <div class="card-body">
+                    <div class="row">
+                        {% for enrollment in enrollments %}
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'profession_detail' enrollment.profession.pk %}" class="text-decoration-none">
+                                <div class="d-flex align-items-center p-3" style="background: var(--bg-color); border-radius: 10px;">
+                                    <img src="{{ enrollment.profession.photo.url }}" style="width: 50px; height: 50px; border-radius: 10px; object-fit: cover; margin-right: 15px;">
+                                    <div>
+                                        <strong style="color: var(--text-color);">{{ enrollment.profession.name }}</strong>
+                                        <br><small class="text-muted">{{ enrollment.enrolled_at|date:"d.m.Y" }}</small>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
+            {% endif %}
+            
+            <!-- Sertifikatlar -->
+            {% if certificates %}
+            <div class="card">
+                <div class="card-header" style="background: transparent;">
+                    <h5 style="color: var(--text-color); margin: 0;">
+                        <i class="bi bi-award me-2"></i>Sertifikatlar
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for cert in certificates %}
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-center justify-content-between p-3" style="background: var(--bg-color); border-radius: 10px;">
+                                <div>
+                                    <strong style="color: var(--text-color);">{{ cert.profession.name }}</strong>
+                                    <br><small class="text-muted">{{ cert.issued_at|date:"d.m.Y" }}</small>
+                                </div>
+                                <a href="{{ cert.file.url }}" class="btn btn-sm btn-success" target="_blank">
+                                    <i class="bi bi-download"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>

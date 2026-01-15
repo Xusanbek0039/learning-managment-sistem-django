@@ -1,0 +1,87 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Savol qo'shish - LMS{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <a href="{% url 'manage_test_questions' test.pk %}" class="btn btn-outline-secondary mb-4">
+        <i class="bi bi-arrow-left me-2"></i>Orqaga
+    </a>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header" style="background: transparent; border-bottom: 1px solid var(--border-color);">
+                    <h4 style="color: var(--primary-blue); margin: 0;">
+                        <i class="bi bi-plus-circle me-2"></i>Savol qo'shish
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label" style="color: var(--text-color);">Savol matni</label>
+                            {{ form.question_text }}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label" style="color: var(--text-color);">Savol rasmi (ixtiyoriy)</label>
+                            {{ form.question_image }}
+                            <small class="text-muted">Agar savolda rasm kerak bo'lsa yuklang</small>
+                        </div>
+                        
+                        <hr>
+                        <h5 style="color: var(--text-color);" class="mb-3">Javob variantlari</h5>
+                        
+                        <div class="mb-3">
+                            <label class="form-label" style="color: var(--text-color);">1-javob</label>
+                            {{ form.answer1 }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label" style="color: var(--text-color);">2-javob</label>
+                            {{ form.answer2 }}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label" style="color: var(--text-color);">3-javob</label>
+                            {{ form.answer3 }}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label" style="color: var(--text-color);">To'g'ri javobni tanlang:</label>
+                            <div class="d-flex gap-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="correct_answer" value="1" id="correct1" required>
+                                    <label class="form-check-label" for="correct1" style="color: var(--text-color);">1-javob</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="correct_answer" value="2" id="correct2">
+                                    <label class="form-check-label" for="correct2" style="color: var(--text-color);">2-javob</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="correct_answer" value="3" id="correct3">
+                                    <label class="form-check-label" for="correct3" style="color: var(--text-color);">3-javob</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-2"></i>Saqlash
+                            </button>
+                            <button type="submit" name="add_another" class="btn btn-outline-primary">
+                                <i class="bi bi-plus-lg me-2"></i>Saqlash va yana qo'shish
+                            </button>
+                            <a href="{% url 'manage_test_questions' test.pk %}" class="btn btn-outline-secondary">
+                                Bekor qilish
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

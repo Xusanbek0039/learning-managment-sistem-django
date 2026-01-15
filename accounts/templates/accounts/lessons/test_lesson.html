@@ -1,0 +1,70 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}{{ lesson.title }} - LMS{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <a href="{% url 'profession_detail' profession.pk %}" class="btn btn-outline-secondary mb-4">
+        <i class="bi bi-arrow-left me-2"></i>Orqaga
+    </a>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card text-center p-5">
+                <div class="mb-4">
+                    <i class="bi bi-question-circle text-primary" style="font-size: 5rem;"></i>
+                </div>
+                <h3 style="color: var(--primary-blue);">{{ lesson.title }}</h3>
+                
+                <div class="row justify-content-center my-4">
+                    <div class="col-md-4">
+                        <div class="card" style="background: var(--bg-color);">
+                            <div class="card-body">
+                                <i class="bi bi-clock text-primary" style="font-size: 2rem;"></i>
+                                <h5 class="mt-2" style="color: var(--text-color);">{{ test.time_limit }} daqiqa</h5>
+                                <small class="text-muted">Vaqt chegarasi</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card" style="background: var(--bg-color);">
+                            <div class="card-body">
+                                <i class="bi bi-percent text-success" style="font-size: 2rem;"></i>
+                                <h5 class="mt-2" style="color: var(--text-color);">{{ test.passing_score }}%</h5>
+                                <small class="text-muted">O'tish bali</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card" style="background: var(--bg-color);">
+                            <div class="card-body">
+                                <i class="bi bi-list-ol text-warning" style="font-size: 2rem;"></i>
+                                <h5 class="mt-2" style="color: var(--text-color);">{{ test.questions.count }}</h5>
+                                <small class="text-muted">Savollar</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if result %}
+                <div class="alert {% if result.passed %}alert-success{% else %}alert-danger{% endif %} mb-4">
+                    <h5>Oxirgi natija: {{ result.score }}%</h5>
+                    <p>{{ result.correct_answers }}/{{ result.total_questions }} to'g'ri javob</p>
+                    <a href="{% url 'test_result' result.pk %}" class="btn btn-outline-{% if result.passed %}success{% else %}danger{% endif %}">
+                        <i class="bi bi-eye me-2"></i>Natijani ko'rish
+                    </a>
+                </div>
+                {% endif %}
+                
+                <a href="{% url 'start_test' test.pk %}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-play-fill me-2"></i>{% if result %}Qayta topshirish{% else %}Testni boshlash{% endif %}
+                </a>
+                
+                <p class="text-muted mt-3">
+                    <i class="bi bi-info-circle me-1"></i>Testni muvaffaqiyatli topshirsangiz 1 coin olasiz!
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

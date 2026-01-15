@@ -1,0 +1,62 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Vazifani baholash - LMS{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <a href="{% url 'homework_submissions' %}" class="btn btn-outline-secondary mb-4">
+        <i class="bi bi-arrow-left me-2"></i>Orqaga
+    </a>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header" style="background: transparent;">
+                    <h5 style="color: var(--text-color); margin: 0;">
+                        <i class="bi bi-person me-2"></i>O'quvchi ma'lumotlari
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Ism:</strong> {{ submission.student.full_name }}</p>
+                    <p><strong>Username:</strong> @{{ submission.student.username }}</p>
+                    <p><strong>Yo'nalish:</strong> {{ submission.homework.lesson.profession.name }}</p>
+                    <p><strong>Vazifa:</strong> {{ submission.homework.lesson.title }}</p>
+                    <p><strong>Yuborilgan:</strong> {{ submission.submitted_at|date:"d.m.Y H:i" }}</p>
+                    <a href="{{ submission.file.url }}" class="btn btn-primary w-100" target="_blank">
+                        <i class="bi bi-download me-2"></i>Faylni yuklab olish
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header" style="background: transparent;">
+                    <h5 style="color: var(--text-color); margin: 0;">
+                        <i class="bi bi-check-circle me-2"></i>Baholash
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label" style="color: var(--text-color);">Baho (1-100)</label>
+                            {{ form.grade }}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label" style="color: var(--text-color);">Izoh (ixtiyoriy)</label>
+                            {{ form.feedback }}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="bi bi-check-lg me-2"></i>Baholash
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

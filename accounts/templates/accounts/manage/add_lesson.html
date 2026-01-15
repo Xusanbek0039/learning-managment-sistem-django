@@ -1,0 +1,78 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Dars qo'shish - LMS{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <a href="{% url 'manage_lessons' profession.pk %}" class="btn btn-outline-secondary mb-4">
+        <i class="bi bi-arrow-left me-2"></i>Orqaga
+    </a>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header" style="background: transparent; border-bottom: 1px solid var(--border-color);">
+                    <h4 style="color: var(--primary-blue); margin: 0;">
+                        {% if lesson_type == 'video' %}
+                        <i class="bi bi-play-circle me-2"></i>Video darslik qo'shish
+                        {% elif lesson_type == 'homework' %}
+                        <i class="bi bi-file-earmark-text me-2"></i>Uyga vazifa qo'shish
+                        {% else %}
+                        <i class="bi bi-question-circle me-2"></i>Test qo'shish
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label" style="color: var(--text-color);">
+                                {% if lesson_type == 'video' %}Dars nomi{% elif lesson_type == 'homework' %}Vazifa nomi{% else %}Test nomi{% endif %}
+                            </label>
+                            {{ form.title }}
+                        </div>
+                        
+                        {% if lesson_type == 'video' %}
+                        <div class="mb-3">
+                            <label class="form-label" style="color: var(--text-color);">YouTube havolasi</label>
+                            {{ form.youtube_url }}
+                            <small class="text-muted">Misol: https://www.youtube.com/watch?v=abc123</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" style="color: var(--text-color);">Davomiyligi (daqiqa)</label>
+                            {{ form.duration }}
+                        </div>
+                        {% elif lesson_type == 'homework' %}
+                        <div class="mb-3">
+                            <label class="form-label" style="color: var(--text-color);">Vazifa tavsifi</label>
+                            {{ form.description }}
+                        </div>
+                        {% else %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" style="color: var(--text-color);">Vaqt chegarasi (daqiqa)</label>
+                                {{ form.time_limit }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" style="color: var(--text-color);">O'tish bali (%)</label>
+                                {{ form.passing_score }}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-2"></i>Saqlash
+                            </button>
+                            <a href="{% url 'manage_lessons' profession.pk %}" class="btn btn-outline-secondary">
+                                Bekor qilish
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
