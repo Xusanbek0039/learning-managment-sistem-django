@@ -1,0 +1,143 @@
+{% extends 'accounts/admin/base_admin.html' %}
+
+{% block title %}{{ user_obj.full_name }} - Admin Panel{% endblock %}
+
+{% block admin_content %}
+<a href="{% url 'admin_users' %}" class="back-link">
+    <i class="bi bi-arrow-left me-2"></i>Orqaga qaytish
+</a>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card text-center p-4">
+            <div class="mb-3">
+                {% if user_obj.photo %}
+                    <img src="{{ user_obj.photo.url }}" alt="{{ user_obj.full_name }}" 
+                         style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-blue);">
+                {% else %}
+                    <div style="width: 150px; height: 150px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue)); display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 3rem; color: white; font-weight: 700;">
+                        {{ user_obj.get_initials }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <h4 style="color: var(--text-color);">{{ user_obj.full_name }}</h4>
+            <p class="text-muted">@{{ user_obj.username }}</p>
+            
+            <div class="mb-3">
+                <span class="badge 
+                    {% if user_obj.role == 'admin' %}bg-danger
+                    {% elif user_obj.role == 'teacher' %}bg-success
+                    {% else %}bg-primary{% endif %}" style="font-size: 1rem; padding: 8px 20px;">
+                    {% if user_obj.role == 'admin' %}Admin{% elif user_obj.role == 'teacher' %}O'qituvchi{% else %}O'quvchi{% endif %}
+                </span>
+            </div>
+            
+            <div class="mb-3">
+                {% if user_obj.is_blocked %}
+                    <span class="badge bg-danger">Bloklangan</span>
+                {% else %}
+                    {% if user_obj.is_online %}
+                        <span class="badge bg-success"><i class="bi bi-circle-fill me-1"></i>Online</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Offline</span>
+                    {% endif %}
+                {% endif %}
+            </div>
+            
+            <hr>
+            
+            <div class="d-grid gap-2">
+                <a href="{% url 'admin_user_edit' user_obj.pk %}" class="btn btn-primary">
+                    <i class="bi bi-pencil me-2"></i>Tahrirlash
+                </a>
+                {% if not user_obj.is_admin %}
+                <a href="{% url 'admin_user_block' user_obj.pk %}" class="btn btn-{% if user_obj.is_blocked %}success{% else %}warning{% endif %}">
+                    <i class="bi bi-{% if user_obj.is_blocked %}unlock{% else %}lock{% endif %} me-2"></i>
+                    {% if user_obj.is_blocked %}Blokdan chiqarish{% else %}Bloklash{% endif %}
+                </a>
+                <a href="{% url 'admin_user_delete' user_obj.pk %}" class="btn btn-outline-danger">
+                    <i class="bi bi-trash me-2"></i>O'chirish
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card p-4">
+            <h5 style="color: var(--primary-blue); margin-bottom: 25px;">
+                <i class="bi bi-person-lines-fill me-2"></i>To'liq ma'lumotlar
+            </h5>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="text-muted" style="font-size: 0.85rem;">Ism</label>
+                    <p style="color: var(--text-color); font-weight: 500;">{{ user_obj.first_name }}</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="text-muted" style="font-size: 0.85rem;">Familiya</label>
+                    <p style="color: var(--text-color); font-weight: 500;">{{ user_obj.last_name }}</p>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="text-muted" style="font-size: 0.85rem;">Username</label>
+                    <p style="color: var(--text-color); font-weight: 500;">{{ user_obj.username }}</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="text-muted" style="font-size: 0.85rem;">Telefon</label>
+                    <p style="color: var(--text-color); font-weight: 500;">{{ user_obj.phone }}</p>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="text-muted" style="font-size: 0.85rem;">Yo'nalish</label>
+                    <p style="color: var(--text-color); font-weight: 500;">
+                        {% if user_obj.profession %}{{ user_obj.profession.name }}{% else %}<span class="text-muted">Tanlanmagan</span>{% endif %}
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <label class="text-muted" style="font-size: 0.85rem;">Rol</label>
+                    <p style="color: var(--text-color); font-weight: 500;">
+                        {% if user_obj.role == 'admin' %}Admin{% elif user_obj.role == 'teacher' %}O'qituvchi{% else %}O'quvchi{% endif %}
+                    </p>
+                </div>
+            </div>
+            
+            {% if user_obj.bio %}
+            <div class="mb-3">
+                <label class="text-muted" style="font-size: 0.85rem;">O'zi haqida</label>
+                <p style="color: var(--text-color);">{{ user_obj.bio }}</p>
+            </div>
+            {% endif %}
+            
+            <hr>
+            
+            <h6 style="color: var(--text-color); margin-bottom: 15px;">
+                <i class="bi bi-clock-history me-2"></i>Faollik
+            </h6>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="text-muted" style="font-size: 0.85rem;">Ro'yxatdan o'tgan</label>
+                    <p style="color: var(--text-color); font-weight: 500;">{{ user_obj.date_joined|date:"d.m.Y H:i" }}</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="text-muted" style="font-size: 0.85rem;">Oxirgi faollik</label>
+                    <p style="color: var(--text-color); font-weight: 500;">
+                        {% if user_obj.last_activity %}
+                            {{ user_obj.last_activity|date:"d.m.Y H:i" }}
+                            <br><small class="text-muted">({{ user_obj.last_activity|timesince }} oldin)</small>
+                        {% else %}
+                            <span class="text-muted">Ma'lumot yo'q</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
