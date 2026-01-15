@@ -136,25 +136,12 @@
             font-size: 1.5rem;
         }
 
-        .stat-icon.blue {
-            background: linear-gradient(135deg, #0d6efd, #0a58ca);
-            color: white;
-        }
-
-        .stat-icon.green {
-            background: linear-gradient(135deg, #198754, #157347);
-            color: white;
-        }
-
-        .stat-icon.orange {
-            background: linear-gradient(135deg, #fd7e14, #e85d04);
-            color: white;
-        }
-
-        .stat-icon.purple {
-            background: linear-gradient(135deg, #6f42c1, #5a32a3);
-            color: white;
-        }
+        .stat-icon.blue { background: linear-gradient(135deg, #0d6efd, #0a58ca); color: white; }
+        .stat-icon.green { background: linear-gradient(135deg, #198754, #157347); color: white; }
+        .stat-icon.orange { background: linear-gradient(135deg, #fd7e14, #e85d04); color: white; }
+        .stat-icon.purple { background: linear-gradient(135deg, #6f42c1, #5a32a3); color: white; }
+        .stat-icon.red { background: linear-gradient(135deg, #dc3545, #b02a37); color: white; }
+        .stat-icon.cyan { background: linear-gradient(135deg, #0dcaf0, #0aa2c0); color: white; }
 
         .stat-number {
             font-size: 2rem;
@@ -210,7 +197,7 @@
             box-shadow: 0 5px 20px rgba(13, 110, 253, 0.4);
         }
 
-        .form-control {
+        .form-control, .form-select {
             background-color: var(--bg-color);
             border: 2px solid var(--border-color);
             color: var(--text-color);
@@ -218,7 +205,7 @@
             border-radius: 10px;
         }
 
-        .form-control:focus {
+        .form-control:focus, .form-select:focus {
             background-color: var(--bg-color);
             border-color: var(--primary-blue);
             box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
@@ -312,6 +299,44 @@
             color: var(--primary-blue);
         }
 
+        .online-badge {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #198754;
+            display: inline-block;
+            margin-left: 5px;
+        }
+
+        .offline-badge {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #6c757d;
+            display: inline-block;
+            margin-left: 5px;
+        }
+
+        .user-avatar-sm {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .user-avatar-placeholder {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
         @media (max-width: 992px) {
             .sidebar {
                 width: 80px;
@@ -319,7 +344,7 @@
             }
             .sidebar-brand span,
             .sidebar-nav .nav-link span,
-            .sidebar-footer {
+            .sidebar-footer .user-info > div:last-child {
                 display: none;
             }
             .sidebar-nav .nav-link {
@@ -352,9 +377,13 @@
                 <i class="bi bi-briefcase"></i>
                 <span>Kasblar</span>
             </a>
-            <a href="{% url 'admin_users' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}">
+            <a href="{% url 'admin_users' %}" class="nav-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="bi bi-people"></i>
                 <span>Foydalanuvchilar</span>
+            </a>
+            <a href="{% url 'admin_statistics' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_statistics' %}active{% endif %}">
+                <i class="bi bi-graph-up"></i>
+                <span>Statistika</span>
             </a>
             <a href="{% url 'home' %}" class="nav-link">
                 <i class="bi bi-house"></i>

@@ -6,12 +6,14 @@
 <div class="top-bar">
     <h1 class="page-title"><i class="bi bi-speedometer2 me-2"></i>Dashboard</h1>
     <div>
-        <span style="color: #6c757d;">Bugun: {{ "now"|date:"d.m.Y" }}</span>
+        <a href="{% url 'admin_export_pdf' %}" class="btn btn-primary">
+            <i class="bi bi-file-pdf me-2"></i>PDF yuklab olish
+        </a>
     </div>
 </div>
 
 <div class="row mb-4">
-    <div class="col-md-3 mb-4">
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
         <div class="stat-card">
             <div class="d-flex align-items-center">
                 <div class="stat-icon blue me-3">
@@ -19,12 +21,12 @@
                 </div>
                 <div>
                     <div class="stat-number">{{ total_users }}</div>
-                    <div class="stat-label">Jami foydalanuvchilar</div>
+                    <div class="stat-label">Jami</div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3 mb-4">
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
         <div class="stat-card">
             <div class="d-flex align-items-center">
                 <div class="stat-icon green me-3">
@@ -32,12 +34,12 @@
                 </div>
                 <div>
                     <div class="stat-number">{{ total_teachers }}</div>
-                    <div class="stat-label">O'qituvchilar</div>
+                    <div class="stat-label">O'qituvchi</div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3 mb-4">
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
         <div class="stat-card">
             <div class="d-flex align-items-center">
                 <div class="stat-icon orange me-3">
@@ -45,12 +47,12 @@
                 </div>
                 <div>
                     <div class="stat-number">{{ total_students }}</div>
-                    <div class="stat-label">O'quvchilar</div>
+                    <div class="stat-label">O'quvchi</div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3 mb-4">
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
         <div class="stat-card">
             <div class="d-flex align-items-center">
                 <div class="stat-icon purple me-3">
@@ -63,32 +65,119 @@
             </div>
         </div>
     </div>
-</div>
-
-<div class="row">
-    <div class="col-md-6 mb-4">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-briefcase me-2"></i>Kasblar</span>
-                <a href="{% url 'admin_professions' %}" class="btn btn-primary btn-sm">
-                    Barchasini ko'rish
-                </a>
-            </div>
-            <div class="card-body">
-                <p style="color: #6c757d;">Kasblarni boshqarish uchun "Kasblar" bo'limiga o'ting.</p>
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon cyan me-3">
+                    <i class="bi bi-circle-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ online_users }}</div>
+                    <div class="stat-label">Online</div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-6 mb-4">
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon red me-3">
+                    <i class="bi bi-slash-circle"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ blocked_users }}</div>
+                    <div class="stat-label">Bloklangan</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-people me-2"></i>Foydalanuvchilar</span>
-                <a href="{% url 'admin_users' %}" class="btn btn-primary btn-sm">
-                    Barchasini ko'rish
-                </a>
+                <span><i class="bi bi-briefcase me-2"></i>Yo'nalishlar bo'yicha</span>
+                <a href="{% url 'admin_statistics' %}" class="btn btn-sm btn-outline-primary">Batafsil</a>
             </div>
             <div class="card-body">
-                <p style="color: #6c757d;">Foydalanuvchilarni boshqarish uchun "Foydalanuvchilar" bo'limiga o'ting.</p>
+                {% if profession_stats %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Yo'nalish</th>
+                                <th class="text-center">O'quvchi</th>
+                                <th class="text-center">O'qituvchi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in profession_stats %}
+                            <tr>
+                                <td>{{ p.name }}</td>
+                                <td class="text-center"><span class="badge bg-primary">{{ p.student_count }}</span></td>
+                                <td class="text-center"><span class="badge bg-success">{{ p.teacher_count }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-3">Yo'nalishlar mavjud emas</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-clock-history me-2"></i>Oxirgi faol foydalanuvchilar</span>
+                <a href="{% url 'admin_users' %}" class="btn btn-sm btn-outline-primary">Barchasi</a>
+            </div>
+            <div class="card-body">
+                {% if recent_users %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Foydalanuvchi</th>
+                                <th>Oxirgi faollik</th>
+                                <th class="text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in recent_users %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {% if u.photo %}
+                                            <img src="{{ u.photo.url }}" class="user-avatar-sm me-2">
+                                        {% else %}
+                                            <div class="user-avatar-placeholder me-2">{{ u.get_initials }}</div>
+                                        {% endif %}
+                                        <div>
+                                            <strong>{{ u.full_name }}</strong>
+                                            <br><small class="text-muted">@{{ u.username }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ u.last_activity|timesince }} oldin</td>
+                                <td class="text-center">
+                                    {% if u.is_online %}
+                                        <span class="badge bg-success">Online</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Offline</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-3">Ma'lumot yo'q</p>
+                {% endif %}
             </div>
         </div>
     </div>
