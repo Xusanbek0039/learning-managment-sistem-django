@@ -1,7 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import RegisterForm, LoginForm
+from .forms import RegisterForm, LoginForm, ProfessionForm
+from .models import Profession
 
 
 def register_view(request):
@@ -53,5 +55,104 @@ def logout_view(request):
     return redirect('login')
 
 
+@login_required
 def home_view(request):
     return render(request, 'accounts/home.html')
+
+
+@login_required
+def professions_view(request):
+    professions = Profession.objects.all()
+    return render(request, 'accounts/professions.html', {'professions': professions})
+
+
+# Admin Panel Views
+@login_required
+def admin_dashboard(request):
+    if not request.user.is_admin:
+        messages.error(request, "Sizda admin paneliga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    from .models import CustomUser
+    context = {
+        'total_users': CustomUser.objects.count(),
+        'total_teachers': CustomUser.objects.filter(role='teacher').count(),
+        'total_students': CustomUser.objects.filter(role='student').count(),
+        'total_professions': Profession.objects.count(),
+    }
+    return render(request, 'accounts/admin/dashboard.html', context)
+
+
+@login_required
+def admin_professions(request):
+    if not request.user.is_admin:
+        messages.error(request, "Sizda admin paneliga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    professions = Profession.objects.all()
+    return render(request, 'accounts/admin/professions.html', {'professions': professions})
+
+
+@login_required
+def admin_profession_add(request):
+    if not request.user.is_admin:
+        messages.error(request, "Sizda admin paneliga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    if request.method == 'POST':
+        form = ProfessionForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Kasb muvaffaqiyatli qo'shildi!")
+            return redirect('admin_professions')
+    else:
+        form = ProfessionForm()
+    
+    return render(request, 'accounts/admin/profession_form.html', {'form': form, 'title': "Kasb qo'shish"})
+
+
+@login_required
+def admin_profession_edit(request, pk):
+    if not request.user.is_admin:
+        messages.error(request, "Sizda admin paneliga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    profession = get_object_or_404(Profession, pk=pk)
+    
+    if request.method == 'POST':
+        form = ProfessionForm(request.POST, request.FILES, instance=profession)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Kasb muvaffaqiyatli tahrirlandi!")
+            return redirect('admin_professions')
+    else:
+        form = ProfessionForm(instance=profession)
+    
+    return render(request, 'accounts/admin/profession_form.html', {'form': form, 'title': "Kasbni tahrirlash", 'profession': profession})
+
+
+@login_required
+def admin_profession_delete(request, pk):
+    if not request.user.is_admin:
+        messages.error(request, "Sizda admin paneliga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    profession = get_object_or_404(Profession, pk=pk)
+    
+    if request.method == 'POST':
+        profession.delete()
+        messages.success(request, "Kasb muvaffaqiyatli o'chirildi!")
+        return redirect('admin_professions')
+    
+    return render(request, 'accounts/admin/profession_delete.html', {'profession': profession})
+
+
+@login_required
+def admin_users(request):
+    if not request.user.is_admin:
+        messages.error(request, "Sizda admin paneliga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    from .models import CustomUser
+    users = CustomUser.objects.all()
+    return render(request, 'accounts/admin/users.html', {'users': users})
