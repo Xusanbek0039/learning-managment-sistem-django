@@ -1,0 +1,76 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Profilni tahrirlash - LMS{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <a href="{% url 'profile' %}" style="color: var(--text-color); text-decoration: none;" class="mb-3 d-inline-block">
+                <i class="bi bi-arrow-left me-2"></i>Orqaga
+            </a>
+            
+            <div class="card p-4">
+                <h4 style="color: var(--primary-blue); margin-bottom: 30px;">
+                    <i class="bi bi-pencil-square me-2"></i>Profilni tahrirlash
+                </h4>
+                
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="text-center mb-4">
+                        {% if user.photo %}
+                            <img src="{{ user.photo.url }}" alt="{{ user.full_name }}" 
+                                 style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-blue);">
+                        {% else %}
+                            <div style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue)); display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 2.5rem; color: white; font-weight: 700;">
+                                {{ user.get_initials }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label" style="color: var(--text-color);">Profil rasmi</label>
+                        {{ form.photo }}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" style="color: var(--text-color);">Ism</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" style="color: var(--text-color);">Familiya</label>
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label" style="color: var(--text-color);">Telefon</label>
+                        {{ form.phone }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label" style="color: var(--text-color);">Yo'nalish</label>
+                        {{ form.profession }}
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label" style="color: var(--text-color);">O'zingiz haqida</label>
+                        {{ form.bio }}
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-2"></i>Saqlash
+                        </button>
+                        <a href="{% url 'profile' %}" class="btn btn-outline-secondary">
+                            Bekor qilish
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
