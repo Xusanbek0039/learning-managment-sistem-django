@@ -7,9 +7,51 @@
     <h1 class="page-title"><i class="bi bi-people me-2"></i>Foydalanuvchilar</h1>
 </div>
 
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label" style="color: var(--text-color);">Rol</label>
+                <select name="role" class="form-select">
+                    <option value="">Barchasi</option>
+                    <option value="admin" {% if role_filter == 'admin' %}selected{% endif %}>Admin</option>
+                    <option value="teacher" {% if role_filter == 'teacher' %}selected{% endif %}>O'qituvchi</option>
+                    <option value="student" {% if role_filter == 'student' %}selected{% endif %}>O'quvchi</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" style="color: var(--text-color);">Yo'nalish</label>
+                <select name="profession" class="form-select">
+                    <option value="">Barchasi</option>
+                    {% for p in professions %}
+                    <option value="{{ p.id }}" {% if profession_filter == p.id|stringformat:"i" %}selected{% endif %}>{{ p.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" style="color: var(--text-color);">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">Barchasi</option>
+                    <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Faol</option>
+                    <option value="blocked" {% if status_filter == 'blocked' %}selected{% endif %}>Bloklangan</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">
+                    <i class="bi bi-filter me-1"></i>Filtrlash
+                </button>
+                <a href="{% url 'admin_users' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-header">
-        <i class="bi bi-list me-2"></i>Barcha foydalanuvchilar ({{ users.count }})
+        <i class="bi bi-list me-2"></i>Foydalanuvchilar ({{ users.count }})
     </div>
     <div class="card-body">
         {% if users %}
@@ -18,11 +60,13 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Ism Familiya</th>
-                        <th>Username</th>
+                        <th>Foydalanuvchi</th>
                         <th>Telefon</th>
                         <th>Rol</th>
-                        <th>Ro'yxatdan o'tgan</th>
+                        <th>Yo'nalish</th>
+                        <th class="text-center">Status</th>
+                        <th>Oxirgi faollik</th>
+                        <th>Amallar</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -31,13 +75,18 @@
                         <td>{{ forloop.counter }}</td>
                         <td>
                             <div class="d-flex align-items-center">
-                                <div class="user-avatar me-2" style="width: 40px; height: 40px; font-size: 0.9rem;">
-                                    {{ u.first_name.0 }}{{ u.last_name.0 }}
+                                {% if u.photo %}
+                                    <img src="{{ u.photo.url }}" class="user-avatar-sm me-2">
+                                {% else %}
+                                    <div class="user-avatar-placeholder me-2">{{ u.get_initials }}</div>
+                                {% endif %}
+                                <div>
+                                    <strong>{{ u.full_name }}</strong>
+                                    {% if u.is_online %}<span class="online-badge"></span>{% endif %}
+                                    <br><small class="text-muted">@{{ u.username }}</small>
                                 </div>
-                                <strong>{{ u.first_name }} {{ u.last_name }}</strong>
                             </div>
                         </td>
-                        <td>{{ u.username }}</td>
                         <td>{{ u.phone }}</td>
                         <td>
                             <span class="badge 
@@ -47,7 +96,39 @@
                                 {% if u.role == 'admin' %}Admin{% elif u.role == 'teacher' %}O'qituvchi{% else %}O'quvchi{% endif %}
                             </span>
                         </td>
-                        <td>{{ u.date_joined|date:"d.m.Y H:i" }}</td>
+                        <td>
+                            {% if u.profession %}{{ u.profession.name }}{% else %}<span class="text-muted">-</span>{% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if u.is_blocked %}
+                                <span class="badge bg-danger">Bloklangan</span>
+                            {% else %}
+                                <span class="badge bg-success">Faol</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if u.last_activity %}
+                                {{ u.last_activity|timesince }} oldin
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="action-btns">
+                            <a href="{% url 'admin_user_view' u.pk %}" class="btn btn-sm btn-outline-info" title="Ko'rish">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="{% url 'admin_user_edit' u.pk %}" class="btn btn-sm btn-outline-primary" title="Tahrirlash">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            {% if not u.is_admin %}
+                            <a href="{% url 'admin_user_block' u.pk %}" class="btn btn-sm btn-outline-warning" title="{% if u.is_blocked %}Blokdan chiqarish{% else %}Bloklash{% endif %}">
+                                <i class="bi bi-{% if u.is_blocked %}unlock{% else %}lock{% endif %}"></i>
+                            </a>
+                            <a href="{% url 'admin_user_delete' u.pk %}" class="btn btn-sm btn-outline-danger" title="O'chirish">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                            {% endif %}
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -56,24 +137,9 @@
         {% else %}
         <div class="text-center py-5">
             <i class="bi bi-people text-muted" style="font-size: 4rem;"></i>
-            <h4 class="mt-3">Hozircha foydalanuvchilar mavjud emas</h4>
+            <h4 class="mt-3">Foydalanuvchilar topilmadi</h4>
         </div>
         {% endif %}
     </div>
 </div>
-
-<style>
-    .user-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-        background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: 700;
-        font-size: 0.9rem;
-    }
-</style>
 {% endblock %}
