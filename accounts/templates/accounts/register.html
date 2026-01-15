@@ -1,0 +1,67 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Ro'yxatdan o'tish - LMS{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="logo-section">
+            <i class="bi bi-mortarboard-fill"></i>
+        </div>
+        <h2>Ro'yxatdan o'tish</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" novalidate>
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Ism</label>
+                    {{ form.first_name }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Familiya</label>
+                    {{ form.last_name }}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                {{ form.username }}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Telefon raqam</label>
+                {{ form.phone }}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Parol</label>
+                {{ form.password1 }}
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Parolni tasdiqlang</label>
+                {{ form.password2 }}
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-person-plus me-2"></i>Ro'yxatdan o'tish
+            </button>
+        </form>
+
+        <div class="auth-link">
+            <span>Akkauntingiz bormi? </span>
+            <a href="{% url 'login' %}">Kirish</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
