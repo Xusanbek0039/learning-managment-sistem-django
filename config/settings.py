@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts',
+    'blog',
 ]
 
 # Jazzmin Admin UI Settings
@@ -152,6 +153,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'accounts.middleware.BirthdayCheckMiddleware',
     'accounts.middleware.UpdateLastActivityMiddleware',
     'accounts.middleware.BlockedUserMiddleware',
     'accounts.middleware.PaymentCheckMiddleware',

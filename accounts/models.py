@@ -43,6 +43,12 @@ class CustomUser(AbstractUser):
     coins = models.IntegerField(default=0, verbose_name="Coinlar")
     total_online_time = models.IntegerField(default=0, verbose_name="Jami online vaqt (daqiqa)")
     
+    # New fields
+    address = models.CharField(max_length=300, blank=True, null=True, verbose_name="Yashash manzili")
+    birth_date = models.DateField(null=True, blank=True, verbose_name="Tug'ilgan kuni")
+    id_card = models.FileField(upload_to='documents/id_cards/', blank=True, null=True, verbose_name="ID karta/Pasport")
+    birth_certificate = models.FileField(upload_to='documents/birth_certificates/', blank=True, null=True, verbose_name="Tug'ilganlik haqida guvohnoma")
+    
     def __str__(self):
         return self.username
     

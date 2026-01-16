@@ -18,6 +18,9 @@ from .models import (
     TestUserAnswer, Certificate, CoinTransaction, Message, PaymentStatus
 )
 
+from django.core.management import call_command
+from django.core.cache import cache
+
 
 def register_view(request):
     if request.user.is_authenticated:
@@ -444,6 +447,70 @@ def export_student_pdf(request, pk=None):
     
     response = HttpResponse(buffer, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="student_stats_{student.username}.pdf"'
+    return response
+
+
+@login_required
+def export_system_pdf(request):
+    if not request.user.is_admin:
+        messages.error(request, "Bu sahifaga kirish huquqingiz yo'q!")
+        return redirect('home')
+    
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.styles import getSampleStyleSheet
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+    from io import BytesIO
+    
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4)
+    elements = []
+    styles = getSampleStyleSheet()
+    
+    # Title
+    elements.append(Paragraph("Tizim Statistikasi", styles['Heading1']))
+    elements.append(Paragraph(f"Sana: {timezone.now().strftime('%d.%m.%Y %H:%M')}", styles['Normal']))
+    elements.append(Spacer(1, 20))
+    
+    # Calculate stats
+    total_students = CustomUser.objects.filter(role='student').count()
+    total_teachers = CustomUser.objects.filter(role='teacher').count()
+    total_courses = Profession.objects.count()
+    total_lessons = Lesson.objects.count()
+    total_videos = VideoLesson.objects.count()
+    total_tests = Test.objects.count()
+    total_coins = CustomUser.objects.aggregate(Sum('coins'))['coins__sum'] or 0
+    total_homeworks = HomeworkSubmission.objects.count()
+    
+    # General info table
+    info_data = [
+        ['Ko\'rsatkich', 'Qiymat'],
+        ['Jami o\'quvchilar', str(total_students)],
+        ['Jami o\'qituvchilar', str(total_teachers)],
+        ['Mavjud kurslar', str(total_courses)],
+        ['Jami darslar', str(total_lessons)],
+        ['Videodarslar', str(total_videos)],
+        ['Testlar', str(total_tests)],
+        ['Topshirilgan vazifalar', str(total_homeworks)],
+        ['Foydalanuvchilardagi jami coinlar', str(total_coins)],
+    ]
+    
+    table = Table(info_data, colWidths=[250, 150])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0d6efd')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
+        ('PADDING', (0, 0), (-1, -1), 8),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ]))
+    elements.append(table)
+    
+    doc.build(elements)
+    buffer.seek(0)
+    
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="system_statistics.pdf"'
     return response
 
 

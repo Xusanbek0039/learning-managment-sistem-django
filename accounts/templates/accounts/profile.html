@@ -5,12 +5,12 @@
 {% block content %}
 <div class="container mt-5">
     {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        {% endfor %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
     {% endif %}
 
     <div class="row">
@@ -18,27 +18,29 @@
             <div class="card text-center p-4">
                 <div class="mb-3">
                     {% if user.photo %}
-                    <img src="{{ user.photo.url }}" alt="{{ user.full_name }}" 
-                         style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-blue);">
+                    <img src="{{ user.photo.url }}" alt="{{ user.full_name }}"
+                        style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-blue);">
                     {% else %}
-                    <div style="width: 150px; height: 150px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue)); display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 3rem; color: white; font-weight: 700;">
+                    <div
+                        style="width: 150px; height: 150px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue)); display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 3rem; color: white; font-weight: 700;">
                         {{ user.get_initials }}
                     </div>
                     {% endif %}
                 </div>
                 <h4 style="color: var(--text-color);">{{ user.full_name }}</h4>
                 <p class="text-muted">@{{ user.username }}</p>
-                
+
                 <div class="mb-3">
                     <span class="role-badge role-{{ user.role }}">
-                        {% if user.role == 'admin' %}Admin{% elif user.role == 'teacher' %}O'qituvchi{% else %}O'quvchi{% endif %}
+                        {% if user.role == 'admin' %}Admin{% elif user.role == 'teacher' %}O'qituvchi{% else
+                        %}O'quvchi{% endif %}
                     </span>
                 </div>
-                
+
                 <div class="coin-badge mb-3">
                     <i class="bi bi-coin me-1"></i>{{ user.coins }} coin
                 </div>
-                
+
                 <div class="d-grid gap-2">
                     <a href="{% url 'profile_edit' %}" class="btn btn-primary">
                         <i class="bi bi-pencil me-2"></i>Tahrirlash
@@ -52,7 +54,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-8">
             <!-- Ma'lumotlar -->
             <div class="card mb-4">
@@ -72,6 +74,40 @@
                             <p style="color: var(--text-color);">{{ user.date_joined|date:"d.m.Y" }}</p>
                         </div>
                     </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="text-muted">Yashash manzili</label>
+                            <p style="color: var(--text-color);">
+                                {% if user.address %}{{ user.address }}{% else %}-{% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted">Tug'ilgan sana</label>
+                            <p style="color: var(--text-color);">
+                                {% if user.birth_date %}{{ user.birth_date|date:"d.m.Y" }}{% else %}-{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    {% if user.id_card or user.birth_certificate %}
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="text-muted">Hujjatlar</label>
+                            <div class="d-flex gap-2">
+                                {% if user.id_card %}
+                                <a href="{{ user.id_card.url }}" target="_blank" class="btn btn-sm btn-outline-info">
+                                    <i class="bi bi-person-badge me-1"></i>ID Karta
+                                </a>
+                                {% endif %}
+                                {% if user.birth_certificate %}
+                                <a href="{{ user.birth_certificate.url }}" target="_blank"
+                                    class="btn btn-sm btn-outline-info">
+                                    <i class="bi bi-file-earmark-text me-1"></i>Guvohnoma
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
                     {% if user.bio %}
                     <div>
                         <label class="text-muted">O'zi haqida</label>
@@ -80,7 +116,7 @@
                     {% endif %}
                 </div>
             </div>
-            
+
             <!-- Kurslarim -->
             {% if enrollments %}
             <div class="card mb-4">
@@ -93,11 +129,15 @@
                     <div class="row">
                         {% for enrollment in enrollments %}
                         <div class="col-md-6 mb-3">
-                            <a href="{% url 'profession_detail' enrollment.profession.pk %}" class="text-decoration-none">
-                                <div class="d-flex align-items-center p-3" style="background: var(--bg-color); border-radius: 10px;">
-                                    <img src="{{ enrollment.profession.photo.url }}" style="width: 50px; height: 50px; border-radius: 10px; object-fit: cover; margin-right: 15px;">
+                            <a href="{% url 'profession_detail' enrollment.profession.pk %}"
+                                class="text-decoration-none">
+                                <div class="d-flex align-items-center p-3"
+                                    style="background: var(--bg-color); border-radius: 10px;">
+                                    <img src="{{ enrollment.profession.photo.url }}"
+                                        style="width: 50px; height: 50px; border-radius: 10px; object-fit: cover; margin-right: 15px;">
                                     <div>
-                                        <strong style="color: var(--text-color);">{{ enrollment.profession.name }}</strong>
+                                        <strong style="color: var(--text-color);">{{ enrollment.profession.name
+                                            }}</strong>
                                         <br><small class="text-muted">{{ enrollment.enrolled_at|date:"d.m.Y" }}</small>
                                     </div>
                                 </div>
@@ -108,7 +148,7 @@
                 </div>
             </div>
             {% endif %}
-            
+
             <!-- Sertifikatlarim -->
             <div class="card">
                 <div class="card-header" style="background: transparent;">
@@ -121,21 +161,25 @@
                     <div class="row">
                         {% for cert in certificates %}
                         <div class="col-md-6 mb-3">
-                            <div class="p-3" style="background: var(--bg-color); border-radius: 15px; border: 2px solid var(--border-color);">
+                            <div class="p-3"
+                                style="background: var(--bg-color); border-radius: 15px; border: 2px solid var(--border-color);">
                                 <div class="d-flex align-items-center mb-3">
-                                    <div style="width: 50px; height: 50px; border-radius: 10px; background: linear-gradient(135deg, #198754, #157347); display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                                    <div
+                                        style="width: 50px; height: 50px; border-radius: 10px; background: linear-gradient(135deg, #198754, #157347); display: flex; align-items: center; justify-content: center; margin-right: 15px;">
                                         <i class="bi bi-award text-white" style="font-size: 1.5rem;"></i>
                                     </div>
                                     <div>
                                         <strong style="color: var(--text-color);">{{ cert.profession.name }}</strong>
-                                        <br><small class="text-muted">Berilgan: {{ cert.issued_at|date:"d.m.Y" }}</small>
+                                        <br><small class="text-muted">Berilgan: {{ cert.issued_at|date:"d.m.Y"
+                                            }}</small>
                                     </div>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <small class="text-muted">
                                         <i class="bi bi-person me-1"></i>{{ cert.issued_by.full_name }}
                                     </small>
-                                    <a href="{{ cert.file.url }}" class="btn btn-success btn-sm" target="_blank" download>
+                                    <a href="{{ cert.file.url }}" class="btn btn-success btn-sm" target="_blank"
+                                        download>
                                         <i class="bi bi-file-pdf me-1"></i>Yuklab olish
                                     </a>
                                 </div>

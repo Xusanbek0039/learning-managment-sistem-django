@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="uz" data-bs-theme="light">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,8 +34,10 @@
             --border: #334155;
         }
 
-        * { font-family: 'Inter', sans-serif; }
-        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
         body {
             background: var(--bg);
             color: var(--text);
@@ -47,7 +50,7 @@
             background: var(--card) !important;
             border-bottom: 1px solid var(--border);
             padding: 0.75rem 0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .navbar-brand {
@@ -65,7 +68,8 @@
             font-size: 0.9rem;
         }
 
-        .nav-link:hover, .nav-link.active {
+        .nav-link:hover,
+        .nav-link.active {
             background: var(--primary);
             color: white !important;
             transform: translateY(-1px);
@@ -81,7 +85,7 @@
 
         .card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
         }
 
         /* Buttons */
@@ -142,12 +146,24 @@
             font-weight: 600;
         }
 
-        .role-admin { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
-        .role-teacher { background: linear-gradient(135deg, #10b981, #059669); color: white; }
-        .role-student { background: linear-gradient(135deg, #0d6efd, #0a58ca); color: white; }
+        .role-admin {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .role-teacher {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .role-student {
+            background: linear-gradient(135deg, #0d6efd, #0a58ca);
+            color: white;
+        }
 
         /* Form Controls */
-        .form-control, .form-select {
+        .form-control,
+        .form-select {
             background: var(--bg);
             border: 2px solid var(--border);
             color: var(--text);
@@ -156,7 +172,8 @@
             transition: all 0.2s;
         }
 
-        .form-control:focus, .form-select:focus {
+        .form-control:focus,
+        .form-select:focus {
             background: var(--bg);
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
@@ -164,7 +181,10 @@
         }
 
         /* Alerts */
-        .alert { border-radius: 12px; border: none; }
+        .alert {
+            border-radius: 12px;
+            border: none;
+        }
 
         /* Theme Toggle */
         .theme-toggle {
@@ -185,7 +205,7 @@
             background: var(--card);
             border: 2px solid var(--border);
             color: var(--text);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .theme-toggle .btn:hover {
@@ -194,23 +214,52 @@
 
         /* Animations */
         @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
         }
 
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes coinBounce {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            25% { transform: translateY(-20px) rotate(-10deg); }
-            50% { transform: translateY(0) rotate(0deg); }
-            75% { transform: translateY(-10px) rotate(10deg); }
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            25% {
+                transform: translateY(-20px) rotate(-10deg);
+            }
+
+            50% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            75% {
+                transform: translateY(-10px) rotate(10deg);
+            }
         }
 
-        .fade-in { animation: fadeInUp 0.5s ease-out; }
+        .fade-in {
+            animation: fadeInUp 0.5s ease-out;
+        }
 
         /* Coin Celebration Modal */
         .coin-celebration {
@@ -219,14 +268,16 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0, 0, 0, 0.8);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 9999;
         }
 
-        .coin-celebration.show { display: flex; }
+        .coin-celebration.show {
+            display: flex;
+        }
 
         .coin-celebration-content {
             text-align: center;
@@ -248,25 +299,42 @@
 
         /* Responsive */
         @media (max-width: 991px) {
-            .navbar-collapse { 
-                background: var(--card); 
-                padding: 1rem; 
+            .navbar-collapse {
+                background: var(--card);
+                padding: 1rem;
                 border-radius: 12px;
                 margin-top: 0.5rem;
                 border: 1px solid var(--border);
             }
-            .nav-link { padding: 0.75rem 1rem !important; }
-            .d-flex.align-items-center { flex-wrap: wrap; gap: 0.5rem; }
+
+            .nav-link {
+                padding: 0.75rem 1rem !important;
+            }
+
+            .d-flex.align-items-center {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
         }
 
         @media (max-width: 576px) {
-            .container { padding: 0 1rem; }
-            .card { border-radius: 12px; }
-            .btn { padding: 0.5rem 1rem; font-size: 0.9rem; }
+            .container {
+                padding: 0 1rem;
+            }
+
+            .card {
+                border-radius: 12px;
+            }
+
+            .btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
         }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
+
 <body>
     <!-- Coin Celebration -->
     <div class="coin-celebration" id="coinCelebration">
@@ -287,75 +355,118 @@
         </button>
     </div>
 
+
+
+
+
+
+    
     {% if user.is_authenticated %}
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
+
             <a class="navbar-brand" href="{% url 'home' %}">
                 <i class="bi bi-mortarboard-fill me-2"></i>LMS
             </a>
-            
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <i class="bi bi-list fs-4" style="color: var(--text);"></i>
             </button>
-            
+
             <div class="collapse navbar-collapse" id="navbarNav">
+
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
                     <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+                            href="{% url 'home' %}">
                             <i class="bi bi-house me-1"></i>Bosh sahifa
                         </a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link {% if 'profession' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'professions' %}">
+                        <a class="nav-link {% if request.resolver_match.url_name and 'profession' in request.resolver_match.url_name %}active{% endif %}"
+                            href="{% url 'professions' %}">
                             <i class="bi bi-book me-1"></i>Kurslar
                         </a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'leaderboard' %}active{% endif %}" href="{% url 'leaderboard' %}">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'leaderboard' %}active{% endif %}"
+                            href="{% url 'leaderboard' %}">
                             <i class="bi bi-trophy me-1"></i>Reyting
                         </a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link {% if 'profile' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'profile' %}">
+                        <a class="nav-link {% if request.resolver_match.url_name and 'profile' in request.resolver_match.url_name %}active{% endif %}"
+                            href="{% url 'profile' %}">
                             <i class="bi bi-person me-1"></i>Profil
                         </a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'messages' %}active{% endif %}" href="{% url 'messages' %}">
+                        <a class="nav-link {% if request.resolver_match.app_names and 'blog' in request.resolver_match.app_names %}active{% endif %}"
+                            href="{% url 'blog:post_list' %}">
+                            <i class="bi bi-newspaper me-1"></i>Postlar
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'messages' %}active{% endif %}"
+                            href="{% url 'messages' %}">
                             <i class="bi bi-envelope me-1"></i>Xabarlar
                         </a>
                     </li>
+
                     {% if user.is_teacher or user.is_admin %}
                     <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'homework_submissions' %}active{% endif %}" href="{% url 'homework_submissions' %}">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'homework_submissions' %}active{% endif %}"
+                            href="{% url 'homework_submissions' %}">
                             <i class="bi bi-file-check me-1"></i>Vazifalar
                         </a>
                     </li>
                     {% endif %}
+
                     {% if user.is_admin %}
                     <li class="nav-item">
-                        <a class="nav-link {% if 'dashboard' in request.path %}active{% endif %}" href="{% url 'admin_dashboard' %}">
+                        <a class="nav-link {% if 'dashboard' in request.path %}active{% endif %}"
+                            href="{% url 'admin_dashboard' %}">
                             <i class="bi bi-speedometer2 me-1"></i>Panel
                         </a>
                     </li>
                     {% endif %}
+
                 </ul>
-                
+
                 <div class="d-flex align-items-center gap-2">
+
                     <span class="coin-badge">
                         <i class="bi bi-coin me-1"></i>{{ user.coins }}
                     </span>
+
                     <span class="role-badge role-{{ user.role }}">
-                        {% if user.role == 'admin' %}Admin{% elif user.role == 'teacher' %}Ustoz{% else %}O'quvchi{% endif %}
+                        {% if user.role == 'admin' %}
+                        Admin
+                        {% elif user.role == 'teacher' %}
+                        Ustoz
+                        {% else %}
+                        O'quvchi
+                        {% endif %}
                     </span>
+
                     <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">
                         <i class="bi bi-box-arrow-right"></i>
                     </a>
+
                 </div>
+
             </div>
         </div>
     </nav>
     {% endif %}
+
 
     <main class="fade-in">
         {% block content %}{% endblock %}
@@ -393,7 +504,7 @@
         function createConfetti() {
             const celebration = document.getElementById('coinCelebration');
             const colors = ['#fbbf24', '#10b981', '#0d6efd', '#ef4444', '#8b5cf6'];
-            
+
             for (let i = 0; i < 50; i++) {
                 const confetti = document.createElement('div');
                 confetti.className = 'confetti';
@@ -402,7 +513,7 @@
                 confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
                 confetti.style.animation = `fall ${2 + Math.random() * 2}s linear forwards`;
                 celebration.appendChild(confetti);
-                
+
                 setTimeout(() => confetti.remove(), 4000);
             }
         }
@@ -418,4 +529,5 @@
     </script>
     {% block extra_js %}{% endblock %}
 </body>
+
 </html>

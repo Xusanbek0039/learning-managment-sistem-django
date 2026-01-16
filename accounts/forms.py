@@ -39,13 +39,16 @@ class RegisterForm(UserCreationForm):
         fields = ['first_name', 'last_name', 'username', 'phone', 'role', 'password1', 'password2']
 
 
-class LoginForm(AuthenticationForm):
-    username = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'})
-    )
-    password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Parol'})
-    )
+class LoginForm(forms.Form):
+    username = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Username'
+    }))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Parol'
+    }))
+
 
 
 class ProfessionForm(forms.ModelForm):
@@ -73,9 +76,14 @@ class UserProfileForm(forms.ModelForm):
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'O\'zingiz haqida...'})
     )
 
+    address = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Yashash manzilingiz'}))
+    birth_date = forms.DateField(required=False, widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
+    id_card = forms.FileField(required=False, widget=forms.FileInput(attrs={'class': 'form-control'}))
+    birth_certificate = forms.FileField(required=False, widget=forms.FileInput(attrs={'class': 'form-control'}))
+
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'phone', 'photo', 'bio']
+        fields = ['first_name', 'last_name', 'email', 'phone', 'address', 'birth_date', 'id_card', 'birth_certificate', 'photo', 'bio']
 
 
 class AdminUserEditForm(forms.ModelForm):
@@ -96,9 +104,14 @@ class AdminUserEditForm(forms.ModelForm):
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Yangi parol'})
     )
 
+    address = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    birth_date = forms.DateField(required=False, widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
+    id_card = forms.FileField(required=False, widget=forms.FileInput(attrs={'class': 'form-control'}))
+    birth_certificate = forms.FileField(required=False, widget=forms.FileInput(attrs={'class': 'form-control'}))
+
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'username', 'phone', 'role', 'profession', 'photo', 'bio', 'is_blocked']
+        fields = ['first_name', 'last_name', 'username', 'phone', 'role', 'profession', 'photo', 'bio', 'is_blocked', 'address', 'birth_date', 'id_card', 'birth_certificate']
 
 
 class ChangePasswordForm(forms.Form):

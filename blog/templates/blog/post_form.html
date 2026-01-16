@@ -1,0 +1,57 @@
+{% extends 'accounts/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Post yaratish - Blog{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h4 class="mb-0 fw-bold">Yangi post yaratish</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="form-label">Sarlavha</label>
+                            {{ form.title|add_class:"form-control form-control-lg" }}
+                            {% if form.title.errors %}
+                            <div class="text-danger small mt-1">{{ form.title.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Turi</label>
+                                {{ form.post_type|add_class:"form-select" }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Rasm yuklash</label>
+                                {{ form.image|add_class:"form-control" }}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Matn</label>
+                            {{ form.content|add_class:"form-control"|attr:"rows:10" }}
+                            {% if form.content.errors %}
+                            <div class="text-danger small mt-1">{{ form.content.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-3">
+                            <a href="{% url 'blog:post_list' %}" class="btn btn-light">Bekor qilish</a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-check-lg me-2"></i>Chop etish
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

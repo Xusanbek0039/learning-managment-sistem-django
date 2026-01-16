@@ -1,0 +1,113 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Blog - LMS{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold" style="color: var(--text);">Blog Postlar</h2>
+        {% if user.is_teacher or user.is_admin %}
+        <a href="{% url 'blog:post_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-2"></i>Post yaratish
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Filter & Search -->
+    <div class="card mb-4 border-0 shadow-sm" style="background: var(--card);">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0"><i class="bi bi-search"></i></span>
+                        <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Qidirish..."
+                            value="{{ search_query|default:'' }}">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select name="type" class="form-select">
+                        <option value="">Barcha turlar</option>
+                        <option value="news" {% if filter_type == 'news' %}selected{% endif %}>Yangilik</option>
+                        <option value="article" {% if filter_type == 'article' %}selected{% endif %}>Maqola</option>
+                        <option value="announcement" {% if filter_type == 'announcement' %}selected{% endif %}>E'lon
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-outline-primary w-100">Filtrlash</button>
+                </div>
+                {% if search_query or filter_type %}
+                <div class="col-md-2">
+                    <a href="{% url 'blog:post_list' %}" class="btn btn-link text-decoration-none">Tozalash</a>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <!-- Posts Grid -->
+    <div class="row g-4">
+        {% for post in posts %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm hover-card">
+                {% if post.image %}
+                <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}"
+                    style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center text-muted"
+                    style="height: 200px;">
+                    <i class="bi bi-image" style="font-size: 3rem;"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge bg-primary bg-opacity-10 text-primary">{{ post.get_post_type_display
+                            }}</span>
+                        <small class="text-muted"><i class="bi bi-clock me-1"></i>{{ post.created_at|date:"d.m.Y"
+                            }}</small>
+                    </div>
+                    <a href="{% url 'blog:post_detail' post.pk %}" class="text-decoration-none">
+                        <h5 class="card-title fw-bold mb-2 text-dark">{{ post.title|truncatechars:50 }}</h5>
+                    </a>
+                    <p class="card-text text-muted small">{{ post.content|striptags|truncatewords:20 }}</p>
+
+                    <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                        <div class="d-flex align-items-center">
+                            {% if post.author.photo %}
+                            <img src="{{ post.author.photo.url }}" class="rounded-circle me-2" width="30" height="30"
+                                style="object-fit: cover;">
+                            {% else %}
+                            <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white me-2"
+                                style="width: 30px; height: 30px; font-size: 0.8rem;">
+                                {{ post.author.get_initials }}
+                            </div>
+                            {% endif %}
+                            <small class="text-muted">{{ post.author.full_name }}</small>
+                        </div>
+                        <div class="d-flex gap-3 text-muted small">
+                            <span><i class="bi bi-heart me-1"></i>{{ post.likes.count }}</span>
+                            <span><i class="bi bi-chat me-1"></i>{{ post.comments.count }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <i class="bi bi-journal-x text-muted" style="font-size: 4rem;"></i>
+            <p class="text-muted mt-3">Postlar topilmadi</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .hover-card {
+        transition: transform 0.2s;
+    }
+
+    .hover-card:hover {
+        transform: translateY(-5px);
+    }
+</style>
+{% endblock %}
