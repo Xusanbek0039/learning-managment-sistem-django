@@ -2,6 +2,16 @@
 
 {% block title %}Test natijasi - LMS{% endblock %}
 
+{% block extra_js %}
+<script>
+{% if result.coin_awarded and result.passed %}
+    document.addEventListener('DOMContentLoaded', function() {
+        showCoinCelebration("Tabriklaymiz! Test muvaffaqiyatli topshirildi! +1 coin 🎉");
+    });
+{% endif %}
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">

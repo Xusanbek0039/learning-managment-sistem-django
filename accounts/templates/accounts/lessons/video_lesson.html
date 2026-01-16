@@ -179,7 +179,8 @@
         }).then(response => response.json())
         .then(data => {
             if (data.success) {
-                location.reload();
+                showCoinCelebration("Tabriklaymiz! Video uchun 1 coin oldingiz! 🎉");
+                setTimeout(() => location.reload(), 2000);
             }
         });
     });

@@ -5,100 +5,167 @@
 {% block admin_content %}
 <div class="top-bar">
     <h1 class="page-title"><i class="bi bi-speedometer2 me-2"></i>Dashboard</h1>
-    <div>
+    <div class="d-flex gap-2">
         <a href="{% url 'admin_export_pdf' %}" class="btn btn-primary">
-            <i class="bi bi-file-pdf me-2"></i>PDF yuklab olish
+            <i class="bi bi-file-pdf me-2"></i>PDF
+        </a>
+        <a href="/admin/" class="btn btn-outline-primary" target="_blank">
+            <i class="bi bi-gear me-2"></i>Django Admin
         </a>
     </div>
 </div>
 
-<div class="row mb-4">
-    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
-        <div class="stat-card">
-            <div class="d-flex align-items-center">
-                <div class="stat-icon blue me-3">
-                    <i class="bi bi-people"></i>
-                </div>
-                <div>
-                    <div class="stat-number">{{ total_users }}</div>
-                    <div class="stat-label">Jami</div>
-                </div>
-            </div>
+<!-- Asosiy statistika -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card text-center">
+            <div class="stat-icon blue mx-auto mb-2"><i class="bi bi-people"></i></div>
+            <div class="stat-number">{{ total_users }}</div>
+            <div class="stat-label">Foydalanuvchilar</div>
         </div>
     </div>
-    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
-        <div class="stat-card">
-            <div class="d-flex align-items-center">
-                <div class="stat-icon green me-3">
-                    <i class="bi bi-person-workspace"></i>
-                </div>
-                <div>
-                    <div class="stat-number">{{ total_teachers }}</div>
-                    <div class="stat-label">O'qituvchi</div>
-                </div>
-            </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card text-center">
+            <div class="stat-icon green mx-auto mb-2"><i class="bi bi-person-workspace"></i></div>
+            <div class="stat-number">{{ total_teachers }}</div>
+            <div class="stat-label">O'qituvchilar</div>
         </div>
     </div>
-    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
-        <div class="stat-card">
-            <div class="d-flex align-items-center">
-                <div class="stat-icon orange me-3">
-                    <i class="bi bi-mortarboard"></i>
-                </div>
-                <div>
-                    <div class="stat-number">{{ total_students }}</div>
-                    <div class="stat-label">O'quvchi</div>
-                </div>
-            </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card text-center">
+            <div class="stat-icon orange mx-auto mb-2"><i class="bi bi-mortarboard"></i></div>
+            <div class="stat-number">{{ total_students }}</div>
+            <div class="stat-label">O'quvchilar</div>
         </div>
     </div>
-    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card text-center">
+            <div class="stat-icon cyan mx-auto mb-2"><i class="bi bi-circle-fill"></i></div>
+            <div class="stat-number">{{ online_users }}</div>
+            <div class="stat-label">Online</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card text-center">
+            <div class="stat-icon red mx-auto mb-2"><i class="bi bi-slash-circle"></i></div>
+            <div class="stat-number">{{ blocked_users }}</div>
+            <div class="stat-label">Bloklangan</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card text-center">
+            <div class="stat-icon purple mx-auto mb-2"><i class="bi bi-coin"></i></div>
+            <div class="stat-number">{{ total_coins }}</div>
+            <div class="stat-label">Jami coinlar</div>
+        </div>
+    </div>
+</div>
+
+<!-- O'quv statistikasi -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
         <div class="stat-card">
             <div class="d-flex align-items-center">
-                <div class="stat-icon purple me-3">
-                    <i class="bi bi-briefcase"></i>
-                </div>
+                <div class="stat-icon blue me-3"><i class="bi bi-briefcase"></i></div>
                 <div>
                     <div class="stat-number">{{ total_professions }}</div>
-                    <div class="stat-label">Kasblar</div>
+                    <div class="stat-label">Kurslar</div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+    <div class="col-md-3">
         <div class="stat-card">
             <div class="d-flex align-items-center">
-                <div class="stat-icon cyan me-3">
-                    <i class="bi bi-circle-fill"></i>
-                </div>
+                <div class="stat-icon green me-3"><i class="bi bi-play-circle"></i></div>
                 <div>
-                    <div class="stat-number">{{ online_users }}</div>
-                    <div class="stat-label">Online</div>
+                    <div class="stat-number">{{ total_videos }}</div>
+                    <div class="stat-label">Video darslar</div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+    <div class="col-md-3">
         <div class="stat-card">
             <div class="d-flex align-items-center">
-                <div class="stat-icon red me-3">
-                    <i class="bi bi-slash-circle"></i>
-                </div>
+                <div class="stat-icon orange me-3"><i class="bi bi-question-circle"></i></div>
                 <div>
-                    <div class="stat-number">{{ blocked_users }}</div>
-                    <div class="stat-label">Bloklangan</div>
+                    <div class="stat-number">{{ total_tests }}</div>
+                    <div class="stat-label">Testlar</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon purple me-3"><i class="bi bi-user-plus"></i></div>
+                <div>
+                    <div class="stat-number">{{ total_enrollments }}</div>
+                    <div class="stat-label">Yozilganlar</div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row">
+<!-- Test va Vazifalar -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-check-circle me-2"></i>Test natijalari
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <h3 style="color: var(--text-color);">{{ total_test_results }}</h3>
+                        <small class="text-muted">Jami</small>
+                    </div>
+                    <div class="col-4">
+                        <h3 class="text-success">{{ passed_tests }}</h3>
+                        <small class="text-muted">O'tgan</small>
+                    </div>
+                    <div class="col-4">
+                        <h3 class="text-primary">{{ avg_test_score }}%</h3>
+                        <small class="text-muted">O'rtacha</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-file-text me-2"></i>Uyga vazifalar
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <h3 style="color: var(--text-color);">{{ pending_homeworks|add:graded_homeworks }}</h3>
+                        <small class="text-muted">Jami</small>
+                    </div>
+                    <div class="col-4">
+                        <h3 class="text-warning">{{ pending_homeworks }}</h3>
+                        <small class="text-muted">Kutilmoqda</small>
+                    </div>
+                    <div class="col-4">
+                        <h3 class="text-success">{{ graded_homeworks }}</h3>
+                        <small class="text-muted">Baholangan</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Yo'nalishlar -->
     <div class="col-lg-6 mb-4">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-briefcase me-2"></i>Yo'nalishlar bo'yicha</span>
-                <a href="{% url 'admin_statistics' %}" class="btn btn-sm btn-outline-primary">Batafsil</a>
+                <span><i class="bi bi-briefcase me-2"></i>Kurslar statistikasi</span>
+                <a href="{% url 'admin_professions' %}" class="btn btn-sm btn-outline-primary">Barchasi</a>
             </div>
             <div class="card-body">
                 {% if profession_stats %}
@@ -106,9 +173,9 @@
                     <table class="table table-sm">
                         <thead>
                             <tr>
-                                <th>Yo'nalish</th>
+                                <th>Kurs</th>
                                 <th class="text-center">O'quvchi</th>
-                                <th class="text-center">O'qituvchi</th>
+                                <th class="text-center">Ustoz</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -123,16 +190,17 @@
                     </table>
                 </div>
                 {% else %}
-                <p class="text-muted text-center py-3">Yo'nalishlar mavjud emas</p>
+                <p class="text-muted text-center py-3">Kurslar mavjud emas</p>
                 {% endif %}
             </div>
         </div>
     </div>
     
+    <!-- Oxirgi faol foydalanuvchilar -->
     <div class="col-lg-6 mb-4">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-clock-history me-2"></i>Oxirgi faol foydalanuvchilar</span>
+                <span><i class="bi bi-clock-history me-2"></i>Oxirgi faollar</span>
                 <a href="{% url 'admin_users' %}" class="btn btn-sm btn-outline-primary">Barchasi</a>
             </div>
             <div class="card-body">
@@ -142,7 +210,7 @@
                         <thead>
                             <tr>
                                 <th>Foydalanuvchi</th>
-                                <th>Oxirgi faollik</th>
+                                <th>Vaqt</th>
                                 <th class="text-center">Status</th>
                             </tr>
                         </thead>
@@ -150,24 +218,15 @@
                             {% for u in recent_users %}
                             <tr>
                                 <td>
-                                    <div class="d-flex align-items-center">
-                                        {% if u.photo %}
-                                            <img src="{{ u.photo.url }}" class="user-avatar-sm me-2">
-                                        {% else %}
-                                            <div class="user-avatar-placeholder me-2">{{ u.get_initials }}</div>
-                                        {% endif %}
-                                        <div>
-                                            <strong>{{ u.full_name }}</strong>
-                                            <br><small class="text-muted">@{{ u.username }}</small>
-                                        </div>
-                                    </div>
+                                    <strong>{{ u.full_name }}</strong>
+                                    <br><small class="text-muted">@{{ u.username }}</small>
                                 </td>
-                                <td>{{ u.last_activity|timesince }} oldin</td>
+                                <td><small>{{ u.last_activity|timesince }}</small></td>
                                 <td class="text-center">
                                     {% if u.is_online %}
-                                        <span class="badge bg-success">Online</span>
+                                    <span class="badge bg-success">Online</span>
                                     {% else %}
-                                        <span class="badge bg-secondary">Offline</span>
+                                    <span class="badge bg-secondary">Offline</span>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -179,6 +238,41 @@
                 <p class="text-muted text-center py-3">Ma'lumot yo'q</p>
                 {% endif %}
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Haftalik statistika -->
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-graph-up me-2"></i>Oxirgi 7 kun
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Sana</th>
+                        {% for day in daily_stats %}
+                        <th class="text-center">{{ day.date|date:"d.m" }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Yangi foydalanuvchilar</td>
+                        {% for day in daily_stats %}
+                        <td class="text-center"><span class="badge bg-primary">{{ day.users }}</span></td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td>Kursga yozilganlar</td>
+                        {% for day in daily_stats %}
+                        <td class="text-center"><span class="badge bg-success">{{ day.enrollments }}</span></td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

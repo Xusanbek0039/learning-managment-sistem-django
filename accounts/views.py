@@ -779,12 +779,41 @@ def admin_dashboard(request):
     blocked_users = CustomUser.objects.filter(is_blocked=True).count()
     online_users = sum(1 for u in CustomUser.objects.all() if u.is_online)
     
+    # Qo'shimcha statistika
+    total_lessons = Lesson.objects.count()
+    total_videos = VideoLesson.objects.count()
+    total_tests = Test.objects.count()
+    total_homeworks = Homework.objects.count()
+    total_enrollments = CourseEnrollment.objects.count()
+    total_certificates = Certificate.objects.count()
+    total_coins = CustomUser.objects.aggregate(total=Sum('coins'))['total'] or 0
+    
+    # Test natijalari
+    total_test_results = TestResult.objects.count()
+    passed_tests = TestResult.objects.filter(passed=True).count()
+    avg_test_score = TestResult.objects.aggregate(avg=Avg('score'))['avg'] or 0
+    
+    # Uyga vazifalar
+    pending_homeworks = HomeworkSubmission.objects.filter(status='pending').count()
+    graded_homeworks = HomeworkSubmission.objects.filter(status='graded').count()
+    
     profession_stats = Profession.objects.annotate(
         student_count=Count('enrollments', filter=Q(enrollments__user__role='student')),
         teacher_count=Count('students', filter=Q(students__role='teacher'))
     )
     
     recent_users = CustomUser.objects.filter(last_activity__isnull=False).order_by('-last_activity')[:10]
+    
+    # Oxirgi 7 kun statistikasi
+    today = timezone.now().date()
+    daily_stats = []
+    for i in range(6, -1, -1):
+        day = today - timedelta(days=i)
+        daily_stats.append({
+            'date': day,
+            'users': CustomUser.objects.filter(date_joined__date=day).count(),
+            'enrollments': CourseEnrollment.objects.filter(enrolled_at__date=day).count(),
+        })
     
     context = {
         'total_users': total_users,
@@ -793,8 +822,21 @@ def admin_dashboard(request):
         'total_professions': total_professions,
         'blocked_users': blocked_users,
         'online_users': online_users,
+        'total_lessons': total_lessons,
+        'total_videos': total_videos,
+        'total_tests': total_tests,
+        'total_homeworks': total_homeworks,
+        'total_enrollments': total_enrollments,
+        'total_certificates': total_certificates,
+        'total_coins': total_coins,
+        'total_test_results': total_test_results,
+        'passed_tests': passed_tests,
+        'avg_test_score': round(avg_test_score, 1),
+        'pending_homeworks': pending_homeworks,
+        'graded_homeworks': graded_homeworks,
         'profession_stats': profession_stats,
         'recent_users': recent_users,
+        'daily_stats': daily_stats,
     }
     return render(request, 'accounts/admin/dashboard.html', context)
 
