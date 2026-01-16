@@ -1,0 +1,86 @@
+{% extends 'accounts/admin/base_admin.html' %}
+
+{% block title %}Xabar yuborish - Admin{% endblock %}
+
+{% block admin_content %}
+<a href="{% url 'admin_messages' %}" class="back-link">
+    <i class="bi bi-arrow-left me-2"></i>Orqaga
+</a>
+
+<div class="top-bar">
+    <h1 class="page-title"><i class="bi bi-send me-2"></i>Xabar yuborish</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label" style="color: var(--text-color);">Xabar turi</label>
+                        <select name="message_type" class="form-select" id="messageType" required>
+                            <option value="all">Barchaga</option>
+                            <option value="students">Faqat o'quvchilarga</option>
+                            <option value="teachers">Faqat o'qituvchilarga</option>
+                            <option value="personal">Shaxsiy xabar</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3" id="recipientDiv" style="display: none;">
+                        <label class="form-label" style="color: var(--text-color);">Qabul qiluvchi</label>
+                        <select name="recipient" class="form-select">
+                            <option value="">Tanlang...</option>
+                            {% for user in users %}
+                            <option value="{{ user.pk }}">{{ user.full_name }} (@{{ user.username }}) - {% if user.role == 'student' %}O'quvchi{% else %}O'qituvchi{% endif %}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label" style="color: var(--text-color);">Sarlavha</label>
+                        <input type="text" name="title" class="form-control" placeholder="Xabar sarlavhasi" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label" style="color: var(--text-color);">Xabar matni</label>
+                        <textarea name="content" class="form-control" rows="6" placeholder="Xabar matnini kiriting..." required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send me-2"></i>Yuborish
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-info-circle me-2"></i>Ma'lumot
+            </div>
+            <div class="card-body">
+                <ul style="color: var(--text-color); padding-left: 20px; font-size: 0.9rem;">
+                    <li class="mb-2">"Barchaga" - barcha o'quvchi va o'qituvchilarga</li>
+                    <li class="mb-2">"O'quvchilarga" - faqat o'quvchilarga</li>
+                    <li class="mb-2">"O'qituvchilarga" - faqat ustozlarga</li>
+                    <li>"Shaxsiy" - bitta kishiga</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('messageType').addEventListener('change', function() {
+    const recipientDiv = document.getElementById('recipientDiv');
+    if (this.value === 'personal') {
+        recipientDiv.style.display = 'block';
+    } else {
+        recipientDiv.style.display = 'none';
+    }
+});
+</script>
+{% endblock %}
