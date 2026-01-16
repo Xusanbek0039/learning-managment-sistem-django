@@ -1,0 +1,51 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}{{ message.title }} - LMS{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <a href="{% url 'messages' %}" class="btn btn-outline-secondary mb-4">
+        <i class="bi bi-arrow-left me-2"></i>Orqaga
+    </a>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header" style="background: transparent;">
+                    <div class="d-flex align-items-center">
+                        {% if message.message_type == 'payment' %}
+                        <div class="bg-warning bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="bi bi-exclamation-triangle text-warning fs-4"></i>
+                        </div>
+                        {% elif message.message_type == 'system' %}
+                        <div class="bg-info bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="bi bi-info-circle text-info fs-4"></i>
+                        </div>
+                        {% else %}
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="bi bi-envelope text-primary fs-4"></i>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h4 class="mb-1" style="color: var(--text);">{{ message.title }}</h4>
+                            <small class="text-muted">{{ message.created_at|date:"d.m.Y H:i" }}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div style="color: var(--text); line-height: 1.8;">
+                        {{ message.content|linebreaks }}
+                    </div>
+                    
+                    {% if message.sender %}
+                    <hr>
+                    <div class="text-muted small">
+                        <i class="bi bi-person me-1"></i>Yuboruvchi: {{ message.sender.full_name }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
