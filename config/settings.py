@@ -154,6 +154,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'accounts.middleware.UpdateLastActivityMiddleware',
     'accounts.middleware.BlockedUserMiddleware',
+    'accounts.middleware.PaymentCheckMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'

@@ -15,7 +15,7 @@ from .forms import (
 from .models import (
     Profession, CustomUser, CourseEnrollment, Lesson, VideoLesson, VideoProgress,
     Homework, HomeworkSubmission, Test, TestQuestion, TestAnswer, TestResult,
-    TestUserAnswer, Certificate, CoinTransaction
+    TestUserAnswer, Certificate, CoinTransaction, Message, PaymentStatus
 )
 
 
@@ -451,6 +451,173 @@ def export_student_pdf(request, pk=None):
 def leaderboard(request):
     students = CustomUser.objects.filter(role='student').order_by('-coins')[:50]
     return render(request, 'accounts/leaderboard.html', {'students': students})
+
+
+# Messages views
+@login_required
+def messages_view(request):
+    # Shaxsiy xabarlar
+    personal_messages = Message.objects.filter(recipient=request.user)
+    
+    # Umumiy xabarlar
+    if request.user.is_student:
+        general_messages = Message.objects.filter(
+            Q(message_type='all') | Q(message_type='students'),
+            recipient__isnull=True
+        )
+    elif request.user.is_teacher:
+        general_messages = Message.objects.filter(
+            Q(message_type='all') | Q(message_type='teachers'),
+            recipient__isnull=True
+        )
+    else:
+        general_messages = Message.objects.filter(message_type='all', recipient__isnull=True)
+    
+    all_messages = (personal_messages | general_messages).distinct().order_by('-created_at')
+    
+    # O'qilmagan xabarlar sonini yangilash
+    unread_count = all_messages.filter(is_read=False).count()
+    
+    return render(request, 'accounts/messages.html', {
+        'messages_list': all_messages,
+        'unread_count': unread_count,
+    })
+
+
+@login_required
+def message_detail(request, pk):
+    message = get_object_or_404(Message, pk=pk)
+    
+    # Faqat o'ziga tegishli xabarlarni ko'rish
+    if message.recipient and message.recipient != request.user:
+        if not request.user.is_admin:
+            messages.error(request, "Bu xabarga kirish huquqingiz yo'q!")
+            return redirect('messages')
+    
+    # O'qilgan deb belgilash
+    if not message.is_read and message.recipient == request.user:
+        message.is_read = True
+        message.save()
+    
+    return render(request, 'accounts/message_detail.html', {'message': message})
+
+
+@login_required
+def mark_message_read(request, pk):
+    message = get_object_or_404(Message, pk=pk, recipient=request.user)
+    message.is_read = True
+    message.save()
+    return JsonResponse({'success': True})
+
+
+# Admin: Send message
+@login_required
+def admin_send_message(request):
+    if not request.user.is_admin:
+        return redirect('home')
+    
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        content = request.POST.get('content')
+        message_type = request.POST.get('message_type')
+        recipient_id = request.POST.get('recipient')
+        
+        if message_type == 'personal' and recipient_id:
+            recipient = get_object_or_404(CustomUser, pk=recipient_id)
+            Message.objects.create(
+                title=title,
+                content=content,
+                message_type='personal',
+                recipient=recipient,
+                sender=request.user
+            )
+            messages.success(request, f"{recipient.full_name}ga xabar yuborildi!")
+        else:
+            # Umumiy xabar
+            if message_type in ['students', 'teachers']:
+                role = 'student' if message_type == 'students' else 'teacher'
+                users = CustomUser.objects.filter(role=role)
+                for user in users:
+                    Message.objects.create(
+                        title=title,
+                        content=content,
+                        message_type=message_type,
+                        recipient=user,
+                        sender=request.user
+                    )
+            else:
+                # Barchaga
+                users = CustomUser.objects.exclude(role='admin')
+                for user in users:
+                    Message.objects.create(
+                        title=title,
+                        content=content,
+                        message_type='all',
+                        recipient=user,
+                        sender=request.user
+                    )
+            messages.success(request, "Xabar muvaffaqiyatli yuborildi!")
+        
+        return redirect('admin_messages')
+    
+    users = CustomUser.objects.exclude(role='admin')
+    return render(request, 'accounts/admin/send_message.html', {'users': users})
+
+
+@login_required
+def admin_messages(request):
+    if not request.user.is_admin:
+        return redirect('home')
+    
+    all_messages = Message.objects.all().order_by('-created_at')[:100]
+    return render(request, 'accounts/admin/messages.html', {'messages_list': all_messages})
+
+
+# Admin: Payment management
+@login_required
+def admin_payments(request):
+    if not request.user.is_admin:
+        return redirect('home')
+    
+    students = CustomUser.objects.filter(role='student').select_related('payment_status')
+    
+    # Ensure all students have payment status
+    for student in students:
+        PaymentStatus.objects.get_or_create(user=student)
+    
+    students = CustomUser.objects.filter(role='student').select_related('payment_status')
+    
+    return render(request, 'accounts/admin/payments.html', {'students': students})
+
+
+@login_required
+def admin_mark_paid(request, pk):
+    if not request.user.is_admin:
+        return redirect('home')
+    
+    user = get_object_or_404(CustomUser, pk=pk)
+    payment_status, _ = PaymentStatus.objects.get_or_create(user=user)
+    payment_status.is_paid = True
+    payment_status.last_payment_date = timezone.now().date()
+    payment_status.save()
+    
+    # Agar bloklangan bo'lsa, ochish
+    if user.is_blocked and payment_status.auto_blocked:
+        user.is_blocked = False
+        user.save()
+        payment_status.auto_blocked = False
+        payment_status.save()
+        
+        Message.objects.create(
+            title="✅ Hisobingiz ochildi",
+            content="To'lov qabul qilindi. Hisobingiz faollashtirildi. O'qishingizni davom eting!",
+            message_type='system',
+            recipient=user,
+            sender=request.user
+        )
+    
+    messages.success(request, f"{user.full_name} to'lovi belgilandi!")
+    return redirect('admin_payments')
 
 
 # Teacher/Admin: Manage lessons
