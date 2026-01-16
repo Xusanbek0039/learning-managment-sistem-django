@@ -264,3 +264,45 @@ class CoinTransaction(models.Model):
     
     def __str__(self):
         return f"{self.user.full_name}: +{self.amount} coin"
+
+
+class Message(models.Model):
+    MESSAGE_TYPES = (
+        ('all', 'Barchaga'),
+        ('students', 'O\'quvchilarga'),
+        ('teachers', 'O\'qituvchilarga'),
+        ('personal', 'Shaxsiy'),
+        ('system', 'Tizim xabari'),
+        ('payment', 'To\'lov eslatmasi'),
+    )
+    
+    title = models.CharField(max_length=200, verbose_name="Sarlavha")
+    content = models.TextField(verbose_name="Xabar matni")
+    message_type = models.CharField(max_length=20, choices=MESSAGE_TYPES, default='all')
+    recipient = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True, related_name='received_messages')
+    sender = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='sent_messages')
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Xabar"
+        verbose_name_plural = "Xabarlar"
+    
+    def __str__(self):
+        return self.title
+
+
+class PaymentStatus(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='payment_status')
+    is_paid = models.BooleanField(default=False, verbose_name="To'langan")
+    paid_until = models.DateField(null=True, blank=True, verbose_name="To'lov muddati")
+    last_payment_date = models.DateField(null=True, blank=True)
+    auto_blocked = models.BooleanField(default=False, verbose_name="Avtomatik bloklangan")
+    
+    class Meta:
+        verbose_name = "To'lov holati"
+        verbose_name_plural = "To'lov holatlari"
+    
+    def __str__(self):
+        return f"{self.user.full_name} - {'To\'langan' if self.is_paid else 'To\'lanmagan'}"
