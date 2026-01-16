@@ -44,6 +44,11 @@ urlpatterns = [
     path('homework/<int:pk>/grade/', views.grade_homework, name='grade_homework'),
     path('test-results/', views.all_test_results, name='all_test_results'),
     
+    # Messages
+    path('messages/', views.messages_view, name='messages'),
+    path('messages/<int:pk>/', views.message_detail, name='message_detail'),
+    path('messages/<int:pk>/read/', views.mark_message_read, name='mark_message_read'),
+    
     # Admin Panel
     path('dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('dashboard/professions/', views.admin_professions, name='admin_professions'),
@@ -60,4 +65,8 @@ urlpatterns = [
     path('dashboard/users/<int:pk>/certificate/', views.issue_certificate, name='issue_certificate'),
     path('dashboard/statistics/', views.admin_statistics, name='admin_statistics'),
     path('dashboard/export-pdf/', views.admin_export_pdf, name='admin_export_pdf'),
+    path('dashboard/messages/', views.admin_messages, name='admin_messages'),
+    path('dashboard/messages/send/', views.admin_send_message, name='admin_send_message'),
+    path('dashboard/payments/', views.admin_payments, name='admin_payments'),
+    path('dashboard/payments/<int:pk>/paid/', views.admin_mark_paid, name='admin_mark_paid'),
 ]
