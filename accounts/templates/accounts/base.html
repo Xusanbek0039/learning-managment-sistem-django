@@ -3,84 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}LMS{% endblock %}</title>
+    <title>{% block title %}LMS - O'quv Markazi{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-blue: #0d6efd;
-            --dark-blue: #0a58ca;
-            --primary-black: #212529;
+            --primary: #0d6efd;
+            --primary-dark: #0a58ca;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
         }
 
         [data-bs-theme="light"] {
-            --bg-color: #f8f9fa;
-            --card-bg: #ffffff;
-            --text-color: #212529;
-            --border-color: #dee2e6;
+            --bg: #f0f4f8;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
         }
 
         [data-bs-theme="dark"] {
-            --bg-color: #1a1a2e;
-            --card-bg: #16213e;
-            --text-color: #f8f9fa;
-            --border-color: #2d2d44;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
         }
 
+        * { font-family: 'Inter', sans-serif; }
+        
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
             transition: all 0.3s ease;
         }
 
-        .auth-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-
-        .auth-card {
-            background-color: var(--card-bg);
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            padding: 40px;
-            width: 100%;
-            max-width: 450px;
-            border: 1px solid var(--border-color);
+        /* Navbar */
+        .navbar {
+            background: var(--card) !important;
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        .auth-card h2 { color: var(--primary-blue); font-weight: 700; margin-bottom: 30px; text-align: center; }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: var(--primary) !important;
+        }
 
-        .form-control, .form-select {
-            background-color: var(--bg-color);
-            border: 2px solid var(--border-color);
-            color: var(--text-color);
-            padding: 12px 15px;
-            border-radius: 10px;
+        .nav-link {
+            color: var(--text) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: var(--primary);
+            color: white !important;
+            transform: translateY(-1px);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
             transition: all 0.3s ease;
         }
 
-        .form-control:focus, .form-select:focus {
-            background-color: var(--bg-color);
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
-            color: var(--text-color);
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+        }
+
+        /* Buttons */
+        .btn {
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 0.6rem 1.2rem;
+            transition: all 0.2s ease;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border: none;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: 600;
-            transition: all 0.3s ease;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(13, 110, 253, 0.4);
+            box-shadow: 0 6px 20px rgba(13, 110, 253, 0.4);
         }
 
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border: none;
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border: none;
+        }
+
+        .btn-purple {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            border: none;
+            color: white;
+        }
+
+        /* Badges */
+        .coin-badge {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #000;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            animation: pulse 2s infinite;
+        }
+
+        .role-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .role-admin { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
+        .role-teacher { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+        .role-student { background: linear-gradient(135deg, #0d6efd, #0a58ca); color: white; }
+
+        /* Form Controls */
+        .form-control, .form-select {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            color: var(--text);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: var(--bg);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+            color: var(--text);
+        }
+
+        /* Alerts */
+        .alert { border-radius: 12px; border: none; }
+
+        /* Theme Toggle */
         .theme-toggle {
             position: fixed;
-            top: 20px;
+            bottom: 20px;
             right: 20px;
             z-index: 1000;
         }
@@ -92,83 +181,125 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.3rem;
-            background-color: var(--card-bg);
-            border: 2px solid var(--border-color);
-            color: var(--text-color);
-            transition: all 0.3s ease;
+            font-size: 1.2rem;
+            background: var(--card);
+            border: 2px solid var(--border);
+            color: var(--text);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        .navbar {
-            background-color: var(--card-bg) !important;
-            border-bottom: 1px solid var(--border-color);
-            padding: 15px 0;
+        .theme-toggle .btn:hover {
+            transform: rotate(180deg) scale(1.1);
         }
 
-        .navbar-brand { color: var(--primary-blue) !important; font-weight: 700; font-size: 1.5rem; }
-
-        .navbar-nav .nav-link {
-            color: var(--text-color) !important;
-            font-weight: 500;
-            padding: 10px 15px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
-        .navbar-nav .nav-link:hover, .navbar-nav .nav-link.active {
-            background-color: var(--primary-blue);
-            color: white !important;
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 15px;
-            transition: all 0.3s ease;
+        @keyframes coinBounce {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-20px) rotate(-10deg); }
+            50% { transform: translateY(0) rotate(0deg); }
+            75% { transform: translateY(-10px) rotate(10deg); }
         }
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        .fade-in { animation: fadeInUp 0.5s ease-out; }
+
+        /* Coin Celebration Modal */
+        .coin-celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
         }
 
-        .card-img-top { border-radius: 15px 15px 0 0; height: 200px; object-fit: cover; }
+        .coin-celebration.show { display: flex; }
 
-        .role-badge { padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
-        .role-admin { background-color: #dc3545; color: white; }
-        .role-teacher { background-color: #198754; color: white; }
-        .role-student { background-color: #0d6efd; color: white; }
-
-        .coin-badge {
-            background: linear-gradient(135deg, #ffc107, #ff9800);
-            color: #000;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-weight: 600;
+        .coin-celebration-content {
+            text-align: center;
+            animation: fadeInUp 0.5s ease;
         }
 
-        .alert { border-radius: 10px; border: none; }
+        .coin-celebration .coin-icon {
+            font-size: 6rem;
+            animation: coinBounce 1s ease infinite;
+            color: #fbbf24;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        /* Responsive */
+        @media (max-width: 991px) {
+            .navbar-collapse { 
+                background: var(--card); 
+                padding: 1rem; 
+                border-radius: 12px;
+                margin-top: 0.5rem;
+                border: 1px solid var(--border);
+            }
+            .nav-link { padding: 0.75rem 1rem !important; }
+            .d-flex.align-items-center { flex-wrap: wrap; gap: 0.5rem; }
+        }
+
+        @media (max-width: 576px) {
+            .container { padding: 0 1rem; }
+            .card { border-radius: 12px; }
+            .btn { padding: 0.5rem 1rem; font-size: 0.9rem; }
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    <!-- Coin Celebration -->
+    <div class="coin-celebration" id="coinCelebration">
+        <div class="coin-celebration-content">
+            <div class="coin-icon">🪙</div>
+            <h1 class="text-white mt-4">Tabriklaymiz!</h1>
+            <p class="text-white-50 fs-4" id="coinMessage">Siz 1 coin oldingiz!</p>
+            <button class="btn btn-warning btn-lg mt-3" onclick="hideCoinCelebration()">
+                <i class="bi bi-check-lg me-2"></i>Davom etish
+            </button>
+        </div>
+    </div>
+
+    <!-- Theme Toggle -->
     <div class="theme-toggle">
-        <button class="btn" id="themeToggle" title="Rejimni o'zgartirish">
+        <button class="btn" id="themeToggle">
             <i class="bi bi-moon-fill" id="themeIcon"></i>
         </button>
     </div>
 
     {% if user.is_authenticated %}
-    <nav class="navbar navbar-expand-lg">
+    <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand" href="{% url 'home' %}">
                 <i class="bi bi-mortarboard-fill me-2"></i>LMS
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+            
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="bi bi-list fs-4" style="color: var(--text);"></i>
             </button>
+            
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">
                             <i class="bi bi-house me-1"></i>Bosh sahifa
@@ -176,7 +307,7 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if 'profession' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'professions' %}">
-                            <i class="bi bi-briefcase me-1"></i>Kasblar
+                            <i class="bi bi-book me-1"></i>Kurslar
                         </a>
                     </li>
                     <li class="nav-item">
@@ -192,26 +323,27 @@
                     {% if user.is_teacher or user.is_admin %}
                     <li class="nav-item">
                         <a class="nav-link {% if request.resolver_match.url_name == 'homework_submissions' %}active{% endif %}" href="{% url 'homework_submissions' %}">
-                            <i class="bi bi-file-earmark-check me-1"></i>Vazifalar
+                            <i class="bi bi-file-check me-1"></i>Vazifalar
                         </a>
                     </li>
                     {% endif %}
                     {% if user.is_admin %}
                     <li class="nav-item">
                         <a class="nav-link {% if 'dashboard' in request.path %}active{% endif %}" href="{% url 'admin_dashboard' %}">
-                            <i class="bi bi-speedometer2 me-1"></i>Admin
+                            <i class="bi bi-speedometer2 me-1"></i>Panel
                         </a>
                     </li>
                     {% endif %}
                 </ul>
-                <div class="d-flex align-items-center">
-                    <span class="coin-badge me-3">
+                
+                <div class="d-flex align-items-center gap-2">
+                    <span class="coin-badge">
                         <i class="bi bi-coin me-1"></i>{{ user.coins }}
                     </span>
-                    <span class="role-badge role-{{ user.role }} me-3">
-                        {% if user.role == 'admin' %}Admin{% elif user.role == 'teacher' %}O'qituvchi{% else %}O'quvchi{% endif %}
+                    <span class="role-badge role-{{ user.role }}">
+                        {% if user.role == 'admin' %}Admin{% elif user.role == 'teacher' %}Ustoz{% else %}O'quvchi{% endif %}
                     </span>
-                    <a href="{% url 'logout' %}" class="btn btn-outline-primary btn-sm">
+                    <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">
                         <i class="bi bi-box-arrow-right"></i>
                     </a>
                 </div>
@@ -220,30 +352,64 @@
     </nav>
     {% endif %}
 
-    {% block content %}{% endblock %}
+    <main class="fade-in">
+        {% block content %}{% endblock %}
+    </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Theme Toggle
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = document.getElementById('themeIcon');
         const html = document.documentElement;
 
         const savedTheme = localStorage.getItem('theme') || 'light';
         html.setAttribute('data-bs-theme', savedTheme);
-        updateIcon(savedTheme);
+        themeIcon.className = savedTheme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
 
         themeToggle.addEventListener('click', () => {
-            const currentTheme = html.getAttribute('data-bs-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            const newTheme = html.getAttribute('data-bs-theme') === 'light' ? 'dark' : 'light';
             html.setAttribute('data-bs-theme', newTheme);
             localStorage.setItem('theme', newTheme);
-            updateIcon(newTheme);
+            themeIcon.className = newTheme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
         });
 
-        function updateIcon(theme) {
-            themeIcon.classList.toggle('bi-moon-fill', theme === 'light');
-            themeIcon.classList.toggle('bi-sun-fill', theme === 'dark');
+        // Coin Celebration
+        function showCoinCelebration(message) {
+            document.getElementById('coinMessage').textContent = message || "Siz 1 coin oldingiz!";
+            document.getElementById('coinCelebration').classList.add('show');
+            createConfetti();
         }
+
+        function hideCoinCelebration() {
+            document.getElementById('coinCelebration').classList.remove('show');
+        }
+
+        function createConfetti() {
+            const celebration = document.getElementById('coinCelebration');
+            const colors = ['#fbbf24', '#10b981', '#0d6efd', '#ef4444', '#8b5cf6'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.top = '-10px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animation = `fall ${2 + Math.random() * 2}s linear forwards`;
+                celebration.appendChild(confetti);
+                
+                setTimeout(() => confetti.remove(), 4000);
+            }
+        }
+
+        // Add confetti animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fall {
+                to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
     {% block extra_js %}{% endblock %}
 </body>

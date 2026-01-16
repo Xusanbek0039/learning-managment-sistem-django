@@ -73,7 +73,26 @@ def logout_view(request):
 
 @login_required
 def home_view(request):
-    return render(request, 'accounts/home.html')
+    professions = Profession.objects.all()[:6]
+    
+    # Statistika
+    total_students = CustomUser.objects.filter(role='student').count()
+    total_courses = Profession.objects.count()
+    total_lessons = Lesson.objects.count()
+    
+    # O'quvchi uchun uning kurslari
+    my_enrollments = []
+    if request.user.is_student:
+        my_enrollments = request.user.enrollments.all()[:4]
+    
+    context = {
+        'professions': professions,
+        'total_students': total_students,
+        'total_courses': total_courses,
+        'total_lessons': total_lessons,
+        'my_enrollments': my_enrollments,
+    }
+    return render(request, 'accounts/home.html', context)
 
 
 @login_required
