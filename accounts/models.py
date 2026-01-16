@@ -305,4 +305,5 @@ class PaymentStatus(models.Model):
         verbose_name_plural = "To'lov holatlari"
     
     def __str__(self):
-        return f"{self.user.full_name} - {'To\'langan' if self.is_paid else 'To\'lanmagan'}"
+        status = "To'langan" if self.is_paid else "To'lanmagan"
+        return f"{self.user.full_name} - {status}"

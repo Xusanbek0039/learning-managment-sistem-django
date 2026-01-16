@@ -4,7 +4,7 @@ from django.utils.html import format_html
 from .models import (
     CustomUser, Profession, CourseEnrollment, Lesson, VideoLesson, VideoProgress,
     Homework, HomeworkSubmission, Test, TestQuestion, TestAnswer, TestResult,
-    Certificate, CoinTransaction
+    Certificate, CoinTransaction, Message, PaymentStatus
 )
 
 
@@ -162,6 +162,22 @@ class CoinTransactionAdmin(admin.ModelAdmin):
     search_fields = ['user__username', 'reason']
     date_hierarchy = 'created_at'
     readonly_fields = ['user', 'amount', 'reason', 'created_at']
+
+
+@admin.register(Message)
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ['title', 'message_type', 'recipient', 'sender', 'is_read', 'created_at']
+    list_filter = ['message_type', 'is_read', 'created_at']
+    search_fields = ['title', 'content', 'recipient__username']
+    date_hierarchy = 'created_at'
+
+
+@admin.register(PaymentStatus)
+class PaymentStatusAdmin(admin.ModelAdmin):
+    list_display = ['user', 'is_paid', 'last_payment_date', 'auto_blocked']
+    list_filter = ['is_paid', 'auto_blocked']
+    search_fields = ['user__username', 'user__first_name']
+    list_editable = ['is_paid']
 
 
 # Admin site customization
