@@ -320,6 +320,11 @@
                             <i class="bi bi-person me-1"></i>Profil
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'messages' %}active{% endif %}" href="{% url 'messages' %}">
+                            <i class="bi bi-envelope me-1"></i>Xabarlar
+                        </a>
+                    </li>
                     {% if user.is_teacher or user.is_admin %}
                     <li class="nav-item">
                         <a class="nav-link {% if request.resolver_match.url_name == 'homework_submissions' %}active{% endif %}" href="{% url 'homework_submissions' %}">
