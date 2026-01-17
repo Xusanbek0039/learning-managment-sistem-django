@@ -458,53 +458,159 @@ def export_system_pdf(request):
     
     from reportlab.lib import colors
     from reportlab.lib.pagesizes import A4
-    from reportlab.lib.styles import getSampleStyleSheet
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
     from io import BytesIO
     
     buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4)
+    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=30, bottomMargin=30)
     elements = []
     styles = getSampleStyleSheet()
     
-    # Title
-    elements.append(Paragraph("Tizim Statistikasi", styles['Heading1']))
-    elements.append(Paragraph(f"Sana: {timezone.now().strftime('%d.%m.%Y %H:%M')}", styles['Normal']))
+    heading_style = ParagraphStyle(
+        'CustomHeading',
+        parent=styles['Heading2'],
+        spaceAfter=10,
+        spaceBefore=20,
+        textColor=colors.HexColor('#0d6efd')
+    )
+    
+    def create_table(data, col_widths=None):
+        if col_widths is None:
+            col_widths = [300, 150]
+        table = Table(data, colWidths=col_widths)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0d6efd')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
+            ('PADDING', (0, 0), (-1, -1), 8),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8f9fa')]),
+        ]))
+        return table
+    
+    elements.append(Paragraph("Tizim Statistikasi - To'liq Hisobot", styles['Title']))
+    elements.append(Paragraph(f"Hisobot sanasi: {timezone.now().strftime('%d.%m.%Y %H:%M')}", styles['Normal']))
     elements.append(Spacer(1, 20))
     
-    # Calculate stats
     total_students = CustomUser.objects.filter(role='student').count()
     total_teachers = CustomUser.objects.filter(role='teacher').count()
+    total_admins = CustomUser.objects.filter(role='admin').count()
+    total_users = CustomUser.objects.count()
+    
+    elements.append(Paragraph("1. Foydalanuvchilar statistikasi", heading_style))
+    user_data = [
+        ["Ko'rsatkich", 'Soni'],
+        ['Jami foydalanuvchilar', str(total_users)],
+        ["O'quvchilar", str(total_students)],
+        ["O'qituvchilar", str(total_teachers)],
+        ['Adminlar', str(total_admins)],
+    ]
+    elements.append(create_table(user_data))
+    elements.append(Spacer(1, 15))
+    
     total_courses = Profession.objects.count()
+    courses_with_students = Profession.objects.annotate(
+        student_count=Count('enrollments')
+    ).order_by('-student_count')
+    
+    elements.append(Paragraph("2. Kurslar va talabalar", heading_style))
+    course_data = [['Kurs nomi', "O'quvchilar soni"]]
+    for course in courses_with_students[:10]:
+        course_data.append([course.name[:40], str(course.student_count)])
+    if total_courses > 10:
+        course_data.append(['...va yana', f'{total_courses - 10} ta kurs'])
+    elements.append(create_table(course_data))
+    elements.append(Spacer(1, 15))
+    
     total_lessons = Lesson.objects.count()
     total_videos = VideoLesson.objects.count()
     total_tests = Test.objects.count()
-    total_coins = CustomUser.objects.aggregate(Sum('coins'))['coins__sum'] or 0
-    total_homeworks = HomeworkSubmission.objects.count()
+    total_homeworks_created = Homework.objects.count()
     
-    # General info table
-    info_data = [
-        ['Ko\'rsatkich', 'Qiymat'],
-        ['Jami o\'quvchilar', str(total_students)],
-        ['Jami o\'qituvchilar', str(total_teachers)],
-        ['Mavjud kurslar', str(total_courses)],
+    elements.append(Paragraph("3. Dars materiallari", heading_style))
+    lesson_data = [
+        ["Ko'rsatkich", 'Soni'],
         ['Jami darslar', str(total_lessons)],
         ['Videodarslar', str(total_videos)],
         ['Testlar', str(total_tests)],
-        ['Topshirilgan vazifalar', str(total_homeworks)],
-        ['Foydalanuvchilardagi jami coinlar', str(total_coins)],
+        ['Uy vazifalari', str(total_homeworks_created)],
     ]
+    elements.append(create_table(lesson_data))
+    elements.append(Spacer(1, 15))
     
-    table = Table(info_data, colWidths=[250, 150])
-    table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0d6efd')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
-        ('PADDING', (0, 0), (-1, -1), 8),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-    ]))
-    elements.append(table)
+    total_test_results = TestResult.objects.count()
+    passed_tests = TestResult.objects.filter(passed=True).count()
+    failed_tests = total_test_results - passed_tests
+    avg_score = TestResult.objects.aggregate(avg=Avg('score'))['avg'] or 0
+    
+    elements.append(Paragraph("4. Test natijalari", heading_style))
+    test_data = [
+        ["Ko'rsatkich", 'Qiymat'],
+        ["Jami topshirilgan testlar", str(total_test_results)],
+        ["Muvaffaqiyatli o'tganlar", str(passed_tests)],
+        ["Muvaffaqiyatsiz", str(failed_tests)],
+        ["O'rtacha ball", f"{avg_score:.1f}%"],
+    ]
+    elements.append(create_table(test_data))
+    elements.append(Spacer(1, 15))
+    
+    total_submissions = HomeworkSubmission.objects.count()
+    pending_homeworks = HomeworkSubmission.objects.filter(grade__isnull=True).count()
+    graded_homeworks = HomeworkSubmission.objects.filter(grade__isnull=False).count()
+    avg_grade = HomeworkSubmission.objects.filter(grade__isnull=False).aggregate(avg=Avg('grade'))['avg'] or 0
+    
+    elements.append(Paragraph("5. Uy vazifalari holati", heading_style))
+    hw_data = [
+        ["Ko'rsatkich", 'Qiymat'],
+        ['Jami topshirilgan vazifalar', str(total_submissions)],
+        ['Baholanmagan (kutilmoqda)', str(pending_homeworks)],
+        ['Baholangan', str(graded_homeworks)],
+        ["O'rtacha baho", f"{avg_grade:.1f}"],
+    ]
+    elements.append(create_table(hw_data))
+    elements.append(Spacer(1, 15))
+    
+    total_coins = CustomUser.objects.aggregate(Sum('coins'))['coins__sum'] or 0
+    total_transactions = CoinTransaction.objects.count()
+    avg_coins_per_user = total_coins / total_users if total_users > 0 else 0
+    
+    elements.append(Paragraph("6. Coin statistikasi", heading_style))
+    coin_data = [
+        ["Ko'rsatkich", 'Qiymat'],
+        ['Jami tarqatilgan coinlar', str(total_coins)],
+        ['Coin tranzaksiyalari', str(total_transactions)],
+        ["Har bir foydalanuvchiga o'rtacha", f"{avg_coins_per_user:.1f}"],
+    ]
+    elements.append(create_table(coin_data))
+    elements.append(Spacer(1, 15))
+    
+    total_enrollments = CourseEnrollment.objects.count()
+    active_enrollments = CourseEnrollment.objects.filter(is_active=True).count()
+    completed_enrollments = CourseEnrollment.objects.filter(completed=True).count()
+    
+    elements.append(Paragraph("7. Kursga yozilish statistikasi", heading_style))
+    enroll_data = [
+        ["Ko'rsatkich", 'Soni'],
+        ["Jami yozilishlar", str(total_enrollments)],
+        ['Faol kurslar', str(active_enrollments)],
+        ['Tugatilgan kurslar', str(completed_enrollments)],
+    ]
+    elements.append(create_table(enroll_data))
+    elements.append(Spacer(1, 15))
+    
+    elements.append(Paragraph("8. Oxirgi 7 kunlik registratsiya", heading_style))
+    reg_data = [['Sana', "Yangi foydalanuvchilar"]]
+    for i in range(6, -1, -1):
+        day = timezone.now().date() - timedelta(days=i)
+        count = CustomUser.objects.filter(
+            date_joined__date=day
+        ).count()
+        reg_data.append([day.strftime('%d.%m.%Y'), str(count)])
+    elements.append(create_table(reg_data))
     
     doc.build(elements)
     buffer.seek(0)
