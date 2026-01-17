@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
-from .models import Post, Comment, Like
+from .models import Post, PostComment, PostLike
 from .forms import PostForm, CommentForm
 
 @login_required
@@ -80,7 +80,7 @@ def post_create(request):
 @login_required
 def toggle_like(request, pk):
     post = get_object_or_404(Post, pk=pk)
-    like, created = Like.objects.get_or_create(post=post, user=request.user)
+    like, created = PostLike.objects.get_or_create(post=post, user=request.user)
     
     if not created:
         like.delete()

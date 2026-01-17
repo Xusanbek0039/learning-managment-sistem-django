@@ -27,10 +27,11 @@
                 <div class="col-md-3">
                     <select name="type" class="form-select">
                         <option value="">Barcha turlar</option>
-                        <option value="news" {% if filter_type == 'news' %}selected{% endif %}>Yangilik</option>
-                        <option value="article" {% if filter_type == 'article' %}selected{% endif %}>Maqola</option>
-                        <option value="announcement" {% if filter_type == 'announcement' %}selected{% endif %}>E'lon
-                        </option>
+                        <option value="news" {% if filter_type == 'news' %}selected{% endif %}>Yangiliklar</option>
+                        <option value="tutorial" {% if filter_type == 'tutorial' %}selected{% endif %}>Darslik</option>
+                        <option value="tips" {% if filter_type == 'tips' %}selected{% endif %}>Maslahatlar</option>
+                        <option value="announcement" {% if filter_type == 'announcement' %}selected{% endif %}>E'lon</option>
+                        <option value="other" {% if filter_type == 'other' %}selected{% endif %}>Boshqa</option>
                     </select>
                 </div>
                 <div class="col-md-2">
