@@ -4,349 +4,528 @@
 
 {% block content %}
 <style>
-    /* Maxsus dizayn elementlari */
-    :root {
-        --glass-bg: rgba(255, 255, 255, 0.95);
-        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+  /* ========================
+     iOS-style Design + Dark/Light Variables
+     ======================== */
+  :root{
+    --accent-1: #4361ee;
+    --accent-2: #7209b7;
+    --success-1: #059669;
+    --glass: rgba(255,255,255,0.85);
+    --bg: #f6f8fb;
+    --card-bg: rgba(255,255,255,0.85);
+    --muted: #68707a;
+    --text: #0b1220;
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --ios-shadow: 0 14px 40px rgba(2,6,23,0.06);
+    --transition: 280ms cubic-bezier(.2,.9,.3,1);
+  }
 
-    [data-bs-theme="dark"] :root {
-        --glass-bg: rgba(25, 25, 35, 0.95);
-    }
+  [data-bs-theme="dark"]{
+    --glass: rgba(8,12,20,0.62);
+    --bg: linear-gradient(180deg,#041025,#051226);
+    --card-bg: rgba(10,14,22,0.66);
+    --muted: #9fb1c9;
+    --text: #e6f1ff;
+    --ios-shadow: 0 18px 48px rgba(0,0,0,0.45);
+    --accent-1: #6aa0ff;
+    --accent-2: #7fb2ff;
+  }
 
-    .hero-card {
-        background: linear-gradient(135deg, #4361ee 0%, #7209b7 100%);
-        border-radius: 30px;
-        position: relative;
-        overflow: hidden;
-        border: none;
-    }
+  /* Respect reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    :root { --transition: 0ms; }
+  }
 
-    .hero-card::after {
-        content: "";
-        position: absolute;
-        top: -50px;
-        right: -50px;
-        width: 200px;
-        height: 200px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-    }
+  /* Base layout */
+  body { background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+  .container { max-width: 1180px; margin: 0 auto; }
 
-    .stat-card-modern {
-        border-radius: 20px;
-        border: 1px solid rgba(0,0,0,0.05);
-        transition: var(--transition);
-        background: var(--glass-bg);
-    }
+  /* Hero */
+  .hero-card {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: linear-gradient(135deg,var(--accent-1),var(--accent-2));
+    color: #fff;
+    box-shadow: var(--ios-shadow);
+    border: none;
+    transition: transform var(--transition), box-shadow var(--transition);
+  }
+  .hero-card:hover { transform: translateY(-6px); box-shadow: 0 24px 60px rgba(2,6,23,0.12); }
 
-    .stat-card-modern:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-    }
+  .hero-badge { background: rgba(255,255,255,0.12); padding: .45rem .85rem; border-radius: 999px; font-weight:700; }
 
-    .course-card {
-        border-radius: 20px;
-        overflow: hidden;
-        border: none;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        transition: var(--transition);
-    }
+  /* Stats */
+  .stat-card-modern {
+    background: var(--card-bg);
+    border-radius: 14px;
+    padding: 1.1rem;
+    transition: transform var(--transition), box-shadow var(--transition);
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+  .stat-card-modern:hover { transform: translateY(-8px); box-shadow: var(--ios-shadow); }
 
-    .course-card:hover {
-        transform: scale(1.02);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    }
+  .icon-box { width:68px;height:68px;border-radius:14px;display:inline-grid;place-items:center; }
 
-    .course-img-wrapper {
-        position: relative;
-        overflow: hidden;
-    }
+  /* Course cards */
+  .course-card { border-radius: 14px; overflow: hidden; transition: transform var(--transition), box-shadow var(--transition); background:var(--card-bg); border:1px solid rgba(0,0,0,0.04); }
+  .course-card:hover { transform: translateY(-6px); box-shadow: var(--ios-shadow); }
+  .course-img { height:200px; object-fit:cover; display:block; transition: transform .6s cubic-bezier(.2,.9,.3,1); }
+  .course-card:hover .course-img { transform: scale(1.08); }
 
-    .course-img-wrapper img {
-        transition: transform 0.5s ease;
-    }
+  /* Buttons */
+  .btn-rounded { border-radius: 14px; padding: .6rem 1.25rem; font-weight:700; }
+  .btn-outline-soft { border-radius: 14px; border: 1px solid rgba(0,0,0,0.06); background: transparent; color:var(--text); }
+  .btn-ghost { background: transparent; border: none; color: var(--text); }
 
-    .course-card:hover .course-img-wrapper img {
-        transform: scale(1.1);
-    }
+  /* Glass info card */
+  .glass-card { background: var(--card-bg); border-radius: 18px; padding: 1.25rem; box-shadow: var(--ios-shadow); border: 1px solid rgba(0,0,0,0.04); }
 
-    .btn-rounded {
-        border-radius: 12px;
-        padding: 10px 25px;
-        font-weight: 600;
-    }
+  /* Section title */
+  .section-title { font-weight:800; position:relative; padding-bottom:.6rem; }
+  .section-sub { color:var(--muted); font-weight:600; }
 
-    .icon-box {
-        width: 70px;
-        height: 70px;
-        border-radius: 18px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 1.5rem;
-    }
+  /* Footer */
+  footer { border-top: 1px solid rgba(0,0,0,0.04); margin-top: 3.5rem; background: transparent; }
 
-    .section-title {
-        position: relative;
-        padding-bottom: 15px;
-        font-weight: 700;
-    }
+  /* Floating AI assistant button */
+  .ai-fab {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 1400;
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    display:grid;place-items:center;
+    background: linear-gradient(135deg,var(--accent-1),var(--accent-2));
+    color: #fff;
+    box-shadow: 0 18px 44px rgba(8,12,23,0.18);
+    cursor: pointer;
+    border: none;
+    transition: transform var(--transition);
+  }
+  .ai-fab:active { transform: translateY(2px) scale(.99); }
 
-    .section-title::after {
-        content: "";
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 50px;
-        height: 4px;
-        background: #4361ee;
-        border-radius: 2px;
-    }
+  /* AI Loader overlay */
+  .ai-overlay {
+    position: fixed; inset: 0; display:none; align-items:center; justify-content:center; z-index:1500;
+    background: linear-gradient(180deg, rgba(2,6,23,0.18), rgba(2,6,23,0.36));
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  }
+  .ai-overlay.show { display:flex; }
 
-    @media (max-width: 768px) {
-        .hero-card { border-radius: 20px; }
-        .display-5 { font-size: 2rem; }
-    }
+  .ai-card {
+    width: min(760px, 94%);
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 1.25rem;
+    box-shadow: var(--ios-shadow);
+    border: 1px solid rgba(0,0,0,0.06);
+    transform: translateY(12px);
+    transition: transform var(--transition), opacity var(--transition);
+  }
+  .ai-overlay.show .ai-card { transform: translateY(0); }
+
+  .ai-title { font-weight: 800; margin: 0; }
+  .ai-body { color: var(--muted); margin-top:.5rem; }
+
+  /* Animated dots (typing) */
+  .dots { display:inline-block; vertical-align:middle; margin-left:.5rem; }
+  .dots span { display:inline-block; width:8px; height:8px; margin:0 3px; background:var(--accent-2); border-radius:999px; opacity:.2; transform: translateY(0); animation: dot 1s infinite; }
+  .dots span:nth-child(2) { animation-delay:.12s }
+  .dots span:nth-child(3) { animation-delay:.24s }
+  @keyframes dot {
+    0% { transform: translateY(0); opacity:.25; }
+    50% { transform: translateY(-8px); opacity:1; }
+    100% { transform: translateY(0); opacity:.25; }
+  }
+
+  /* AI response area */
+  .ai-response {
+    margin-top:1rem; padding: .85rem; border-radius: 12px; background: rgba(0,0,0,0.03); max-height:360px; overflow:auto;
+  }
+  [data-bs-theme="dark"] .ai-response { background: rgba(255,255,255,0.03); }
+
+  /* Small screens */
+  @media (max-width: 768px) {
+    .hero-card { border-radius: 14px; }
+    .ai-card { padding: 1rem; }
+    .ai-fab { right: 14px; bottom: 14px; width:56px; height:56px; border-radius:12px; }
+  }
 </style>
 
 <div class="container py-4">
-    <div class="hero-card mb-5 shadow-lg animate-up">
-        <div class="card-body p-4 p-md-5 text-white">
-            <div class="row align-items-center">
-                <div class="col-lg-7">
-                    <span class="badge bg-white bg-opacity-25 text-white mb-3 px-3 py-2 rounded-pill">🚀 Bilim olish vaqti keldi</span>
-                    <h1 class="display-5 fw-bold mb-3">
-                        Dasturlash dunyosiga <br><span class="text-info">Professional</span> sayohat!
-                    </h1>
-                    <p class="lead mb-4 opacity-75">
-                        Sizni zamonaviy texnologiyalar olami kutmoqda. Kurslarni tanlang, o'rganing va IT sohasida o'z o'rningizni toping.
-                    </p>
-                    <div class="d-flex flex-wrap gap-3">
-                        <a href="{% url 'professions' %}" class="btn btn-light btn-lg btn-rounded text-primary shadow">
-                            <i class="bi bi-rocket-takeoff me-2"></i>Boshlash
-                        </a>
-                        <a href="{% url 'leaderboard' %}" class="btn btn-outline-light btn-lg btn-rounded">
-                            <i class="bi bi-trophy me-2"></i>Reyting
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-5 text-center d-none d-lg-block">
-                    <div class="position-relative">
-                        <i class="bi bi-laptop text-white opacity-25" style="font-size: 14rem;"></i>
-                        <div class="position-absolute top-50 start-50 translate-middle">
-                            <i class="bi bi-code-square text-white fs-1"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+  <!-- Hero -->
+  <div class="hero-card mb-5">
+    <div class="card-body p-4 p-md-5">
+      <div class="row align-items-center">
+        <div class="col-lg-7">
+          <span class="hero-badge mb-3 d-inline-block">🚀 Bilim olish vaqti keldi</span>
+          <h1 class="display-5 fw-bold mb-3">
+            Dasturlash dunyosiga <br><span style="color:rgba(255,255,255,0.95)">Professional</span> sayohat!
+          </h1>
+          <p class="lead opacity-75 mb-4" style="max-width:60ch">
+            Sizni zamonaviy texnologiyalar olami kutmoqda. Kurslarni tanlang, o'rganing va IT sohasida o'z o'rningizni toping.
+          </p>
 
-    <div class="row g-4 mb-5">
-        <div class="col-6 col-md-4">
-            <div class="stat-card-modern text-center p-4 h-100 shadow-sm">
-                <div class="icon-box bg-primary bg-opacity-10 text-primary">
-                    <i class="bi bi-people-fill fs-2"></i>
-                </div>
-                <h3 class="fw-bold m-0">{{ total_students|default:"1000" }}+</h3>
-                <p class="text-muted small mb-0 font-monospace">TALABALAR</p>
-            </div>
-        </div>
-        <div class="col-6 col-md-4">
-            <div class="stat-card-modern text-center p-4 h-100 shadow-sm">
-                <div class="icon-box bg-success bg-opacity-10 text-success">
-                    <i class="bi bi-book-half fs-2"></i>
-                </div>
-                <h3 class="fw-bold m-0">{{ total_courses|default:"12" }}</h3>
-                <p class="text-muted small mb-0 font-monospace">KURSLAR</p>
-            </div>
-        </div>
-        <div class="col-12 col-md-4">
-            <div class="stat-card-modern text-center p-4 h-100 shadow-sm">
-                <div class="icon-box bg-warning bg-opacity-10 text-warning">
-                    <i class="bi bi-play-circle-fill fs-2"></i>
-                </div>
-                <h3 class="fw-bold m-0">{{ total_lessons|default:"500" }}+</h3>
-                <p class="text-muted small mb-0 font-monospace">DARSLIKLAR</p>
-            </div>
-        </div>
-    </div>
-
-    {% if user.is_admin %}
-    <div class="alert alert-primary border-0 rounded-4 p-4 mb-5 d-flex justify-content-between align-items-center flex-wrap gap-3">
-        <div>
-            <h5 class="alert-heading mb-1 fw-bold">Tizimni boshqarish</h5>
-            <p class="mb-0 small opacity-75">Statistika va hisobotlarni yuklab olishingiz mumkin.</p>
-        </div>
-        <a href="{% url 'export_system_pdf' %}" class="btn btn-primary btn-rounded shadow-sm">
-            <i class="bi bi-file-earmark-pdf-fill me-2"></i>PDF Yuklash
-        </a>
-    </div>
-    {% endif %}
-
-    {% if my_enrollments %}
-    <section class="mb-5">
-        <div class="d-flex justify-content-between align-items-end mb-4">
-            <div>
-                <h3 class="section-title">O'qishni davom ettiring</h3>
-                <p class="text-muted small mb-0">Siz oxirgi marta ko'rgan kurslaringiz</p>
-            </div>
-            <a href="{% url 'profile' %}" class="btn btn-link text-decoration-none fw-bold">Barchasi <i class="bi bi-chevron-right"></i></a>
-        </div>
-        <div class="row g-4">
-            {% for enrollment in my_enrollments %}
-            <div class="col-md-6 col-lg-3">
-                <div class="card course-card h-100">
-                    <div class="course-img-wrapper">
-                        <img src="{{ enrollment.profession.photo.url }}" class="card-img-top" style="height: 160px; object-fit: cover;">
-                        <div class="position-absolute top-0 end-0 m-2">
-                            <span class="badge bg-success rounded-pill">Faol</span>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <h6 class="fw-bold text-truncate">{{ enrollment.profession.name }}</h6>
-                        <div class="progress mb-3" style="height: 6px;">
-                            <div class="progress-bar bg-primary" style="width: 45%"></div>
-                        </div>
-                        <a href="{% url 'profession_detail' enrollment.profession.pk %}" class="btn btn-outline-primary btn-sm w-100 btn-rounded">
-                            Kursga o'tish
-                        </a>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </section>
-    {% endif %}
-
-    <section class="mb-5">
-        <div class="d-flex justify-content-between align-items-end mb-4">
-            <div>
-                <h3 class="section-title">Ommabop yo'nalishlar</h3>
-                <p class="text-muted small mb-0">Professional darajaga chiqing</p>
-            </div>
-            <a href="{% url 'professions' %}" class="btn btn-primary btn-sm btn-rounded shadow-sm">Barchasi</a>
-        </div>
-        
-        <div class="row g-4">
-            {% for profession in professions %}
-            <div class="col-md-6 col-lg-4">
-                <div class="card course-card h-100 shadow-sm">
-                    <div class="course-img-wrapper">
-                        <img src="{{ profession.photo.url }}" class="card-img-top" style="height: 200px; object-fit: cover;">
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h5 class="card-title fw-bold mb-0 text-primary">{{ profession.name }}</h5>
-                            <span class="badge bg-light text-primary border"><i class="bi bi-star-fill text-warning me-1"></i>4.9</span>
-                        </div>
-                        <p class="card-text text-muted small mb-4">{{ profession.description|truncatewords:15 }}</p>
-                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-people text-muted me-2"></i>
-                                <span class="small text-muted">{{ profession.student_count|default:"0" }} o'quvchi</span>
-                            </div>
-                            <a href="{% url 'profession_detail' profession.pk %}" class="btn btn-primary btn-rounded btn-sm shadow-sm px-4">Batafsil</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% empty %}
-            <div class="col-12 text-center py-5">
-                <div class="bg-light d-inline-block p-4 rounded-circle mb-3">
-                    <i class="bi bi-search text-muted fs-1"></i>
-                </div>
-                <h5 class="text-muted">Hozircha kurslar mavjud emas</h5>
-            </div>
-            {% endfor %}
-        </div>
-    </section>
-
-    <div class="card border-0 rounded-5 mb-5 shadow-sm" style="background: var(--glass-bg);">
-        <div class="card-body p-4 p-md-5">
-            <h3 class="text-center mb-5 fw-bold">Markazimizning ustunliklari</h3>
-            <div class="row g-4 text-center">
-                <div class="col-md-4">
-                    <div class="p-3">
-                        <div class="icon-box bg-primary bg-opacity-10 text-primary mx-auto">
-                            <i class="bi bi-camera-reels-fill fs-2"></i>
-                        </div>
-                        <h5 class="fw-bold">Sifatli video kontent</h5>
-                        <p class="text-muted small">Har bir dars yuqori sifatli 4K formatda yozilgan.</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="p-3">
-                        <div class="icon-box bg-success bg-opacity-10 text-success mx-auto">
-                            <i class="bi bi-award-fill fs-2"></i>
-                        </div>
-                        <h5 class="fw-bold">Rasmiy Sertifikat</h5>
-                        <p class="text-muted small">Kursni bitiring va xalqaro standartdagi sertifikatga ega bo'ling.</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="p-3">
-                        <div class="icon-box bg-info bg-opacity-10 text-info mx-auto">
-                            <i class="bi bi-chat-left-dots-fill fs-2"></i>
-                        </div>
-                        <h5 class="fw-bold">24/7 Support</h5>
-                        <p class="text-muted small">Mentorlarimiz sizni qiynagan savollarga doim javob berishadi.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card border-0 rounded-5 text-center shadow-lg" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
-        <div class="card-body py-5 text-white">
-            <h2 class="fw-bold mb-3">Kelajagingizni biz bilan quring!</h2>
-            <p class="mb-4 opacity-75">10,000 dan ortiq o'quvchilar allaqachon bizga ishonishdi.</p>
-            <a href="{% url 'professions' %}" class="btn btn-light btn-lg btn-rounded px-5 fw-bold shadow">
-                Hoziroq Ro'yxatdan O'tish
+          <div class="d-flex flex-wrap gap-3">
+            <a href="{% url 'professions' %}" class="btn btn-light btn-lg btn-rounded shadow btn-rounded">
+              <i class="bi bi-rocket-takeoff me-2"></i>Boshlash
             </a>
+            <a href="{% url 'leaderboard' %}" class="btn btn-outline-light btn-lg btn-rounded" style="border-color: rgba(255,255,255,0.18); color: #fff;">
+              <i class="bi bi-trophy me-2"></i>Reyting
+            </a>
+          </div>
         </div>
+
+        <div class="col-lg-5 text-center d-none d-lg-block">
+          <div style="position:relative;">
+            <i class="bi bi-laptop" style="font-size:14rem; color: rgba(255,255,255,0.08)"></i>
+            <div style="position:absolute; inset:0; display:grid; place-items:center;">
+              <i class="bi bi-code-square fs-1" style="color:rgba(255,255,255,0.9)"></i>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
+
+  <!-- Quick stats -->
+  <div class="row g-4 mb-4">
+    <div class="col-6 col-md-4">
+      <div class="stat-card-modern text-center p-4 h-100">
+        <div class="icon-box bg-primary bg-opacity-10 text-primary mx-auto mb-2" style="background: linear-gradient(135deg, rgba(67,97,238,0.12), rgba(114,9,183,0.08));">
+          <i class="bi bi-people-fill fs-3" style="color:var(--accent-2)"></i>
+        </div>
+        <h3 class="fw-bold m-0">{{ total_students|default:"1000" }}+</h3>
+        <p class="text-muted small mb-0">TALABALAR</p>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4">
+      <div class="stat-card-modern text-center p-4 h-100">
+        <div class="icon-box bg-success bg-opacity-10 text-success mx-auto mb-2" style="background: linear-gradient(135deg, rgba(5,150,105,0.08), rgba(16,185,129,0.06));">
+          <i class="bi bi-book-half fs-3" style="color:var(--success-1)"></i>
+        </div>
+        <h3 class="fw-bold m-0">{{ total_courses|default:"12" }}</h3>
+        <p class="text-muted small mb-0">KURSLAR</p>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-4">
+      <div class="stat-card-modern text-center p-4 h-100">
+        <div class="icon-box bg-warning bg-opacity-10 text-warning mx-auto mb-2" style="background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(249,115,22,0.06));">
+          <i class="bi bi-play-circle-fill fs-3" style="color:#f59e0b"></i>
+        </div>
+        <h3 class="fw-bold m-0">{{ total_lessons|default:"500" }}+</h3>
+        <p class="text-muted small mb-0">DARSLIKLAR</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin quick action -->
+  {% if user.is_admin %}
+  <div class="alert glass-card d-flex justify-content-between align-items-center mb-5 flex-wrap gap-3">
+    <div>
+      <h5 class="mb-1 fw-bold">Tizimni boshqarish</h5>
+      <p class="mb-0 small opacity-75">Statistika va hisobotlarni yuklab olishingiz mumkin.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{% url 'export_system_pdf' %}" class="btn btn-primary btn-rounded">
+        <i class="bi bi-file-earmark-pdf-fill me-2"></i>PDF Yuklash
+      </a>
+      <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-soft btn-rounded">Panel</a>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Continue learning -->
+  {% if my_enrollments %}
+  <section class="mb-5">
+    <div class="d-flex justify-content-between align-items-end mb-3">
+      <div>
+        <h3 class="section-title">O'qishni davom ettiring</h3>
+        <p class="section-sub">Siz oxirgi marta ko'rgan kurslaringiz</p>
+      </div>
+      <a href="{% url 'profile' %}" class="btn btn-ghost fw-bold">Barchasi <i class="bi bi-chevron-right"></i></a>
+    </div>
+
+    <div class="row g-4">
+      {% for enrollment in my_enrollments %}
+      <div class="col-6 col-md-3">
+        <div class="course-card">
+          <div style="position:relative;">
+            <img src="{{ enrollment.profession.photo.url }}" alt="{{ enrollment.profession.name }}" class="course-img card-img-top">
+            <div style="position:absolute; top:10px; right:10px;">
+              <span class="badge bg-success rounded-pill">Faol</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <h6 class="fw-bold text-truncate">{{ enrollment.profession.name }}</h6>
+            <div class="progress mb-3" style="height:8px; border-radius:8px; overflow:hidden;">
+              <div class="progress-bar" style="width:{{ enrollment.progress|default:45 }}%; background: linear-gradient(90deg,var(--accent-1),var(--accent-2));"></div>
+            </div>
+            <a href="{% url 'profession_detail' enrollment.profession.pk %}" class="btn btn-outline-soft btn-sm w-100 btn-rounded">Kursga o'tish</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Popular professions -->
+  <section class="mb-5">
+    <div class="d-flex justify-content-between align-items-end mb-3">
+      <div>
+        <h3 class="section-title">Ommabop yo'nalishlar</h3>
+        <p class="section-sub">Professional darajaga chiqing</p>
+      </div>
+      <a href="{% url 'professions' %}" class="btn btn-primary btn-sm btn-rounded">Barchasi</a>
+    </div>
+
+    <div class="row g-4">
+      {% for profession in professions %}
+      <div class="col-md-6 col-lg-4">
+        <div class="course-card h-100">
+          <img src="{{ profession.photo.url }}" alt="{{ profession.name }}" class="course-img">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <h5 class="card-title fw-bold mb-0" style="color:var(--accent-1)">{{ profession.name }}</h5>
+              <span class="badge bg-light text-primary border"><i class="bi bi-star-fill text-warning me-1"></i>4.9</span>
+            </div>
+            <p class="card-text text-muted small mb-4">{{ profession.description|truncatewords:15 }}</p>
+            <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+              <div class="d-flex align-items-center">
+                <i class="bi bi-people text-muted me-2"></i>
+                <span class="small text-muted">{{ profession.student_count|default:"0" }} o'quvchi</span>
+              </div>
+              <a href="{% url 'profession_detail' profession.pk %}" class="btn btn-primary btn-rounded btn-sm px-4">Batafsil</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12 text-center py-5">
+        <div class="bg-light d-inline-block p-4 rounded-circle mb-3">
+          <i class="bi bi-search text-muted fs-1"></i>
+        </div>
+        <h5 class="text-muted">Hozircha kurslar mavjud emas</h5>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Advantages -->
+  <div class="glass-card mb-5">
+    <h3 class="text-center mb-4 fw-bold">Markazimizning ustunliklari</h3>
+    <div class="row g-4 text-center">
+      <div class="col-md-4">
+        <div class="p-3">
+          <div class="icon-box bg-primary bg-opacity-10 text-primary mx-auto mb-3" style="background:linear-gradient(135deg, rgba(67,97,238,0.08), rgba(114,9,183,0.06));">
+            <i class="bi bi-camera-reels-fill fs-3" style="color:var(--accent-2)"></i>
+          </div>
+          <h5 class="fw-bold">Sifatli video kontent</h5>
+          <p class="text-muted small">Har bir dars yuqori sifatli formatda yozilgan.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="p-3">
+          <div class="icon-box bg-success bg-opacity-10 text-success mx-auto mb-3" style="background:linear-gradient(135deg, rgba(5,150,105,0.06), rgba(16,185,129,0.04));">
+            <i class="bi bi-award-fill fs-3" style="color:var(--success-1)"></i>
+          </div>
+          <h5 class="fw-bold">Rasmiy Sertifikat</h5>
+          <p class="text-muted small">Kursni bitiring va sertifikatga ega bo'ling.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="p-3">
+          <div class="icon-box bg-info bg-opacity-10 text-info mx-auto mb-3" style="background:linear-gradient(135deg, rgba(59,130,246,0.06), rgba(56,189,248,0.04));">
+            <i class="bi bi-chat-left-dots-fill fs-3" style="color:#0ea5e9"></i>
+          </div>
+          <h5 class="fw-bold">24/7 Support</h5>
+          <p class="text-muted small">Mentorlarimiz sizni qiynagan savollarga doim javob berishadi.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="card border-0 rounded-5 mb-5 text-center" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); box-shadow: var(--ios-shadow);">
+    <div class="card-body py-5 text-white">
+      <h2 class="fw-bold mb-3">Kelajagingizni biz bilan quring!</h2>
+      <p class="mb-4 opacity-75">10,000 dan ortiq o'quvchilar allaqachon bizga ishonishdi.</p>
+      <a href="{% url 'professions' %}" class="btn btn-light btn-lg btn-rounded px-5 fw-bold">Hoziroq Ro'yxatdan O'tish</a>
+    </div>
+  </div>
 </div>
 
-<footer class="mt-5 py-5 border-top bg-light">
-    <div class="container">
-        <div class="row g-4">
-            <div class="col-md-4">
-                <h5 class="fw-bold mb-3 text-primary">LMS Academy</h5>
-                <p class="text-muted small">Zamonaviy ta'lim markazi. Biz bilan eng qisqa vaqt ichida professional dasturchi bo'ling.</p>
-            </div>
-            <div class="col-md-4 text-md-center">
-                <h5 class="fw-bold mb-3">Havolalar</h5>
-                <ul class="list-unstyled small">
-                    <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Biz haqimizda</a></li>
-                    <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Bog'lanish</a></li>
-                    <li><a href="#" class="text-muted text-decoration-none">Maxfiylik siyosati</a></li>
-                </ul>
-            </div>
-            <div class="col-md-4 text-md-end">
-                <h5 class="fw-bold mb-3">Biz ijtimoiy tarmoqlarda</h5>
-                <div class="d-flex justify-content-md-end gap-3">
-                    <a href="#" class="btn btn-outline-primary btn-sm rounded-circle"><i class="bi bi-telegram"></i></a>
-                    <a href="#" class="btn btn-outline-danger btn-sm rounded-circle"><i class="bi bi-instagram"></i></a>
-                    <a href="#" class="btn btn-outline-primary btn-sm rounded-circle"><i class="bi bi-facebook"></i></a>
-                </div>
-                <div class="mt-3 text-muted small">© 2026 Barcha huquqlar himoyalangan.</div>
-            </div>
+<!-- Floating AI assistant -->
+
+
+
+<footer class="mt-5 py-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <h5 class="fw-bold mb-3" style="color:var(--accent-1)">LMS Academy</h5>
+        <p class="text-muted small">Zamonaviy ta'lim markazi. Biz bilan eng qisqa vaqt ichida professional dasturchi bo'ling.</p>
+      </div>
+      <div class="col-md-4 text-md-center">
+        <h5 class="fw-bold mb-3">Havolalar</h5>
+        <ul class="list-unstyled small">
+          <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Biz haqimizda</a></li>
+          <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Bog'lanish</a></li>
+          <li><a href="#" class="text-muted text-decoration-none">Maxfiylik siyosati</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4 text-md-end">
+        <h5 class="fw-bold mb-3">Biz ijtimoiy tarmoqlarda</h5>
+        <div class="d-flex justify-content-md-end gap-3">
+          <a href="#" class="btn btn-outline-primary btn-sm rounded-circle"><i class="bi bi-telegram"></i></a>
+          <a href="#" class="btn btn-outline-danger btn-sm rounded-circle"><i class="bi bi-instagram"></i></a>
+          <a href="#" class="btn btn-outline-primary btn-sm rounded-circle"><i class="bi bi-facebook"></i></a>
         </div>
+        <div class="mt-3 text-muted small">© 2026 Barcha huquqlar himoyalangan.</div>
+      </div>
     </div>
+  </div>
 </footer>
 
 <script>
-    // Oddiy skroll animatsiyasi
-    document.addEventListener("DOMContentLoaded", function() {
-        const cards = document.querySelectorAll('.animate-up');
-        cards.forEach((card, index) => {
-            setTimeout(() => {
-                card.style.opacity = '1';
-                card.style.transform = 'translateY(0)';
-            }, index * 100);
-        });
+  // =========================
+  // Theme initialization + sync with system
+  // =========================
+  (function(){
+    const html = document.documentElement;
+    const saved = localStorage.getItem('theme'); // 'light'|'dark' or null
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (saved) {
+      html.setAttribute('data-bs-theme', saved);
+    } else {
+      html.setAttribute('data-bs-theme', prefersDark ? 'dark' : 'light');
+    }
+
+    // Watch for system changes if user didn't set preference
+    window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      if (!localStorage.getItem('theme')) {
+        html.setAttribute('data-bs-theme', e.matches ? 'dark' : 'light');
+      }
     });
+  })();
+
+  // =========================
+  // Simple AI Assistant demo (client-side simulation)
+  // - showAiOverlay() / hideAiOverlay()
+  // - send query triggers simulated "AI loading" and then renders response
+  // =========================
+  (function(){
+    const aiFab = document.getElementById('aiFab');
+    const aiOverlay = document.getElementById('aiOverlay');
+    const aiClose = document.getElementById('aiClose');
+    const aiSend = document.getElementById('aiSend');
+    const aiClear = document.getElementById('aiClear');
+    const aiPrompt = document.getElementById('aiPrompt');
+    const aiResponse = document.getElementById('aiResponse');
+    const aiDots = document.getElementById('aiDots');
+
+    function showAiOverlay(prefill) {
+      aiOverlay.classList.add('show');
+      aiOverlay.setAttribute('aria-hidden','false');
+      if (prefill) aiPrompt.value = prefill;
+      aiPrompt.focus();
+      aiResponse.innerHTML = ''; // clear previous
+    }
+
+    function hideAiOverlay() {
+      aiOverlay.classList.remove('show');
+      aiOverlay.setAttribute('aria-hidden','true');
+    }
+
+    // Simulate AI processing: show typing indicator, then result
+    async function simulateAiProcess(prompt) {
+      // show typing dots
+      aiDots.style.visibility = 'visible';
+      aiResponse.innerHTML = '<div style="opacity:.85">AI javob kutilyapti...</div>';
+
+      // Simulated network + computation delay
+      await new Promise(res => setTimeout(res, 1200 + Math.random()*1200));
+
+      // Generate a simple simulated answer (for demo only)
+      const reply = generateSimulatedReply(prompt);
+      aiDots.style.visibility = 'hidden';
+      aiResponse.innerHTML = `<div style="white-space:pre-wrap;line-height:1.5">${escapeHtml(reply)}</div>`;
+      aiResponse.scrollTop = aiResponse.scrollHeight;
+    }
+
+    function generateSimulatedReply(prompt) {
+      const p = (prompt || '').trim().toLowerCase();
+      if (!p) return "Iltimos, savol yoki topshiriq yozing — men yordam beraman.";
+      if (p.includes('python')) {
+        return "Python kurslari uchun tavsiya: Boshlang'ich uchun 'Python Fundamentals', keyin 'Web dev with Django'.\n\nHar bir kursda loyihalar, kod-review va imtihonlar bo'lishi kerak.";
+      }
+      if (p.includes('sertifikat')) {
+        return "Sertifikat: Kursni 70% va undan yuqori natija bilan tugatgan talabalar rasmiy sertifikat oladi. Sertifikat PDF formatda yuklab olinadi.";
+      }
+      if (p.includes('narx') || p.includes('price') || p.includes('to\'lov')) {
+        return "Kurslarning narxi va chegirmalar bo'limi: Har bir kurs sahifasida narx ko'rsatilgan. Talabalar uchun vaqtinchalik chegirmalar va promo-kodlar beriladi.";
+      }
+      // fallback
+      return "Ajoyib savol! Mana qisqacha tavsiya:\n1. Kursni reja asosida o'ting.\n2. Amaliy loyihalarni bajaring.\n3. Mentorlar bilan savollarni muhokama qiling.\n\nAgar aniq kurs haqida so'rasangiz, men batafsil yordam beraman.";
+    }
+
+    function escapeHtml(str) {
+      return str.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+    }
+
+    // Events
+    aiFab.addEventListener('click', ()=> showAiOverlay());
+    aiClose.addEventListener('click', hideAiOverlay);
+    aiClear.addEventListener('click', ()=> {
+      aiPrompt.value = '';
+      aiResponse.innerHTML = '';
+      aiPrompt.focus();
+    });
+
+    aiSend.addEventListener('click', async ()=> {
+      const prompt = aiPrompt.value || '';
+      // Minimal validation
+      if (!prompt.trim()) {
+        aiResponse.innerHTML = '<div class="text-muted">Iltimos, savol kiriting.</div>';
+        aiPrompt.focus();
+        return;
+      }
+      // Simulate sending to AI — replace with actual API call if available
+      await simulateAiProcess(prompt);
+    });
+
+    // Close overlay on ESC
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && aiOverlay.classList.contains('show')) hideAiOverlay();
+      // Quick open AI with "/" when not focused on input
+      if (e.key === '/' && !aiOverlay.classList.contains('show') && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        showAiOverlay('');
+      }
+    });
+
+    // On load: subtle entrance animation for hero
+    document.addEventListener('DOMContentLoaded', ()=> {
+      document.querySelectorAll('.hero-card, .stat-card-modern, .course-card, .glass-card, .ai-fab').forEach((el, i) => {
+        el.style.opacity = 0;
+        el.style.transform = 'translateY(10px)';
+        setTimeout(()=> {
+          el.style.transition = 'opacity 400ms ease, transform 400ms cubic-bezier(.2,.9,.3,1)';
+          el.style.opacity = 1;
+          el.style.transform = 'translateY(0)';
+        }, 120 + i * 80);
+      });
+    });
+  })();
 </script>
 {% endblock %}
