@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'accounts',
     'blog',
+    'ai_yordamchi',
 ]
 
 # Jazzmin Admin UI Settings
