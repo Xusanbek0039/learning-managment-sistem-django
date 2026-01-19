@@ -21,7 +21,7 @@ def ai_chat(request):
 
         answer = response.choices[0].message.content
 
-    return render(request, "ai_yordamchi/chat.html", {
+    return render(request, "chat.html", {
         "answer": answer,
         "question": question
     })
