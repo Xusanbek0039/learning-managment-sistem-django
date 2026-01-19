@@ -15,7 +15,8 @@ from .forms import (
 from .models import (
     Profession, CustomUser, CourseEnrollment, Lesson, VideoLesson, VideoProgress,
     Homework, HomeworkSubmission, Test, TestQuestion, TestAnswer, TestResult,
-    TestUserAnswer, Certificate, CoinTransaction, Message, PaymentStatus
+    TestUserAnswer, Certificate, CoinTransaction, Message, PaymentStatus,
+    Product, ProductLike, ProductComment, ProductPurchase, ActivityLog
 )
 
 from django.core.management import call_command
@@ -288,11 +289,20 @@ def submit_test(request, pk):
     result.passed = score >= test.passing_score
     result.save()
     
-    if result.passed and not result.coin_awarded:
-        request.user.add_coins(1, f"Test muvaffaqiyatli topshirildi: {test.lesson.title}")
+    # Har bir to'g'ri javob uchun 1 coin
+    if correct > 0 and not result.coin_awarded:
+        request.user.add_coins(correct, f"Test: {correct} ta to'g'ri javob - {test.lesson.title}")
         result.coin_awarded = True
         result.save()
-        messages.success(request, "Tabriklaymiz! Siz testni muvaffaqiyatli topshirdingiz va 1 coin oldingiz!")
+        
+        # Activity log
+        ActivityLog.objects.create(
+            user=request.user,
+            action_type='submit_test',
+            description=f"Test topshirdi: {test.lesson.title} - {correct}/{total} to'g'ri, {correct} coin oldi"
+        )
+        
+        messages.success(request, f"Tabriklaymiz! {correct} ta to'g'ri javob uchun {correct} coin oldingiz!")
     
     return redirect('test_result', pk=result.pk)
 
@@ -1037,6 +1047,7 @@ def grade_homework(request, pk):
         return redirect('home')
     
     submission = get_object_or_404(HomeworkSubmission, pk=pk)
+    was_graded = submission.grade is not None
     
     if request.method == 'POST':
         form = HomeworkGradeForm(request.POST)
@@ -1047,6 +1058,20 @@ def grade_homework(request, pk):
             submission.graded_by = request.user
             submission.graded_at = timezone.now()
             submission.save()
+            
+            # Baholangan vazifa uchun 5 coin (faqat birinchi marta)
+            if not was_graded and not submission.coin_awarded:
+                submission.student.add_coins(5, f"Vazifa baholandi: {submission.homework.lesson.title}")
+                submission.coin_awarded = True
+                submission.save()
+                
+                # Activity log
+                ActivityLog.objects.create(
+                    user=submission.student,
+                    action_type='homework_graded',
+                    description=f"Vazifasi baholandi: {submission.homework.lesson.title} - Baho: {submission.grade}, +5 coin"
+                )
+            
             messages.success(request, "Vazifa baholandi!")
             return redirect('homework_submissions')
     else:
