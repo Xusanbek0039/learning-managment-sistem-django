@@ -49,7 +49,7 @@ def post_detail(request, pk):
             request.user.add_coins(1, f"Izoh qoldirildi: {post.title}")
             ActivityLog.objects.create(
                 user=request.user,
-                action_type='comment_post',
+                action_type='Postga izoh qoldirdi',
                 description=f"Postga izoh qoldirdi: {post.title}"
             )
             messages.success(request, "Izoh qoldirildi (+1 coin)!")
@@ -94,7 +94,7 @@ def toggle_like(request, pk):
         request.user.add_coins(1, f"Postga like bosildi: {post.title}")
         ActivityLog.objects.create(
             user=request.user,
-            action_type='like_post',
+            action_type='Postga like bosdi',
             description=f"Postga like bosdi: {post.title}"
         )
         

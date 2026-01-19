@@ -314,7 +314,7 @@ def submit_test(request, pk):
         # Activity log
         ActivityLog.objects.create(
             user=request.user,
-            action_type='submit_test',
+            action_type='Test topshirdi',
             description=f"Test topshirdi: {test.lesson.title} - {correct}/{total} to'g'ri, {correct} coin oldi"
         )
         
@@ -1084,7 +1084,7 @@ def grade_homework(request, pk):
                 # Activity log
                 ActivityLog.objects.create(
                     user=submission.student,
-                    action_type='homework_graded',
+                    action_type='Vazifa baxosi uchun',
                     description=f"Vazifasi baholandi: {submission.homework.lesson.title} - Baho: {submission.grade}, +5 coin"
                 )
             
@@ -1498,7 +1498,7 @@ def market_detail(request, pk):
             request.user.add_coins(1, f"Mahsulotga izoh: {product.name}")
             ActivityLog.objects.create(
                 user=request.user,
-                action_type='comment_product',
+                action_type='Izoh qoldirdi',
                 description=f"Mahsulotga izoh qoldirdi: {product.name}"
             )
             messages.success(request, "Izoh qo'shildi (+1 coin)!")
@@ -1523,7 +1523,7 @@ def market_like(request, pk):
         request.user.add_coins(1, f"Mahsulotga like: {product.name}")
         ActivityLog.objects.create(
             user=request.user,
-            action_type='like_product',
+            action_type='Like bosdi',
             description=f"Mahsulotga like bosdi: {product.name}"
         )
     
@@ -1566,7 +1566,7 @@ def market_purchase(request, pk):
         )
         ActivityLog.objects.create(
             user=request.user,
-            action_type='purchase_product',
+            action_type='Sotib olindi',
             description=f"Mahsulot sotib oldi: {product.name} ({product.coin_price} coin)"
         )
         
