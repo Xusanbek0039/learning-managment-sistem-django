@@ -5,60 +5,35 @@
 {% block extra_css %}
 <style>
 :root{
+    --card-bg: var(--bs-body-bg);
+    --card-border: var(--bs-border-color);
     --soft-bg: rgba(0,0,0,.06);
 }
 [data-bs-theme="dark"]{
     --soft-bg: rgba(255,255,255,.06);
 }
 
-/* ===== VIDEO BOX ===== */
-.video-wrapper{
-    position: relative;
-    border-radius: 18px;
-    overflow: hidden;
-    box-shadow: 0 10px 35px rgba(0,0,0,.25);
+.card{
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
 }
 
-.video-overlay{
-    position:absolute;
-    inset:0;
-    background:linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,.15));
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-    transition:.3s;
-}
-.video-overlay:hover{
-    background:linear-gradient(to top, rgba(0,0,0,.7), rgba(0,0,0,.25));
-}
-
-.play-btn{
-    font-size:4rem;
-    color:#fff;
-    animation:pulse 1.8s infinite;
-}
-
-@keyframes pulse{
-    0%{transform:scale(1);opacity:.9}
-    50%{transform:scale(1.15);opacity:1}
-    100%{transform:scale(1);opacity:.9}
-}
-
-/* ===== TIMER ===== */
 .video-timer {
     background: linear-gradient(135deg, #6c757d, #495057);
     color: #fff;
     padding: 14px 22px;
     border-radius: 14px;
+    font-size: 1rem;
     font-weight: 600;
     display: inline-flex;
     align-items: center;
     gap: 10px;
 }
+
 .video-timer.ready {
     background: linear-gradient(135deg, #198754, #157347);
 }
+
 .video-timer.paused {
     background: linear-gradient(135deg, #fd7e14, #e85d04);
 }
@@ -70,116 +45,130 @@
     overflow: hidden;
     margin-top: 15px;
 }
+
 .progress-bar-fill {
     height: 100%;
     background: linear-gradient(135deg, #0d6efd, #0a58ca);
     transition: width 1s linear;
 }
 
-.btn-watch{max-width:320px;width:100%}
+.btn-watch{
+    width:100%;
+    max-width:320px;
+}
+
+@media (max-width: 576px){
+    .video-timer{
+        font-size: .95rem;
+        padding: 12px 16px;
+    }
+}
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container my-4 my-md-5">
 
-<a href="{% url 'profession_detail' profession.pk %}" class="btn btn-outline-secondary mb-4">
-    <i class="bi bi-arrow-left me-2"></i>Orqaga
-</a>
+    <a href="{% url 'profession_detail' profession.pk %}" class="btn btn-outline-secondary mb-4">
+        <i class="bi bi-arrow-left me-2"></i>Orqaga
+    </a>
 
-<div class="card shadow-sm">
-<div class="card-header bg-transparent">
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <h5 class="m-0 text-primary">
-            <i class="bi bi-play-circle me-2"></i>{{ lesson.title }}
-        </h5>
-        {% if progress.watched %}
-        <span class="badge bg-success">
-            <i class="bi bi-check-circle me-1"></i>Ko‘rilgan
-        </span>
-        {% endif %}
+    <div class="card shadow-sm">
+        <div class="card-header bg-transparent border-bottom">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <h5 class="m-0 text-primary">
+                    <i class="bi bi-play-circle me-2"></i>{{ lesson.title }}
+                </h5>
+                {% if progress.watched %}
+                    <span class="badge bg-success">
+                        <i class="bi bi-check-circle me-1"></i>Ko‘rilgan
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card-body">
+
+            <!-- VIDEO -->
+<div class="ratio ratio-16x9 mb-4 rounded overflow-hidden position-relative" id="videoBox">
+
+    <!-- Thumbnail -->
+    <div id="thumbLayer" class="w-100 h-100 position-absolute top-0 start-0" style="cursor:pointer;">
+        <img 
+            src="https://img.youtube.com/vi/{{ video.get_embed_url|cut:'https://www.youtube.com/embed/' }}/hqdefault.jpg"
+            class="w-100 h-100 object-fit-cover"
+            alt="Video">
+        <div class="position-absolute top-50 start-50 translate-middle text-white fs-1">
+            <i class="bi bi-play-circle-fill"></i>
+        </div>
     </div>
-</div>
 
-<div class="card-body">
-
-<!-- ===== VIDEO ===== -->
-<div class="ratio ratio-16x9 video-wrapper mb-4">
-
-    <div id="videoOverlay" class="video-overlay">
-        <i class="bi bi-play-circle-fill play-btn"></i>
-    </div>
-
+    <!-- Iframe (hidden) -->
     <iframe
         id="videoFrame"
         src=""
         title="{{ lesson.title }}"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowfullscreen
-        class="w-100 h-100 border-0">
+        class="w-100 h-100 border-0 d-none">
     </iframe>
 
 </div>
 
-{% if not progress.watched %}
-<div class="text-center">
 
-    <div class="mb-4">
+            {% if not progress.watched %}
+            <div class="text-center">
 
-        <div class="video-timer mb-2" id="timerDisplay">
-            <i class="bi bi-clock"></i>
-            <span>Qolgan vaqt: <span id="countdown">00:00</span></span>
+                <!-- TIMER -->
+                <div class="mb-4">
+
+                    <div class="video-timer mb-2" id="timerDisplay">
+                        <i class="bi bi-clock"></i>
+                        <span>
+                            Qolgan vaqt:
+                            <span id="countdown">00:00</span>
+                        </span>
+                    </div>
+
+                    <div class="progress-bar-custom mx-auto" style="max-width:400px;">
+                        <div class="progress-bar-fill" id="progressBar" style="width:0%;"></div>
+                    </div>
+
+                    <p class="text-muted mt-2" id="statusText">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Videoni kamida {% widthratio video.duration 2 1 %} daqiqa ko‘ring
+                    </p>
+
+                </div>
+
+                <button class="btn btn-success btn-lg btn-watch mt-2" id="markWatched" disabled>
+                    <i class="bi bi-check-circle me-2"></i>Ko‘rdim (+1 coin)
+                </button>
+
+            </div>
+            {% else %}
+
+            <div class="alert alert-success text-center">
+                <i class="bi bi-check-circle me-2"></i>
+                Siz bu videoni ko‘rgansiz va 1 coin oldingiz!
+            </div>
+
+            {% endif %}
         </div>
-
-        <div class="progress-bar-custom mx-auto" style="max-width:400px;">
-            <div class="progress-bar-fill" id="progressBar" style="width:0%;"></div>
-        </div>
-
-        <p class="text-muted mt-2" id="statusText">
-            Videoni kamida {{ video.duration|default:1 }} daqiqa ko‘ring
-        </p>
-
     </div>
-
-    <button class="btn btn-success btn-lg btn-watch mt-2" id="markWatched" disabled>
-        <i class="bi bi-check-circle me-2"></i>Ko‘rdim (+1 coin)
-    </button>
-
-</div>
-{% else %}
-
-<div class="alert alert-success text-center">
-    <i class="bi bi-check-circle me-2"></i>
-    Siz bu videoni ko‘rgansiz. Qayta ko‘rishingiz mumkin 😊
-</div>
-
-{% endif %}
-
-<!-- REPLAY -->
-<div class="text-center mt-3">
-    <button class="btn btn-outline-primary" id="replayBtn">
-        <i class="bi bi-arrow-repeat me-1"></i>Qayta ko‘rish
-    </button>
-</div>
-
-</div>
-</div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-const overlay = document.getElementById('videoOverlay');
-const iframe = document.getElementById('videoFrame');
-const replayBtn = document.getElementById('replayBtn');
-
-let timerStarted = false;
-let isPaused = false;
-let watchedTime = 0;
-
 {% if not progress.watched %}
+
 const videoMinutes = {{ video.duration|default:1 }};
-const requiredTime = Math.floor(videoMinutes * 60 / 2);
+const videoDuration = videoMinutes * 60; // sekund
+const requiredTime = Math.floor(videoDuration / 2); // 50%
+
+let watchedTime = 0;
+let isPaused = false;
 
 const timerDisplay = document.getElementById('timerDisplay');
 const countdownEl = document.getElementById('countdown');
@@ -187,67 +176,62 @@ const progressBar = document.getElementById('progressBar');
 const statusText = document.getElementById('statusText');
 const markWatchedBtn = document.getElementById('markWatched');
 
-function formatTime(sec){
-    const m = Math.floor(sec / 60);
-    const s = sec % 60;
+function formatTime(seconds){
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
     return `${m}:${s.toString().padStart(2,'0')}`;
 }
-countdownEl.textContent = formatTime(requiredTime);
 
 function updateTimer(){
-    if(isPaused || !timerStarted) return;
+    if(isPaused) return;
 
     watchedTime++;
 
-    const remain = Math.max(0, requiredTime - watchedTime);
-    const progress = Math.min(100, watchedTime / requiredTime * 100);
+    const remaining = Math.max(0, requiredTime - watchedTime);
+    const progress = Math.min(100, (watchedTime / requiredTime) * 100);
 
-    countdownEl.textContent = formatTime(remain);
+    countdownEl.textContent = formatTime(remaining);
     progressBar.style.width = progress + "%";
 
     if(watchedTime >= requiredTime){
         clearInterval(timerInterval);
         timerDisplay.classList.add('ready');
-        timerDisplay.innerHTML = '<i class="bi bi-check-circle"></i><span>Tayyor!</span>';
-        statusText.innerHTML = 'Endi tugmani bosishingiz mumkin 🎉';
+        timerDisplay.innerHTML = '<i class="bi bi-check-circle"></i><span>Tayyor! Tugmani bosishingiz mumkin</span>';
+        statusText.innerHTML = '<i class="bi bi-check-circle text-success me-1"></i>Video yetarlicha ko‘rildi';
         markWatchedBtn.disabled = false;
     }
 }
 
-const timerInterval = setInterval(updateTimer, 1000);
-
-document.addEventListener('visibilitychange', ()=>{
-    isPaused = document.hidden;
-    if(isPaused){
-        timerDisplay.classList.add('paused');
+document.addEventListener('visibilitychange', () => {
+    if(document.hidden){
+        isPaused = true;
+        if(!timerDisplay.classList.contains('ready')){
+            timerDisplay.classList.add('paused');
+            statusText.innerHTML = '<i class="bi bi-pause-circle text-warning me-1"></i>Timer to‘xtatildi. Videoga qayting!';
+        }
     }else{
+        isPaused = false;
         timerDisplay.classList.remove('paused');
     }
 });
-{% endif %}
 
-/* ===== PLAY ===== */
-function playVideo(){
+countdownEl.textContent = formatTime(requiredTime);
+const timerInterval = setInterval(updateTimer, 1000);
+const thumb = document.getElementById('thumbLayer');
+const iframe = document.getElementById('videoFrame');
+
+thumb.addEventListener('click', function(){
     iframe.src = "{{ video.get_embed_url }}?autoplay=1";
-    overlay.style.display = 'none';
-    timerStarted = true;
-}
-
-overlay.addEventListener('click', playVideo);
-
-/* ===== REPLAY ===== */
-replayBtn.addEventListener('click', ()=>{
-    iframe.src = "";
-    setTimeout(()=>playVideo(),300);
+    iframe.classList.remove('d-none');
+    thumb.classList.add('d-none');
 });
+markWatchedBtn.addEventListener('click', function(){
+    if(this.disabled) return;
 
-/* ===== MARK WATCHED ===== */
-{% if not progress.watched %}
-markWatchedBtn.addEventListener('click', ()=>{
     fetch('{% url "mark_video_watched" video.pk %}',{
         method:'POST',
         headers:{
-            'X-CSRFToken':'{{ csrf_token }}',
+            'X-CSRFToken': '{{ csrf_token }}',
             'Content-Type':'application/json'
         }
     })
@@ -255,10 +239,14 @@ markWatchedBtn.addEventListener('click', ()=>{
     .then(data=>{
         if(data.success){
             alert("Tabriklaymiz! 🎉 1 coin oldingiz!");
-            location.reload();
+            setTimeout(()=>location.reload(),1500);
         }
     });
 });
+
 {% endif %}
 </script>
 {% endblock %}
+
+
+
