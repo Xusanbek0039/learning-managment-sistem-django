@@ -414,6 +414,13 @@
                     </li>
 
                     <li class="nav-item">
+                        <a class="nav-link {% if 'market' in request.resolver_match.url_name %}active{% endif %}"
+                            href="{% url 'market_list' %}">
+                            <i class="bi bi-shop me-1"></i>Market
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
                         <a class="nav-link {% if request.resolver_match.url_name == 'messages' %}active{% endif %}"
                             href="{% url 'messages' %}">
                             <i class="bi bi-envelope me-1"></i>Xabarlar
