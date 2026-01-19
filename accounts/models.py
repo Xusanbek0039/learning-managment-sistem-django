@@ -128,22 +128,58 @@ class Lesson(models.Model):
         return f"{self.title} ({self.get_lesson_type_display()})"
 
 
+from django.db import models
+from django.utils.html import format_html
+
+
 class VideoLesson(models.Model):
-    lesson = models.OneToOneField(Lesson, on_delete=models.CASCADE, related_name='video')
-    youtube_url = models.URLField(verbose_name="YouTube havolasi")
-    duration = models.IntegerField(default=0, verbose_name="Davomiyligi (daqiqa)")
-    
+    lesson = models.OneToOneField(
+        'Lesson',
+        on_delete=models.CASCADE,
+        related_name='video'
+    )
+
+    youtube_url = models.URLField(
+        verbose_name="YouTube havolasi"
+    )
+
+    duration = models.PositiveIntegerField(
+        default=1,
+        verbose_name="Davomiyligi (daqiqa)"
+    )
+
     def get_embed_url(self):
-        if 'watch?v=' in self.youtube_url:
-            video_id = self.youtube_url.split('watch?v=')[1].split('&')[0]
-            return f"https://www.youtube.com/embed/{video_id}"
-        elif 'youtu.be/' in self.youtube_url:
-            video_id = self.youtube_url.split('youtu.be/')[1].split('?')[0]
-            return f"https://www.youtube.com/embed/{video_id}"
-        return self.youtube_url
-    
+        url = self.youtube_url.strip()
+
+        # https://www.youtube.com/watch?v=ID
+        if "watch?v=" in url:
+            video_id = url.split("watch?v=")[1].split("&")[0]
+
+        # https://youtu.be/ID
+        elif "youtu.be/" in url:
+            video_id = url.split("youtu.be/")[1].split("?")[0]
+
+        # https://www.youtube.com/embed/ID
+        elif "youtube.com/embed/" in url:
+            video_id = url.split("embed/")[1].split("?")[0]
+
+        else:
+            return url  # fallback
+
+        return f"https://www.youtube.com/embed/{video_id}"
+
+    def embed_preview(self):
+        """Admin panel uchun preview"""
+        return format_html(
+            '<iframe width="200" height="120" src="{}" frameborder="0" allowfullscreen></iframe>',
+            self.get_embed_url()
+        )
+
+    embed_preview.short_description = "Video preview"
+
     def __str__(self):
-        return self.lesson.title
+        return f"🎬 {self.lesson.title}"
+
 
 
 class VideoProgress(models.Model):

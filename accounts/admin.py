@@ -86,8 +86,18 @@ class LessonAdmin(admin.ModelAdmin):
 
 @admin.register(VideoLesson)
 class VideoLessonAdmin(admin.ModelAdmin):
-    list_display = ['lesson', 'duration', 'youtube_url']
-    search_fields = ['lesson__title']
+    list_display = ('lesson', 'duration', 'youtube_url', 'embed_preview')
+    search_fields = ('lesson__title',)
+    readonly_fields = ('embed_preview',)
+
+    fieldsets = (
+        (None, {
+            'fields': ('lesson', 'youtube_url', 'duration')
+        }),
+        ('Video Preview', {
+            'fields': ('embed_preview',),
+        }),
+    )
 
 
 @admin.register(Homework)
