@@ -23,8 +23,7 @@
                 <div class="card-body p-4 p-lg-5">
                     <div class="d-flex align-items-center mb-4">
                         <span class="badge bg-primary me-3">{{ post.get_post_type_display }}</span>
-                        <span class="text-muted small"><i class="bi bi-calendar3 me-2"></i>{{ post.created_at|date:"d F
-                            Y, H:i" }}</span>
+                        <span class="text-muted small"><i class="bi bi-calendar3 me-2"></i>{{ post.created_at|date:"d.m.Y, H:i" }}</span>
                     </div>
 
                     <h1 class="fw-bold mb-4" style="color: var(--text);">{{ post.title }}</h1>
@@ -72,8 +71,7 @@
                         <form method="post">
                             {% csrf_token %}
                             <div class="mb-3">
-                                {{ form.content|add_class:"form-control
-                                bg-light"|attr:"rows:3"|attr:"placeholder:Fikringizni yozib qoldiring..." }}
+                                <textarea name="content" class="form-control bg-light" rows="3" placeholder="Fikringizni yozib qoldiring..." required>{{ form.content.value|default:'' }}</textarea>
                             </div>
                             <div class="text-end">
                                 <button type="submit" class="btn btn-primary">

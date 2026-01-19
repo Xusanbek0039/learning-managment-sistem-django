@@ -48,7 +48,7 @@ def login_view(request):
         return redirect('home')
     
     if request.method == 'POST':
-        form = LoginForm(request, data=request.POST)
+        form = LoginForm(request.POST)
         if form.is_valid():
             user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
             if user is not None:
@@ -589,15 +589,11 @@ def export_system_pdf(request):
     elements.append(Spacer(1, 15))
     
     total_enrollments = CourseEnrollment.objects.count()
-    active_enrollments = CourseEnrollment.objects.filter(is_active=True).count()
-    completed_enrollments = CourseEnrollment.objects.filter(completed=True).count()
     
     elements.append(Paragraph("7. Kursga yozilish statistikasi", heading_style))
     enroll_data = [
         ["Ko'rsatkich", 'Soni'],
         ["Jami yozilishlar", str(total_enrollments)],
-        ['Faol kurslar', str(active_enrollments)],
-        ['Tugatilgan kurslar', str(completed_enrollments)],
     ]
     elements.append(create_table(enroll_data))
     elements.append(Spacer(1, 15))

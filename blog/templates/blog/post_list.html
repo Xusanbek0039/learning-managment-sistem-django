@@ -62,10 +62,8 @@
                 {% endif %}
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="badge bg-primary bg-opacity-10 text-primary">{{ post.get_post_type_display
-                            }}</span>
-                        <small class="text-muted"><i class="bi bi-clock me-1"></i>{{ post.created_at|date:"d.m.Y"
-                            }}</small>
+                        <span class="badge bg-primary bg-opacity-10 text-primary">{{ post.get_post_type_display }}</span>
+                        <small class="text-muted"><i class="bi bi-clock me-1"></i>{{ post.created_at|date:"d.m.Y" }}</small>
                     </div>
                     <a href="{% url 'blog:post_detail' post.pk %}" class="text-decoration-none">
                         <h5 class="card-title fw-bold mb-2 text-dark">{{ post.title|truncatechars:50 }}</h5>
