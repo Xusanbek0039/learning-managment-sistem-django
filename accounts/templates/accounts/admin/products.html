@@ -2,11 +2,127 @@
 
 {% block title %}Mahsulotlarni boshqarish - Admin{% endblock %}
 
+{% block extra_css %}
+<meta name="keywords" content="Suyunov Husan, IT Creative, Django iOS admin panel, dark light responsive UI">
+<style>
+
+/* ===== iOS COLORS ===== */
+:root{
+    --bg:#f2f2f7;
+    --card:rgba(255,255,255,.85);
+    --text:#111;
+    --muted:#6c757d;
+    --border:rgba(0,0,0,.08);
+    --primary:#0a84ff;
+}
+@media (prefers-color-scheme: dark){
+    :root{
+        --bg:#000;
+        --card:rgba(28,28,30,.9);
+        --text:#fff;
+        --muted:#9ca3af;
+        --border:rgba(255,255,255,.1);
+    }
+}
+
+/* ===== PAGE ===== */
+.admin-ios{
+    background:var(--bg);
+    min-height:100vh;
+    padding:1rem;
+    color:var(--text);
+}
+
+/* ===== TOP BAR ===== */
+.top-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:1rem;
+    gap:.5rem;
+}
+.page-title{
+    font-weight:700;
+    font-size:1.5rem;
+}
+.btn-primary{
+    background:var(--primary);
+    border:none;
+    border-radius:14px;
+    padding:.55rem .9rem;
+}
+
+/* ===== CARD ===== */
+.card{
+    background:var(--card)!important;
+    backdrop-filter:blur(20px);
+    border-radius:22px;
+    border:1px solid var(--border);
+    overflow:hidden;
+}
+
+/* ===== TABLE ===== */
+.table{
+    margin:0;
+    color:var(--text);
+}
+.table thead{
+    background:transparent;
+}
+.table th{
+    color:var(--muted);
+    font-weight:600;
+    border-bottom:1px solid var(--border);
+}
+.table td{
+    border-top:1px solid var(--border);
+}
+
+/* ===== BADGES ===== */
+.badge{
+    border-radius:999px;
+    padding:.35rem .65rem;
+}
+
+/* ===== ACTION BTNS ===== */
+.action-btns .btn{
+    border-radius:12px;
+}
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media(max-width:768px){
+    table thead{display:none;}
+
+    table tr{
+        display:block;
+        padding:1rem;
+        border-bottom:1px solid var(--border);
+    }
+
+    table td{
+        display:flex;
+        justify-content:space-between;
+        border:none;
+        padding:.35rem 0;
+    }
+
+    table td::before{
+        content:attr(data-label);
+        font-weight:600;
+        color:var(--muted);
+    }
+}
+
+</style>
+{% endblock %}
+
 {% block admin_content %}
+<div class="admin-ios">
+
 <div class="top-bar">
     <h1 class="page-title"><i class="bi bi-box-seam me-2"></i>Mahsulotlar</h1>
     <a href="{% url 'admin_product_add' %}" class="btn btn-primary">
-        <i class="bi bi-plus-lg me-2"></i>Yangi mahsulot
+        <i class="bi bi-plus-lg me-1"></i>Yangi
     </a>
 </div>
 
@@ -21,63 +137,72 @@
                         <th>Narxi</th>
                         <th>Zaxira</th>
                         <th>Holat</th>
-                        <th class="text-center">Likelar</th>
-                        <th class="text-center">Izohlar</th>
+                        <th class="text-center">❤️</th>
+                        <th class="text-center">💬</th>
                         <th>Amallar</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for product in products %}
                     <tr>
-                        <td>
+
+                        <td data-label="Rasm">
                             {% if product.image %}
-                            <img src="{{ product.image.url }}" class="rounded" width="50" height="50" style="object-fit: cover;">
+                            <img src="{{ product.image.url }}" class="rounded" width="46" height="46" style="object-fit: cover;">
                             {% else %}
-                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width:46px;height:46px;">
                                 <i class="bi bi-image text-muted"></i>
                             </div>
                             {% endif %}
                         </td>
-                        <td class="align-middle fw-bold">{{ product.name }}</td>
-                        <td class="align-middle">
+
+                        <td data-label="Nomi" class="fw-bold">{{ product.name }}</td>
+
+                        <td data-label="Narxi">
                             <span class="badge bg-warning text-dark">
                                 <i class="bi bi-coin me-1"></i>{{ product.coin_price }}
                             </span>
                         </td>
-                        <td class="align-middle">
+
+                        <td data-label="Zaxira">
                             {% if product.stock > 0 %}
                             <span class="badge bg-success">{{ product.stock }} ta</span>
                             {% else %}
                             <span class="badge bg-danger">Tugagan</span>
                             {% endif %}
                         </td>
-                        <td class="align-middle">
+
+                        <td data-label="Holat">
                             {% if product.is_active %}
                             <span class="badge bg-success">Faol</span>
                             {% else %}
                             <span class="badge bg-secondary">Nofaol</span>
                             {% endif %}
                         </td>
-                        <td class="align-middle text-center">
+
+                        <td data-label="Likelar" class="text-center">
                             <span class="badge bg-danger">{{ product.likes_count }}</span>
                         </td>
-                        <td class="align-middle text-center">
+
+                        <td data-label="Izohlar" class="text-center">
                             <span class="badge bg-info">{{ product.comments_count }}</span>
                         </td>
-                        <td class="align-middle action-btns">
-                            <a href="{% url 'admin_product_edit' product.pk %}" class="btn btn-sm btn-outline-primary" title="Tahrirlash">
+
+                        <td data-label="Amallar" class="action-btns">
+                            <a href="{% url 'admin_product_edit' product.pk %}" class="btn btn-sm btn-outline-primary">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <a href="{% url 'admin_product_delete' product.pk %}" class="btn btn-sm btn-outline-danger" title="O'chirish">
+                            <a href="{% url 'admin_product_delete' product.pk %}" class="btn btn-sm btn-outline-danger">
                                 <i class="bi bi-trash"></i>
                             </a>
                         </td>
+
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="8" class="text-center py-5">
-                            <i class="bi bi-box-seam text-muted" style="font-size: 3rem;"></i>
-                            <p class="text-muted mt-3 mb-0">Hozircha mahsulotlar yo'q</p>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="bi bi-box-seam" style="font-size:3rem;"></i>
+                            <p class="mt-2 mb-0">Hozircha mahsulotlar yo‘q</p>
                         </td>
                     </tr>
                     {% endfor %}
@@ -85,5 +210,7 @@
             </table>
         </div>
     </div>
+</div>
+
 </div>
 {% endblock %}
