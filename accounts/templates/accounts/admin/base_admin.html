@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="uz" data-bs-theme="light">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -55,7 +56,7 @@
             font-size: 1.5rem;
             font-weight: 700;
             padding: 20px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             margin-bottom: 20px;
         }
 
@@ -64,7 +65,7 @@
         }
 
         .sidebar-nav .nav-link {
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
             padding: 12px 15px;
             border-radius: 10px;
             margin-bottom: 5px;
@@ -74,7 +75,7 @@
         }
 
         .sidebar-nav .nav-link:hover {
-            background-color: rgba(255,255,255,0.1);
+            background-color: rgba(255, 255, 255, 0.1);
             color: white;
         }
 
@@ -123,7 +124,7 @@
 
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
         .stat-icon {
@@ -136,12 +137,35 @@
             font-size: 1.5rem;
         }
 
-        .stat-icon.blue { background: linear-gradient(135deg, #0d6efd, #0a58ca); color: white; }
-        .stat-icon.green { background: linear-gradient(135deg, #198754, #157347); color: white; }
-        .stat-icon.orange { background: linear-gradient(135deg, #fd7e14, #e85d04); color: white; }
-        .stat-icon.purple { background: linear-gradient(135deg, #6f42c1, #5a32a3); color: white; }
-        .stat-icon.red { background: linear-gradient(135deg, #dc3545, #b02a37); color: white; }
-        .stat-icon.cyan { background: linear-gradient(135deg, #0dcaf0, #0aa2c0); color: white; }
+        .stat-icon.blue {
+            background: linear-gradient(135deg, #0d6efd, #0a58ca);
+            color: white;
+        }
+
+        .stat-icon.green {
+            background: linear-gradient(135deg, #198754, #157347);
+            color: white;
+        }
+
+        .stat-icon.orange {
+            background: linear-gradient(135deg, #fd7e14, #e85d04);
+            color: white;
+        }
+
+        .stat-icon.purple {
+            background: linear-gradient(135deg, #6f42c1, #5a32a3);
+            color: white;
+        }
+
+        .stat-icon.red {
+            background: linear-gradient(135deg, #dc3545, #b02a37);
+            color: white;
+        }
+
+        .stat-icon.cyan {
+            background: linear-gradient(135deg, #0dcaf0, #0aa2c0);
+            color: white;
+        }
 
         .stat-number {
             font-size: 2rem;
@@ -197,7 +221,8 @@
             box-shadow: 0 5px 20px rgba(13, 110, 253, 0.4);
         }
 
-        .form-control, .form-select {
+        .form-control,
+        .form-select {
             background-color: var(--bg-color);
             border: 2px solid var(--border-color);
             color: var(--text-color);
@@ -205,7 +230,8 @@
             border-radius: 10px;
         }
 
-        .form-control:focus, .form-select:focus {
+        .form-control:focus,
+        .form-select:focus {
             background-color: var(--bg-color);
             border-color: var(--primary-blue);
             box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
@@ -213,7 +239,7 @@
         }
 
         .theme-toggle-admin {
-            background-color: rgba(255,255,255,0.1);
+            background-color: rgba(255, 255, 255, 0.1);
             border: none;
             color: white;
             width: 40px;
@@ -241,7 +267,7 @@
             display: flex;
             align-items: center;
             padding: 15px;
-            background-color: rgba(255,255,255,0.05);
+            background-color: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
         }
 
@@ -265,7 +291,7 @@
         }
 
         .user-role {
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.5);
             font-size: 0.8rem;
         }
 
@@ -342,70 +368,87 @@
                 width: 80px;
                 padding: 15px;
             }
+
             .sidebar-brand span,
             .sidebar-nav .nav-link span,
-            .sidebar-footer .user-info > div:last-child {
+            .sidebar-footer .user-info>div:last-child {
                 display: none;
             }
+
             .sidebar-nav .nav-link {
                 justify-content: center;
                 padding: 15px;
             }
+
             .sidebar-nav .nav-link i {
                 margin: 0;
             }
+
             .main-content {
                 margin-left: 80px;
             }
         }
     </style>
 </head>
+
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
-        <div class="sidebar-brand">
-            <i class="bi bi-mortarboard-fill me-2"></i>
-            <span>LMS Admin</span>
+        <div class="sidebar-brand" style="text-decoration: none;">
+            <a href="{% url 'home' %}" class="nav-link"> <i class="bi bi-mortarboard-fill me-2 "></i>
+                <span>LMS Admin</span></a>
+
         </div>
 
         <nav class="sidebar-nav">
-            <a href="{% url 'admin_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+            <a href="{% url 'admin_dashboard' %}"
+                class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
                 <i class="bi bi-speedometer2"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="{% url 'admin_professions' %}" class="nav-link {% if 'profession' in request.resolver_match.url_name %}active{% endif %}">
+            <a href="{% url 'admin_professions' %}"
+                class="nav-link {% if 'profession' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="bi bi-briefcase"></i>
                 <span>Kasblar</span>
             </a>
-            <a href="{% url 'admin_users' %}" class="nav-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}">
+            <a href="{% url 'admin_users' %}"
+                class="nav-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="bi bi-people"></i>
                 <span>Foydalanuvchilar</span>
             </a>
-            <a href="{% url 'admin_statistics' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_statistics' %}active{% endif %}">
+            <a href="{% url 'admin_statistics' %}"
+                class="nav-link {% if request.resolver_match.url_name == 'admin_statistics' %}active{% endif %}">
                 <i class="bi bi-graph-up"></i>
                 <span>Statistika</span>
             </a>
-            <a href="{% url 'admin_messages' %}" class="nav-link {% if 'message' in request.resolver_match.url_name %}active{% endif %}">
+            <a href="{% url 'admin_messages' %}"
+                class="nav-link {% if 'message' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="bi bi-envelope"></i>
                 <span>Xabarlar</span>
             </a>
-            <a href="{% url 'admin_payments' %}" class="nav-link {% if 'payment' in request.resolver_match.url_name %}active{% endif %}">
+            
+            <a href="{% url 'admin_payments' %}"
+                class="nav-link {% if 'payment' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="bi bi-credit-card"></i>
                 <span>To'lovlar</span>
             </a>
-            <a href="{% url 'homework_submissions' %}" class="nav-link {% if request.resolver_match.url_name == 'homework_submissions' %}active{% endif %}">
+            <a href="{% url 'homework_submissions' %}"
+                class="nav-link {% if request.resolver_match.url_name == 'homework_submissions' %}active{% endif %}">
                 <i class="bi bi-file-check"></i>
                 <span>Vazifalar</span>
             </a>
-            <a href="{% url 'admin_products' %}" class="nav-link {% if 'product' in request.resolver_match.url_name %}active{% endif %}">
+            <a href="{% url 'admin_products' %}"
+                class="nav-link {% if 'product' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="bi bi-shop"></i>
                 <span>Mahsulotlar</span>
             </a>
-            <a href="{% url 'admin_purchases' %}" class="nav-link {% if 'purchase' in request.resolver_match.url_name %}active{% endif %}">
+            <a href="{% url 'admin_purchases' %}"
+                class="nav-link {% if 'purchase' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="bi bi-bag-check"></i>
                 <span>Xaridlar</span>
             </a>
-            <a href="{% url 'admin_activities' %}" class="nav-link {% if 'activities' in request.resolver_match.url_name %}active{% endif %}">
+            <a href="{% url 'admin_activities' %}"
+                class="nav-link {% if 'activities' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="bi bi-activity"></i>
                 <span>Harakatlar</span>
             </a>
@@ -413,10 +456,7 @@
                 <i class="bi bi-newspaper"></i>
                 <span>Blog</span>
             </a>
-            <a href="{% url 'home' %}" class="nav-link">
-                <i class="bi bi-house"></i>
-                <span>Ortga qaytish</span>
-            </a>
+        
         </nav>
 
         <div class="sidebar-footer">
@@ -438,12 +478,12 @@
     <!-- Main Content -->
     <div class="main-content">
         {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
         {% endif %}
 
         {% block admin_content %}{% endblock %}
@@ -462,7 +502,7 @@
         themeToggle.addEventListener('click', () => {
             const currentTheme = html.getAttribute('data-bs-theme');
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            
+
             html.setAttribute('data-bs-theme', newTheme);
             localStorage.setItem('theme', newTheme);
             updateIcon(newTheme);
@@ -479,4 +519,5 @@
         }
     </script>
 </body>
+
 </html>

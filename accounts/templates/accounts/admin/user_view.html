@@ -1,186 +1,214 @@
 {% extends 'accounts/admin/base_admin.html' %}
 
-{% block title %}{{ user_obj.full_name }} - Admin Panel{% endblock %}
+{% block title %}{{ user_obj.full_name }} | Admin Panel{% endblock %}
 
 {% block admin_content %}
-<a href="{% url 'admin_users' %}" class="back-link">
-    <i class="bi bi-arrow-left me-2"></i>Orqaga qaytish
+
+<a href="{% url 'admin_users' %}" class="btn btn-outline-secondary rounded-pill mb-4">
+    <i class="bi bi-arrow-left me-1"></i>Orqaga
 </a>
 
-<div class="row">
-    <div class="col-md-4 mb-4">
-        <div class="card text-center p-4">
-            <div class="mb-3">
-                {% if user_obj.photo %}
-                <img src="{{ user_obj.photo.url }}" alt="{{ user_obj.full_name }}"
-                    style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-blue);">
-                {% else %}
-                <div
-                    style="width: 150px; height: 150px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue)); display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 3rem; color: white; font-weight: 700;">
-                    {{ user_obj.get_initials }}
-                </div>
-                {% endif %}
+<div class="row g-4">
+
+<!-- ================= LEFT PROFILE ================= -->
+<div class="col-lg-4">
+
+<div class="card text-center p-4 h-100">
+
+    <!-- AVATAR -->
+    <div class="mb-3">
+
+        {% if user_obj.photo and user_obj.photo.url %}
+            <img src="{{ user_obj.photo.url }}"
+                 class="rounded-circle"
+                 style="width:140px;height:140px;object-fit:cover;border:4px solid #6366f1;">
+        {% else %}
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold mx-auto"
+                 style="width:140px;height:140px;font-size:3rem;">
+                {{ user_obj.get_initials }}
             </div>
+        {% endif %}
 
-            <h4 style="color: var(--text-color);">{{ user_obj.full_name }}</h4>
-            <p class="text-muted">@{{ user_obj.username }}</p>
-
-            <div class="mb-3">
-                <span class="badge 
-                    {% if user_obj.role == 'admin' %}bg-danger
-                    {% elif user_obj.role == 'teacher' %}bg-success
-                    {% else %}bg-primary{% endif %}" style="font-size: 1rem; padding: 8px 20px;">
-                    {% if user_obj.role == 'admin' %}Admin{% elif user_obj.role == 'teacher' %}O'qituvchi{% else
-                    %}O'quvchi{% endif %}
-                </span>
-            </div>
-
-            <div class="mb-3">
-                <span class="coin-badge"
-                    style="background: linear-gradient(135deg, #ffc107, #ff9800); color: #000; padding: 8px 20px; border-radius: 20px;">
-                    <i class="bi bi-coin me-1"></i>{{ user_obj.coins }} coin
-                </span>
-            </div>
-
-            <hr>
-
-            <div class="d-grid gap-2">
-                <a href="{% url 'admin_user_edit' user_obj.pk %}" class="btn btn-primary">
-                    <i class="bi bi-pencil me-2"></i>Tahrirlash
-                </a>
-                <a href="{% url 'user_statistics' user_obj.pk %}" class="btn btn-outline-info">
-                    <i class="bi bi-graph-up me-2"></i>Statistika
-                </a>
-                {% if user_obj.is_student %}
-                <a href="{% url 'issue_certificate' user_obj.pk %}" class="btn btn-outline-success">
-                    <i class="bi bi-award me-2"></i>Sertifikat berish
-                </a>
-                {% endif %}
-                {% if not user_obj.is_admin %}
-                <a href="{% url 'admin_user_block' user_obj.pk %}"
-                    class="btn btn-{% if user_obj.is_blocked %}success{% else %}warning{% endif %}">
-                    <i class="bi bi-{% if user_obj.is_blocked %}unlock{% else %}lock{% endif %} me-2"></i>
-                    {% if user_obj.is_blocked %}Blokdan chiqarish{% else %}Bloklash{% endif %}
-                </a>
-                {% endif %}
-            </div>
-        </div>
     </div>
 
-    <div class="col-md-8">
-        <div class="card mb-4">
-            <div class="card-header" style="background: transparent;">
-                <h5 style="color: var(--text-color); margin: 0;">
-                    <i class="bi bi-person-lines-fill me-2"></i>Ma'lumotlar
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="text-muted">Telefon</label>
-                        <p style="color: var(--text-color);">{{ user_obj.phone }}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="text-muted">Ro'yxatdan o'tgan</label>
-                        <p style="color: var(--text-color);">{{ user_obj.date_joined|date:"d.m.Y H:i" }}</p>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="text-muted">Yashash manzili</label>
-                        <p style="color: var(--text-color);">
-                            {% if user_obj.address %}{{ user_obj.address }}{% else %}-{% endif %}
-                        </p>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="text-muted">Tug'ilgan sana</label>
-                        <p style="color: var(--text-color);">
-                            {% if user_obj.birth_date %}{{ user_obj.birth_date|date:"d.m.Y" }}{% else %}-{% endif %}
-                        </p>
-                    </div>
-                </div>
-                {% if user_obj.id_card or user_obj.birth_certificate %}
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="text-muted">Hujjatlar</label>
-                        <div class="d-flex gap-2">
-                            {% if user_obj.id_card %}
-                            <a href="{{ user_obj.id_card.url }}" target="_blank" class="btn btn-sm btn-outline-info">
-                                <i class="bi bi-person-badge me-1"></i>ID Karta
-                            </a>
-                            {% endif %}
-                            {% if user_obj.birth_certificate %}
-                            <a href="{{ user_obj.birth_certificate.url }}" target="_blank"
-                                class="btn btn-sm btn-outline-info">
-                                <i class="bi bi-file-earmark-text me-1"></i>Guvohnoma
-                            </a>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="text-muted">Oxirgi faollik</label>
-                        <p style="color: var(--text-color);">
-                            {% if user_obj.last_activity %}{{ user_obj.last_activity|date:"d.m.Y H:i" }}{% else %}-{%
-                            endif %}
-                        </p>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="text-muted">Status</label>
-                        <p>
-                            {% if user_obj.is_blocked %}
-                            <span class="badge bg-danger">Bloklangan</span>
-                            {% elif user_obj.is_online %}
-                            <span class="badge bg-success">Online</span>
-                            {% else %}
-                            <span class="badge bg-secondary">Offline</span>
-                            {% endif %}
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <h4 class="fw-bold mb-0">{{ user_obj.full_name }}</h4>
+    <small class="text-muted">@{{ user_obj.username }}</small>
 
-        {% if certificates %}
-        <div class="card">
-            <div class="card-header" style="background: transparent;">
-                <h5 style="color: var(--text-color); margin: 0;">
-                    <i class="bi bi-award me-2"></i>Sertifikatlar
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table" style="color: var(--text-color);">
-                        <thead>
-                            <tr>
-                                <th>Yo'nalish</th>
-                                <th>Berilgan sana</th>
-                                <th>Bergan</th>
-                                <th>Fayl</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for cert in certificates %}
-                            <tr>
-                                <td>{{ cert.profession.name }}</td>
-                                <td>{{ cert.issued_at|date:"d.m.Y" }}</td>
-                                <td>{{ cert.issued_by.full_name }}</td>
-                                <td>
-                                    <a href="{{ cert.file.url }}" class="btn btn-sm btn-outline-primary"
-                                        target="_blank">
-                                        <i class="bi bi-download"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+    <!-- ROLE -->
+    <div class="my-3">
+        <span class="badge rounded-pill px-4 py-2
+            {% if user_obj.role == 'admin' %}bg-danger
+            {% elif user_obj.role == 'teacher' %}bg-success
+            {% else %}bg-primary{% endif %}">
+            {% if user_obj.role == 'admin' %}Admin
+            {% elif user_obj.role == 'teacher' %}O‘qituvchi
+            {% else %}O‘quvchi{% endif %}
+        </span>
+    </div>
+
+    <!-- COINS -->
+    <div class="mb-3">
+        <span class="badge rounded-pill fs-6 px-4 py-2 text-dark"
+              style="background:linear-gradient(135deg,#facc15,#f59e0b);">
+            <i class="bi bi-coin me-1"></i>{{ user_obj.coins }} coin
+        </span>
+    </div>
+
+    <hr>
+
+    <!-- ACTIONS -->
+    <div class="d-grid gap-2">
+
+        <a href="{% url 'admin_user_edit' user_obj.pk %}" class="btn btn-primary rounded-pill">
+            <i class="bi bi-pencil me-1"></i>Tahrirlash
+        </a>
+
+        <a href="{% url 'user_statistics' user_obj.pk %}" class="btn btn-outline-info rounded-pill">
+            <i class="bi bi-graph-up me-1"></i>Statistika
+        </a>
+
+        {% if user_obj.is_student %}
+        <a href="{% url 'issue_certificate' user_obj.pk %}" class="btn btn-outline-success rounded-pill">
+            <i class="bi bi-award me-1"></i>Sertifikat berish
+        </a>
         {% endif %}
+
+        {% if not user_obj.is_admin %}
+        <a href="{% url 'admin_user_block' user_obj.pk %}"
+           class="btn {% if user_obj.is_blocked %}btn-success{% else %}btn-warning{% endif %} rounded-pill">
+            <i class="bi bi-{% if user_obj.is_blocked %}unlock{% else %}lock{% endif %} me-1"></i>
+            {% if user_obj.is_blocked %}Blokdan chiqarish{% else %}Bloklash{% endif %}
+        </a>
+        {% endif %}
+
+    </div>
+
+</div>
+</div>
+
+<!-- ================= RIGHT INFO ================= -->
+<div class="col-lg-8 d-flex flex-column gap-4">
+
+<!-- INFO CARD -->
+<div class="card p-4">
+
+<h5 class="fw-bold mb-3">
+    <i class="bi bi-person-lines-fill me-2"></i>Ma’lumotlar
+</h5>
+
+<div class="row g-3">
+
+<div class="col-md-6">
+    <small class="text-muted">Telefon</small>
+    <div>{{ user_obj.phone|default:"-" }}</div>
+</div>
+
+<div class="col-md-6">
+    <small class="text-muted">Ro‘yxatdan o‘tgan</small>
+    <div>{{ user_obj.date_joined|date:"d.m.Y H:i" }}</div>
+</div>
+
+<div class="col-md-6">
+    <small class="text-muted">Manzil</small>
+    <div>{{ user_obj.address|default:"-" }}</div>
+</div>
+
+<div class="col-md-6">
+    <small class="text-muted">Tug‘ilgan sana</small>
+    <div>
+        {% if user_obj.birth_date %}{{ user_obj.birth_date|date:"d.m.Y" }}{% else %}-{% endif %}
     </div>
 </div>
+
+{% if user_obj.id_card or user_obj.birth_certificate %}
+<div class="col-12">
+    <small class="text-muted">Hujjatlar</small><br>
+
+    {% if user_obj.id_card and user_obj.id_card.url %}
+        <a href="{{ user_obj.id_card.url }}" target="_blank"
+           class="btn btn-sm btn-outline-info rounded-pill me-2">
+            <i class="bi bi-person-badge me-1"></i>ID karta
+        </a>
+    {% endif %}
+
+    {% if user_obj.birth_certificate and user_obj.birth_certificate.url %}
+        <a href="{{ user_obj.birth_certificate.url }}" target="_blank"
+           class="btn btn-sm btn-outline-info rounded-pill">
+            <i class="bi bi-file-earmark-text me-1"></i>Guvohnoma
+        </a>
+    {% endif %}
+</div>
+{% endif %}
+
+<div class="col-md-6">
+    <small class="text-muted">Oxirgi faollik</small>
+    <div>
+        {% if user_obj.last_activity %}
+            {{ user_obj.last_activity|date:"d.m.Y H:i" }}
+        {% else %}-{% endif %}
+    </div>
+</div>
+
+<div class="col-md-6">
+    <small class="text-muted">Status</small><br>
+
+    {% if user_obj.is_blocked %}
+        <span class="badge bg-danger rounded-pill px-3">Bloklangan</span>
+    {% elif user_obj.is_online %}
+        <span class="badge bg-success rounded-pill px-3">Online</span>
+    {% else %}
+        <span class="badge bg-secondary rounded-pill px-3">Offline</span>
+    {% endif %}
+</div>
+
+</div>
+</div>
+
+<!-- CERTIFICATES -->
+{% if certificates %}
+<div class="card p-4">
+
+<h5 class="fw-bold mb-3">
+    <i class="bi bi-award me-2"></i>Sertifikatlar
+</h5>
+
+<div class="table-responsive">
+<table class="table table-hover align-middle">
+
+<thead>
+<tr>
+    <th>Yo‘nalish</th>
+    <th>Sana</th>
+    <th>Bergan</th>
+    <th>Fayl</th>
+</tr>
+</thead>
+
+<tbody>
+{% for cert in certificates %}
+<tr>
+    <td>{{ cert.profession.name }}</td>
+    <td>{{ cert.issued_at|date:"d.m.Y" }}</td>
+    <td>{{ cert.issued_by.full_name }}</td>
+    <td>
+        {% if cert.file and cert.file.url %}
+        <a href="{{ cert.file.url }}" target="_blank"
+           class="btn btn-sm btn-outline-primary rounded-pill">
+            <i class="bi bi-download"></i>
+        </a>
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}
+</tbody>
+
+</table>
+</div>
+
+</div>
+{% endif %}
+
+</div>
+</div>
+
 {% endblock %}

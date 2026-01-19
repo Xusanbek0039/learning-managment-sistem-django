@@ -1,60 +1,117 @@
 {% extends 'accounts/base.html' %}
 
-{% block title %}Sotib olishni tasdiqlash - LMS{% endblock %}
+{% block title %}Sotib olishni tasdiqlash | LMS - IT Creative{% endblock %}
+
+{% block extra_css %}
+<style>
+
+/* ===== THEME ===== */
+.confirm-wrap{--border:rgba(0,0,0,.08);--shadow:0 20px 50px rgba(0,0,0,.12)}
+[data-bs-theme="dark"] .confirm-wrap{--border:rgba(255,255,255,.12);--shadow:0 30px 70px rgba(0,0,0,.7)}
+
+/* ===== CARD ===== */
+.confirm-card{
+    background:var(--bs-body-bg);
+    border:1px solid var(--border);
+    border-radius:1.5rem;
+    box-shadow:var(--shadow);
+}
+
+/* ===== ICON ===== */
+.confirm-icon{
+    width:90px;height:90px;border-radius:50%;
+    background:linear-gradient(135deg,#facc15,#f59e0b);
+    display:flex;align-items:center;justify-content:center;
+    font-size:2.5rem;color:#111;margin:auto
+}
+
+/* ===== PRODUCT ===== */
+.product-img{max-height:160px;border-radius:1rem;object-fit:cover}
+
+/* ===== STATS ===== */
+.stat-box{
+    background:var(--bs-tertiary-bg);
+    border-radius:1rem;padding:1rem 1.3rem;min-width:140px
+}
+
+/* ===== BUTTONS ===== */
+.action-btn{border-radius:2rem;font-weight:600;padding:.6rem 1.6rem}
+
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-5 text-center">
-                    <div class="mb-4">
-                        <i class="bi bi-cart-check text-warning" style="font-size: 4rem;"></i>
-                    </div>
-                    
-                    <h3 class="fw-bold mb-4" style="color: var(--text);">Sotib olishni tasdiqlang</h3>
-                    
-                    {% if product.image %}
-                    <img src="{{ product.image.url }}" class="rounded mb-4" alt="{{ product.name }}" 
-                        style="max-height: 150px; object-fit: cover;">
-                    {% endif %}
-                    
-                    <h5 class="mb-3">{{ product.name }}</h5>
-                    
-                    <div class="d-flex justify-content-center gap-4 mb-4">
-                        <div class="text-center">
-                            <small class="text-muted d-block">Narxi</small>
-                            <span class="badge bg-warning text-dark fs-5">
-                                <i class="bi bi-coin me-1"></i>{{ product.coin_price }}
-                            </span>
-                        </div>
-                        <div class="text-center">
-                            <small class="text-muted d-block">Sizning balansingiz</small>
-                            <span class="badge bg-primary fs-5">
-                                <i class="bi bi-wallet2 me-1"></i>{{ user.coins }}
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <div class="alert alert-info mb-4">
-                        <i class="bi bi-info-circle me-2"></i>
-                        Sotib olgandan so'ng sizda <strong>{{ user.coins|add:product.coin_price|add:product.coin_price|add:"-"|slice:"1:" }}{{ user.coins }} - {{ product.coin_price }} = {{ remaining_coins }}</strong> coin qoladi
-                    </div>
-                    
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="d-flex gap-3 justify-content-center">
-                            <a href="{% url 'market_detail' product.pk %}" class="btn btn-outline-secondary px-4">
-                                <i class="bi bi-arrow-left me-2"></i>Bekor qilish
-                            </a>
-                            <button type="submit" class="btn btn-success px-4">
-                                <i class="bi bi-check-lg me-2"></i>Tasdiqlash
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+<div class="container py-5 confirm-wrap">
+
+<div class="row justify-content-center">
+<div class="col-md-7 col-lg-6">
+
+<div class="confirm-card p-4 p-md-5 text-center">
+
+    <!-- ICON -->
+    <div class="confirm-icon mb-4">
+        <i class="bi bi-cart-check"></i>
     </div>
+
+    <h3 class="fw-bold mb-2">Sotib olishni tasdiqlaysizmi?</h3>
+    <p class="text-body-secondary mb-4">
+        Quyidagi mahsulot uchun coin yechiladi
+    </p>
+
+    {% if product.image %}
+        <img src="{{ product.image.url }}" class="product-img mb-3">
+    {% endif %}
+
+    <h5 class="fw-bold mb-4">{{ product.name }}</h5>
+
+    <!-- STATS -->
+    <div class="d-flex justify-content-center gap-3 flex-wrap mb-4">
+
+        <div class="stat-box">
+            <small class="text-muted d-block">Narxi</small>
+            <b><i class="bi bi-coin"></i> {{ product.coin_price }}</b>
+        </div>
+
+        <div class="stat-box">
+            <small class="text-muted d-block">Balansingiz</small>
+            <b><i class="bi bi-wallet2"></i> {{ user.coins }}</b>
+        </div>
+
+        <div class="stat-box">
+            <small class="text-muted d-block">Qoladi</small>
+            <b class="{% if remaining_coins < 0 %}text-danger{% else %}text-success{% endif %}">
+                {{ remaining_coins }}
+            </b>
+        </div>
+
+    </div>
+
+    <!-- INFO -->
+    <div class="alert alert-info rounded-4 small mb-4">
+        <i class="bi bi-info-circle me-1"></i>
+        Xariddan so‘ng balansingizdan <b>{{ product.coin_price }}</b> coin yechiladi.
+    </div>
+
+    <!-- ACTIONS -->
+    <form method="post">
+        {% csrf_token %}
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+
+            <a href="{% url 'market_detail' product.pk %}"
+               class="btn btn-outline-secondary action-btn">
+                <i class="bi bi-arrow-left me-1"></i>Bekor qilish
+            </a>
+
+            <button type="submit" class="btn btn-success action-btn">
+                <i class="bi bi-check-lg me-1"></i>Tasdiqlash
+            </button>
+
+        </div>
+    </form>
+
+</div>
+
+</div>
+</div>
 </div>
 {% endblock %}

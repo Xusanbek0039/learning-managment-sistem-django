@@ -1,116 +1,205 @@
 {% extends 'accounts/base.html' %}
 
-{% block title %}Statistika - LMS{% endblock %}
+{% block title %}Statistika | LMS - IT Creative{% endblock %}
+
+{% block extra_css %}
+<style>
+
+/* ===== THEME ===== */
+.stat-wrap{--border:rgba(0,0,0,.08);--shadow:0 15px 40px rgba(0,0,0,.12)}
+[data-bs-theme="dark"] .stat-wrap{--border:rgba(255,255,255,.12);--shadow:0 30px 70px rgba(0,0,0,.7)}
+
+/* ===== CARDS ===== */
+.stat-card, .box-card{
+    background:var(--bs-body-bg);
+    border:1px solid var(--border);
+    border-radius:1.5rem;
+    box-shadow:var(--shadow);
+}
+
+/* ===== STAT ICON ===== */
+.stat-icon{
+    width:60px;height:60px;border-radius:1rem;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.8rem;color:#fff;margin:auto
+}
+
+/* ===== GRADIENTS ===== */
+.bg-coin{background:linear-gradient(135deg,#facc15,#f59e0b)}
+.bg-video{background:linear-gradient(135deg,#3b82f6,#2563eb)}
+.bg-test{background:linear-gradient(135deg,#22c55e,#16a34a)}
+.bg-score{background:linear-gradient(135deg,#06b6d4,#0891b2)}
+
+/* ===== PERIOD BTN ===== */
+.period-btn{border-radius:2rem;font-weight:600}
+
+/* ===== TABLE ===== */
+.table thead th{border-bottom:1px solid var(--border)}
+.table td, .table th{vertical-align:middle}
+
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 style="color: var(--primary-blue);">
-            <i class="bi bi-graph-up me-2"></i>{{ student.full_name }} statistikasi
-        </h3>
-        <a href="{% if request.user == student %}{% url 'my_statistics_pdf' %}{% else %}{% url 'user_statistics_pdf' student.pk %}{% endif %}" class="btn btn-primary">
-            <i class="bi bi-file-pdf me-2"></i>PDF yuklab olish
-        </a>
-    </div>
+<div class="container py-5 stat-wrap">
 
-    <!-- Davr filtri -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="btn-group">
-                <a href="?period=week" class="btn btn-{% if period == 'week' %}primary{% else %}outline-primary{% endif %}">
-                    Haftalik
-                </a>
-                <a href="?period=month" class="btn btn-{% if period == 'month' %}primary{% else %}outline-primary{% endif %}">
-                    Oylik
-                </a>
-                <a href="?period=all" class="btn btn-{% if period == 'all' %}primary{% else %}outline-primary{% endif %}">
-                    Butun davr
-                </a>
-            </div>
-        </div>
-    </div>
+<!-- ================= HEADER ================= -->
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
 
-    <!-- Statistika kartalari -->
-    <div class="row mb-4">
-        <div class="col-md-3 mb-3">
-            <div class="card text-center p-4">
-                <i class="bi bi-coin text-warning" style="font-size: 2.5rem;"></i>
-                <h2 style="color: var(--text-color);">{{ coins }}</h2>
-                <small class="text-muted">Jami coinlar</small>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card text-center p-4">
-                <i class="bi bi-play-circle text-primary" style="font-size: 2.5rem;"></i>
-                <h2 style="color: var(--text-color);">{{ videos_watched }}</h2>
-                <small class="text-muted">Ko'rilgan videolar</small>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card text-center p-4">
-                <i class="bi bi-check-circle text-success" style="font-size: 2.5rem;"></i>
-                <h2 style="color: var(--text-color);">{{ test_results.count }}</h2>
-                <small class="text-muted">Topshirilgan testlar</small>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card text-center p-4">
-                <i class="bi bi-percent text-info" style="font-size: 2.5rem;"></i>
-                <h2 style="color: var(--text-color);">{{ avg_score }}%</h2>
-                <small class="text-muted">O'rtacha ball</small>
-            </div>
-        </div>
-    </div>
+<h3 class="fw-bold mb-0">
+    <i class="bi bi-graph-up me-2"></i>{{ student.full_name }} statistikasi
+</h3>
 
-    <!-- Test natijalari -->
-    <div class="card">
-        <div class="card-header" style="background: transparent;">
-            <h5 style="color: var(--text-color); margin: 0;">
-                <i class="bi bi-list-check me-2"></i>Test natijalari
-            </h5>
-        </div>
-        <div class="card-body">
-            {% if test_results %}
-            <div class="table-responsive">
-                <table class="table" style="color: var(--text-color);">
-                    <thead>
-                        <tr>
-                            <th>Test</th>
-                            <th>Yo'nalish</th>
-                            <th class="text-center">Natija</th>
-                            <th class="text-center">Status</th>
-                            <th>Sana</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for result in test_results %}
-                        <tr>
-                            <td>{{ result.test.lesson.title }}</td>
-                            <td>{{ result.test.lesson.profession.name }}</td>
-                            <td class="text-center">
-                                <strong>{{ result.score }}%</strong>
-                                <br><small class="text-muted">{{ result.correct_answers }}/{{ result.total_questions }}</small>
-                            </td>
-                            <td class="text-center">
-                                {% if result.passed %}
-                                <span class="badge bg-success">O'tdi</span>
-                                {% else %}
-                                <span class="badge bg-danger">O'tmadi</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ result.completed_at|date:"d.m.Y H:i" }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% else %}
-            <div class="text-center py-4">
-                <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
-                <p class="text-muted mt-2">Test natijalari yo'q</p>
-            </div>
-            {% endif %}
-        </div>
-    </div>
+<a href="{% if request.user == student %}{% url 'my_statistics_pdf' %}{% else %}{% url 'user_statistics_pdf' student.pk %}{% endif %}"
+   class="btn btn-danger rounded-pill">
+    <i class="bi bi-file-pdf me-1"></i>PDF yuklab olish
+</a>
+
+</div>
+
+<!-- ================= PERIOD FILTER ================= -->
+<div class="box-card p-3 mb-4">
+
+<div class="btn-group flex-wrap">
+
+<a href="?period=week"
+   class="btn period-btn {% if period == 'week' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+   Haftalik
+</a>
+
+<a href="?period=month"
+   class="btn period-btn {% if period == 'month' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+   Oylik
+</a>
+
+<a href="?period=all"
+   class="btn period-btn {% if period == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+   Butun davr
+</a>
+
+</div>
+
+</div>
+
+<!-- ================= STATS ================= -->
+<div class="row g-4 mb-4">
+
+<div class="col-md-6 col-lg-3">
+<div class="stat-card text-center p-4">
+
+<div class="stat-icon bg-coin mb-3">
+    <i class="bi bi-coin"></i>
+</div>
+
+<h2 class="fw-bold">{{ coins }}</h2>
+<small class="text-muted">Jami coinlar</small>
+
+</div>
+</div>
+
+<div class="col-md-6 col-lg-3">
+<div class="stat-card text-center p-4">
+
+<div class="stat-icon bg-video mb-3">
+    <i class="bi bi-play-circle"></i>
+</div>
+
+<h2 class="fw-bold">{{ videos_watched }}</h2>
+<small class="text-muted">Ko‘rilgan videolar</small>
+
+</div>
+</div>
+
+<div class="col-md-6 col-lg-3">
+<div class="stat-card text-center p-4">
+
+<div class="stat-icon bg-test mb-3">
+    <i class="bi bi-check-circle"></i>
+</div>
+
+<h2 class="fw-bold">{{ test_results.count }}</h2>
+<small class="text-muted">Topshirilgan testlar</small>
+
+</div>
+</div>
+
+<div class="col-md-6 col-lg-3">
+<div class="stat-card text-center p-4">
+
+<div class="stat-icon bg-score mb-3">
+    <i class="bi bi-percent"></i>
+</div>
+
+<h2 class="fw-bold">{{ avg_score }}%</h2>
+<small class="text-muted">O‘rtacha ball</small>
+
+</div>
+</div>
+
+</div>
+
+<!-- ================= TEST RESULTS ================= -->
+<div class="box-card p-4">
+
+<h5 class="fw-bold mb-3">
+    <i class="bi bi-list-check me-2"></i>Test natijalari
+</h5>
+
+{% if test_results %}
+
+<div class="table-responsive">
+<table class="table table-hover align-middle">
+
+<thead>
+<tr>
+    <th>Test</th>
+    <th>Yo‘nalish</th>
+    <th class="text-center">Natija</th>
+    <th class="text-center">Status</th>
+    <th>Sana</th>
+</tr>
+</thead>
+
+<tbody>
+{% for result in test_results %}
+<tr>
+
+<td>{{ result.test.lesson.title }}</td>
+
+<td>{{ result.test.lesson.profession.name }}</td>
+
+<td class="text-center">
+    <b>{{ result.score }}%</b><br>
+    <small class="text-muted">{{ result.correct_answers }}/{{ result.total_questions }}</small>
+</td>
+
+<td class="text-center">
+{% if result.passed %}
+    <span class="badge bg-success rounded-pill px-3">O‘tdi</span>
+{% else %}
+    <span class="badge bg-danger rounded-pill px-3">O‘tmadi</span>
+{% endif %}
+</td>
+
+<td>{{ result.completed_at|date:"d.m.Y H:i" }}</td>
+
+</tr>
+{% endfor %}
+</tbody>
+
+</table>
+</div>
+
+{% else %}
+
+<div class="text-center py-5 text-muted">
+    <i class="bi bi-inbox display-5"></i>
+    <p class="mt-2 mb-0">Test natijalari mavjud emas</p>
+</div>
+
+{% endif %}
+
+</div>
+
 </div>
 {% endblock %}

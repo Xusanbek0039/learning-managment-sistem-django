@@ -1,224 +1,96 @@
 {% extends 'accounts/admin/base_admin.html' %}
 
-{% block title %}Xaridlar ro‘yxati - Admin{% endblock %}
-
-{% block extra_css %}
-<meta name="keywords" content="Suyunov Husan, IT Creative, Django admin iOS style purchases dark light responsive">
-<style>
-
-/* ===== iOS Minimal Palette ===== */
-:root{
-    --bg:#f5f5f7;
-    --card:#ffffff;
-    --text:#111;
-    --muted:#6b7280;
-    --border:rgba(0,0,0,.08);
-    --primary:#0a84ff;
-    --success:#28a745;
-    --warning:#f5c542;
-}
-@media (prefers-color-scheme: dark){
-    :root{
-        --bg:#0b0b0c;
-        --card:#1c1c1e;
-        --text:#f5f5f7;
-        --muted:#9ca3af;
-        --border:rgba(255,255,255,.08);
-    }
-}
-
-/* ===== Layout ===== */
-.admin-ios{
-    background:var(--bg);
-    min-height:100vh;
-    padding:1rem;
-    color:var(--text);
-}
-
-/* ===== Top ===== */
-.top-bar{
-    margin-bottom:1rem;
-}
-.page-title{
-    font-size:1.4rem;
-    font-weight:700;
-}
-
-/* ===== Card ===== */
-.card{
-    background:var(--card)!important;
-    border-radius:14px;
-    border:1px solid var(--border);
-}
-
-/* ===== Table ===== */
-.table{
-    margin:0;
-    color:var(--text);
-}
-.table thead{
-    background:transparent;
-}
-.table th{
-    color:var(--muted);
-    font-weight:600;
-    border-bottom:1px solid var(--border);
-}
-.table td{
-    border-top:1px solid var(--border);
-    vertical-align:middle;
-}
-
-/* ===== Avatars ===== */
-.avatar{
-    width:34px;height:34px;border-radius:50%;object-fit:cover;
-}
-.prod-img{
-    width:38px;height:38px;border-radius:8px;object-fit:cover;
-}
-
-/* ===== Status ===== */
-.badge{
-    border-radius:999px;
-    padding:.35rem .6rem;
-}
-
-/* ===== Buttons ===== */
-.btn-success{
-    border-radius:10px;
-}
-
-/* ===== Mobile Responsive ===== */
-@media(max-width:768px){
-    table thead{display:none;}
-
-    table tr{
-        display:block;
-        padding:1rem;
-        border-bottom:1px solid var(--border);
-    }
-
-    table td{
-        display:flex;
-        justify-content:space-between;
-        border:none;
-        padding:.35rem 0;
-    }
-
-    table td::before{
-        content:attr(data-label);
-        font-weight:600;
-        color:var(--muted);
-    }
-
-    .text-end{text-align:left!important;}
-}
-
-</style>
-{% endblock %}
+{% block title %}Xaridlar ro'yxati - Admin{% endblock %}
 
 {% block admin_content %}
-<div class="admin-ios">
-
 <div class="top-bar">
-    <h1 class="page-title">
-        <i class="bi bi-bag-check me-1"></i>Sotib olingan mahsulotlar
-    </h1>
+    <h1 class="page-title"><i class="bi bi-bag-check me-2"></i>Sotib olingan mahsulotlar</h1>
 </div>
 
 <div class="card">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-
-            <table class="table table-hover mb-0">
-                <thead>
-                    <tr>
-                        <th class="ps-4">Foydalanuvchi</th>
-                        <th>Mahsulot</th>
-                        <th>Coin</th>
-                        <th>Sana</th>
-                        <th>Holat</th>
-                        <th class="text-end pe-4">Amal</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                {% for purchase in purchases %}
-                <tr>
-
-                    <td data-label="Foydalanuvchi" class="ps-4">
-                        <div class="d-flex align-items-center gap-2">
-                            {% if purchase.user.photo %}
-                            <img src="{{ purchase.user.photo.url }}" class="avatar">
-                            {% else %}
-                            <div class="avatar bg-light d-flex align-items-center justify-content-center">
-                                <i class="bi bi-person-fill text-muted"></i>
-                            </div>
-                            {% endif %}
-                            <strong>{{ purchase.user.full_name }}</strong>
-                        </div>
-                    </td>
-
-                    <td data-label="Mahsulot">
-                        <div class="d-flex align-items-center gap-2">
-                            {% if purchase.product.image %}
-                            <img src="{{ purchase.product.image.url }}" class="prod-img">
-                            {% endif %}
-                            {{ purchase.product.name }}
-                        </div>
-                    </td>
-
-                    <td data-label="Coin">
-                        <span class="badge bg-warning text-dark">
-                            <i class="bi bi-coin me-1"></i>{{ purchase.coins_spent }}
-                        </span>
-                    </td>
-
-                    <td data-label="Sana">
-                        <small class="text-muted">
-                            {{ purchase.purchased_at|date:"d.m.Y H:i" }}
-                        </small>
-                    </td>
-
-                    <td data-label="Holat">
-                        {% if purchase.is_delivered %}
-                        <span class="badge bg-success">Yetkazilgan</span>
-                        {% else %}
-                        <span class="badge bg-warning text-dark">Kutilmoqda</span>
-                        {% endif %}
-                    </td>
-
-                    <td data-label="Amal" class="text-end pe-4">
-                        {% if not purchase.is_delivered %}
-                        <form method="post" action="{% url 'admin_mark_delivered' purchase.pk %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-success">
-                                <i class="bi bi-check-lg me-1"></i>Yetkazildi
-                            </button>
-                        </form>
-                        {% else %}
-                        <span class="text-success">
-                            <i class="bi bi-check-circle-fill"></i>
-                        </span>
-                        {% endif %}
-                    </td>
-
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="6" class="text-center py-5 text-muted">
-                        <i class="bi bi-bag" style="font-size:2.5rem;"></i>
-                        <p class="mt-2 mb-0">Hozircha xaridlar yo‘q</p>
-                    </td>
-                </tr>
-                {% endfor %}
-                </tbody>
-
-            </table>
-
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Foydalanuvchi</th>
+                            <th>Mahsulot</th>
+                            <th>Sarflangan coin</th>
+                            <th>Sana</th>
+                            <th>Holat</th>
+                            <th class="text-end pe-4">Amal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for purchase in purchases %}
+                        <tr>
+                            <td class="ps-4 align-middle">
+                                <div class="d-flex align-items-center gap-2">
+                                    {% if purchase.user.photo %}
+                                    <img src="{{ purchase.user.photo.url }}" class="rounded-circle" width="35" height="35" style="object-fit: cover;">
+                                    {% else %}
+                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                                        <i class="bi bi-person-fill text-muted"></i>
+                                    </div>
+                                    {% endif %}
+                                    <span class="fw-bold">{{ purchase.user.full_name }}</span>
+                                </div>
+                            </td>
+                            <td class="align-middle">
+                                <div class="d-flex align-items-center gap-2">
+                                    {% if purchase.product.image %}
+                                    <img src="{{ purchase.product.image.url }}" class="rounded" width="40" height="40" style="object-fit: cover;">
+                                    {% endif %}
+                                    <span>{{ purchase.product.name }}</span>
+                                </div>
+                            </td>
+                            <td class="align-middle">
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-coin me-1"></i>{{ purchase.coins_spent }}
+                                </span>
+                            </td>
+                            <td class="align-middle">
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar3 me-1"></i>{{ purchase.purchased_at|date:"d.m.Y, H:i" }}
+                                </small>
+                            </td>
+                            <td class="align-middle">
+                                {% if purchase.is_delivered %}
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle me-1"></i>Yetkazilgan
+                                </span>
+                                {% else %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-clock me-1"></i>Kutilmoqda
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td class="align-middle text-end pe-4">
+                                {% if not purchase.is_delivered %}
+                                <form method="post" action="{% url 'admin_mark_delivered' purchase.pk %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-success">
+                                        <i class="bi bi-check-lg me-1"></i>Yetkazildi
+                                    </button>
+                                </form>
+                                {% else %}
+                                <span class="text-success">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <i class="bi bi-bag text-muted" style="font-size: 3rem;"></i>
+                                <p class="text-muted mt-3 mb-0">Hozircha xaridlar yo'q</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-</div>
-
 </div>
 {% endblock %}

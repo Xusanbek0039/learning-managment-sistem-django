@@ -1,51 +1,105 @@
 {% extends 'accounts/base.html' %}
 
-{% block title %}{{ message.title }} - LMS{% endblock %}
+{% block title %}{{ message.title }} | LMS - IT Creative{% endblock %}
+
+{% block extra_css %}
+<style>
+
+/* ===== THEME ===== */
+.msg-wrap{--border:rgba(0,0,0,.08);--shadow:0 15px 40px rgba(0,0,0,.12)}
+[data-bs-theme="dark"] .msg-wrap{--border:rgba(255,255,255,.12);--shadow:0 30px 70px rgba(0,0,0,.7)}
+
+/* ===== CARD ===== */
+.msg-card{
+    background:var(--bs-body-bg);
+    border:1px solid var(--border);
+    border-radius:1.5rem;
+    box-shadow:var(--shadow);
+}
+
+/* ===== ICON ===== */
+.msg-icon{
+    width:56px;height:56px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.5rem;flex-shrink:0
+}
+
+/* ===== CONTENT ===== */
+.msg-content{line-height:1.8;font-size:.95rem}
+
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <a href="{% url 'messages' %}" class="btn btn-outline-secondary mb-4">
-        <i class="bi bi-arrow-left me-2"></i>Orqaga
-    </a>
+<div class="container py-5 msg-wrap">
 
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header" style="background: transparent;">
-                    <div class="d-flex align-items-center">
-                        {% if message.message_type == 'payment' %}
-                        <div class="bg-warning bg-opacity-10 rounded-circle p-3 me-3">
-                            <i class="bi bi-exclamation-triangle text-warning fs-4"></i>
-                        </div>
-                        {% elif message.message_type == 'system' %}
-                        <div class="bg-info bg-opacity-10 rounded-circle p-3 me-3">
-                            <i class="bi bi-info-circle text-info fs-4"></i>
-                        </div>
-                        {% else %}
-                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
-                            <i class="bi bi-envelope text-primary fs-4"></i>
-                        </div>
-                        {% endif %}
-                        <div>
-                            <h4 class="mb-1" style="color: var(--text);">{{ message.title }}</h4>
-                            <small class="text-muted">{{ message.created_at|date:"d.m.Y H:i" }}</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div style="color: var(--text); line-height: 1.8;">
-                        {{ message.content|linebreaks }}
-                    </div>
-                    
-                    {% if message.sender %}
-                    <hr>
-                    <div class="text-muted small">
-                        <i class="bi bi-person me-1"></i>Yuboruvchi: {{ message.sender.full_name }}
-                    </div>
-                    {% endif %}
-                </div>
+<!-- BACK -->
+<a href="{% url 'messages' %}" class="btn btn-outline-secondary rounded-pill mb-4">
+    <i class="bi bi-arrow-left me-1"></i>Orqaga
+</a>
+
+<div class="row justify-content-center">
+<div class="col-lg-8">
+
+<div class="msg-card">
+
+<!-- HEADER -->
+<div class="p-4 border-bottom">
+
+    <div class="d-flex align-items-center gap-3">
+
+        {% if message.message_type == 'payment' %}
+            <div class="msg-icon bg-warning bg-opacity-10 text-warning">
+                <i class="bi bi-exclamation-triangle"></i>
             </div>
+        {% elif message.message_type == 'system' %}
+            <div class="msg-icon bg-info bg-opacity-10 text-info">
+                <i class="bi bi-info-circle"></i>
+            </div>
+        {% else %}
+            <div class="msg-icon bg-primary bg-opacity-10 text-primary">
+                <i class="bi bi-envelope"></i>
+            </div>
+        {% endif %}
+
+        <div class="flex-grow-1">
+            <h5 class="fw-bold mb-1">{{ message.title }}</h5>
+            <small class="text-muted">
+                <i class="bi bi-clock me-1"></i>{{ message.created_at|date:"d.m.Y H:i" }}
+            </small>
         </div>
+
+        {% if message.message_type == 'payment' %}
+            <span class="badge bg-warning text-dark rounded-pill px-3">To'lov</span>
+        {% elif message.message_type == 'system' %}
+            <span class="badge bg-info rounded-pill px-3">Tizim</span>
+        {% else %}
+            <span class="badge bg-primary rounded-pill px-3">Xabar</span>
+        {% endif %}
+
     </div>
+</div>
+
+<!-- BODY -->
+<div class="p-4 p-lg-5">
+
+    <div class="msg-content text-body-secondary">
+        {{ message.content|linebreaks }}
+    </div>
+
+    {% if message.sender %}
+    <hr class="my-4">
+    <div class="small text-muted d-flex align-items-center gap-2">
+        <i class="bi bi-person"></i>
+        Yuboruvchi: <b>{{ message.sender.full_name }}</b>
+    </div>
+    {% endif %}
+
+</div>
+
+</div>
+
+</div>
+</div>
 </div>
 {% endblock %}

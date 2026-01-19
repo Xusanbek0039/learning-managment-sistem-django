@@ -1,69 +1,132 @@
 {% extends 'accounts/base.html' %}
 
-{% block title %}Xabarlar - LMS{% endblock %}
+{% block title %}Xabarlar | LMS - IT Creative{% endblock %}
+
+{% block extra_css %}
+<style>
+
+/* ===== THEME ===== */
+.inbox-wrap{--border:rgba(0,0,0,.08);--shadow:0 10px 30px rgba(0,0,0,.12)}
+[data-bs-theme="dark"] .inbox-wrap{--border:rgba(255,255,255,.12);--shadow:0 25px 60px rgba(0,0,0,.7)}
+
+/* ===== ITEM ===== */
+.msg-item{
+    background:var(--bs-body-bg);
+    border:1px solid var(--border);
+    border-radius:1.2rem;
+    box-shadow:var(--shadow);
+    transition:.25s ease;
+}
+.msg-item:hover{
+    transform:translateY(-4px);
+    box-shadow:0 18px 40px rgba(0,0,0,.25);
+}
+
+/* ===== ICON ===== */
+.msg-ic{
+    width:52px;height:52px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.3rem;flex-shrink:0
+}
+
+/* ===== UNREAD ===== */
+.unread{border-left:6px solid #6366f1}
+
+/* ===== EMPTY ===== */
+.empty-box{
+    border:2px dashed var(--border);
+    border-radius:1.5rem;
+    padding:4rem 2rem
+}
+
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 style="color: var(--text);">
-            <i class="bi bi-envelope me-2"></i>Xabarlar
-            {% if unread_count > 0 %}
-            <span class="badge bg-danger">{{ unread_count }}</span>
+<div class="container py-5 inbox-wrap">
+
+<!-- HEADER -->
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <h3 class="fw-bold mb-0">
+        <i class="bi bi-envelope me-2"></i>Xabarlar
+        {% if unread_count > 0 %}
+            <span class="badge bg-danger ms-2">{{ unread_count }}</span>
+        {% endif %}
+    </h3>
+</div>
+
+{% if messages_list %}
+
+<div class="d-flex flex-column gap-3">
+
+{% for msg in messages_list %}
+<a href="{% url 'message_detail' msg.pk %}" class="text-decoration-none text-body">
+
+<div class="msg-item p-3 p-md-4 {% if not msg.is_read %}unread{% endif %}">
+
+    <div class="d-flex justify-content-between align-items-start gap-3">
+
+        <div class="d-flex gap-3 align-items-center">
+
+            {% if msg.message_type == 'payment' %}
+                <div class="msg-ic bg-warning bg-opacity-10 text-warning">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+            {% elif msg.message_type == 'system' %}
+                <div class="msg-ic bg-info bg-opacity-10 text-info">
+                    <i class="bi bi-info-circle"></i>
+                </div>
+            {% else %}
+                <div class="msg-ic bg-primary bg-opacity-10 text-primary">
+                    <i class="bi bi-envelope"></i>
+                </div>
             {% endif %}
-        </h3>
+
+            <div>
+                <h6 class="fw-bold mb-1">
+                    {% if not msg.is_read %}
+                        <span class="badge bg-primary rounded-circle p-1 me-1"></span>
+                    {% endif %}
+                    {{ msg.title }}
+                </h6>
+
+                <p class="small text-body-secondary mb-0">
+                    {{ msg.content|truncatewords:18 }}
+                </p>
+            </div>
+
+        </div>
+
+        <div class="text-end small text-muted">
+            {{ msg.created_at|date:"d.m.Y H:i" }}
+
+            <div class="mt-1">
+            {% if msg.message_type == 'payment' %}
+                <span class="badge bg-warning text-dark rounded-pill">To‘lov</span>
+            {% elif msg.message_type == 'system' %}
+                <span class="badge bg-info rounded-pill">Tizim</span>
+            {% endif %}
+            </div>
+        </div>
+
     </div>
 
-    {% if messages_list %}
-    <div class="row">
-        {% for msg in messages_list %}
-        <div class="col-12 mb-3">
-            <a href="{% url 'message_detail' msg.pk %}" class="text-decoration-none">
-                <div class="card {% if not msg.is_read %}border-primary{% endif %}" style="{% if not msg.is_read %}border-width: 2px;{% endif %}">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div class="d-flex align-items-center">
-                                {% if msg.message_type == 'payment' %}
-                                <div class="bg-warning bg-opacity-10 rounded-circle p-3 me-3">
-                                    <i class="bi bi-exclamation-triangle text-warning fs-4"></i>
-                                </div>
-                                {% elif msg.message_type == 'system' %}
-                                <div class="bg-info bg-opacity-10 rounded-circle p-3 me-3">
-                                    <i class="bi bi-info-circle text-info fs-4"></i>
-                                </div>
-                                {% else %}
-                                <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
-                                    <i class="bi bi-envelope text-primary fs-4"></i>
-                                </div>
-                                {% endif %}
-                                <div>
-                                    <h5 class="mb-1" style="color: var(--text);">
-                                        {% if not msg.is_read %}<i class="bi bi-circle-fill text-primary me-2" style="font-size: 0.5rem;"></i>{% endif %}
-                                        {{ msg.title }}
-                                    </h5>
-                                    <p class="text-muted mb-0 small">{{ msg.content|truncatewords:20 }}</p>
-                                </div>
-                            </div>
-                            <div class="text-end">
-                                <small class="text-muted">{{ msg.created_at|date:"d.m.Y H:i" }}</small>
-                                {% if msg.message_type == 'payment' %}
-                                <br><span class="badge bg-warning">To'lov</span>
-                                {% elif msg.message_type == 'system' %}
-                                <br><span class="badge bg-info">Tizim</span>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="card text-center py-5">
-        <i class="bi bi-envelope-open text-muted" style="font-size: 4rem;"></i>
-        <h5 class="mt-3" style="color: var(--text);">Xabarlar yo'q</h5>
-        <p class="text-muted">Sizga hech qanday xabar kelmagan</p>
-    </div>
-    {% endif %}
+</div>
+</a>
+{% endfor %}
+
+</div>
+
+{% else %}
+
+<!-- EMPTY -->
+<div class="empty-box text-center">
+    <i class="bi bi-envelope-open display-4 opacity-50"></i>
+    <h5 class="mt-3">Xabarlar yo‘q</h5>
+    <p class="text-body-secondary mb-0">Hozircha sizga hech qanday xabar kelmagan</p>
+</div>
+
+{% endif %}
+
 </div>
 {% endblock %}
