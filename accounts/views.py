@@ -59,6 +59,15 @@ def login_view(request):
                 login(request, user)
                 user.last_activity = timezone.now()
                 user.save()
+                
+                # Activity log
+                ActivityLog.objects.create(
+                    user=user,
+                    action_type='login',
+                    description="Tizimga kirdi",
+                    ip_address=request.META.get('REMOTE_ADDR')
+                )
+                
                 messages.success(request, "Tizimga muvaffaqiyatli kirdingiz!")
                 return redirect('home')
         else:
@@ -70,6 +79,13 @@ def login_view(request):
 
 
 def logout_view(request):
+    if request.user.is_authenticated:
+        ActivityLog.objects.create(
+            user=request.user,
+            action_type='logout',
+            description="Tizimdan chiqdi",
+            ip_address=request.META.get('REMOTE_ADDR')
+        )
     logout(request)
     messages.success(request, "Tizimdan chiqdingiz!")
     return redirect('login')

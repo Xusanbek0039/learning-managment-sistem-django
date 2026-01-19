@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.db.models import Q
 from .models import Post, PostComment, PostLike
 from .forms import PostForm, CommentForm
+from accounts.models import ActivityLog
 
 @login_required
 def post_list(request):
@@ -46,6 +47,11 @@ def post_detail(request, pk):
             
             # Award coin for comment
             request.user.add_coins(1, f"Izoh qoldirildi: {post.title}")
+            ActivityLog.objects.create(
+                user=request.user,
+                action_type='comment_post',
+                description=f"Postga izoh qoldirdi: {post.title}"
+            )
             messages.success(request, "Izoh qoldirildi (+1 coin)!")
             return redirect('blog:post_detail', pk=pk)
     else:
@@ -86,6 +92,11 @@ def toggle_like(request, pk):
         like.delete()
     else:
         request.user.add_coins(1, f"Postga like bosildi: {post.title}")
+        ActivityLog.objects.create(
+            user=request.user,
+            action_type='like_post',
+            description=f"Postga like bosdi: {post.title}"
+        )
         
     return redirect('blog:post_detail', pk=pk)
 

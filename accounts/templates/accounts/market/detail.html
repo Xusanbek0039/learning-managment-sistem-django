@@ -1,0 +1,122 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}{{ product.name }} - Market{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'market_list' %}">Market</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ product.name|truncatechars:20 }}</li>
+                </ol>
+            </nav>
+
+            <!-- Product Content -->
+            <article class="card border-0 shadow-sm mb-5">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}"
+                    style="max-height: 400px; object-fit: cover;">
+                {% endif %}
+                <div class="card-body p-4 p-lg-5">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <span class="badge bg-warning text-dark fs-5">
+                            <i class="bi bi-coin me-1"></i>{{ product.coin_price }} coin
+                        </span>
+                        {% if product.stock > 0 %}
+                        <span class="badge bg-success fs-6">{{ product.stock }} ta mavjud</span>
+                        {% else %}
+                        <span class="badge bg-danger fs-6">Tugagan</span>
+                        {% endif %}
+                    </div>
+
+                    <h1 class="fw-bold mb-4" style="color: var(--text);">{{ product.name }}</h1>
+
+                    <div class="product-description mb-5" style="white-space: pre-wrap; color: var(--text);">{{ product.description }}</div>
+
+                    <!-- Interactions -->
+                    <div class="d-flex align-items-center gap-3 pt-4 border-top flex-wrap">
+                        <a href="{% url 'market_like' product.pk %}"
+                            class="btn {% if is_liked %}btn-danger{% else %}btn-outline-danger{% endif %} rounded-pill px-4">
+                            <i class="bi {% if is_liked %}bi-heart-fill{% else %}bi-heart{% endif %} me-2"></i>
+                            {% if is_liked %}Liked{% else %}Like{% endif %} ({{ product.likes.count }})
+                        </a>
+                        <span class="text-muted">
+                            <i class="bi bi-chat-dots me-2"></i>{{ product.comments.count }} Izohlar
+                        </span>
+                        
+                        {% if product.stock > 0 %}
+                            {% if user.coins >= product.coin_price %}
+                            <a href="{% url 'market_purchase' product.pk %}" class="btn btn-success rounded-pill px-4 ms-auto">
+                                <i class="bi bi-cart-check me-2"></i>Sotib olish
+                            </a>
+                            {% else %}
+                            <button class="btn btn-secondary rounded-pill px-4 ms-auto" disabled>
+                                <i class="bi bi-cart-x me-2"></i>Coin yetarli emas
+                            </button>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <i class="bi bi-wallet2 me-1"></i>Sizning balansingiz: <strong>{{ user.coins }}</strong> coin
+                        </small>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Comments Section -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4 p-lg-5">
+                    <h4 class="mb-4">Izohlar ({{ comments.count }})</h4>
+
+                    <!-- Comment Form -->
+                    <div class="mb-5">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <textarea name="content" class="form-control bg-light" rows="3" placeholder="Fikringizni yozib qoldiring... (+1 coin)" required></textarea>
+                            </div>
+                            <div class="text-end">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-send me-2"></i>Yuborish
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Comment List -->
+                    <div class="d-flex flex-column gap-4">
+                        {% for comment in comments %}
+                        <div class="d-flex gap-3">
+                            {% if comment.user.photo %}
+                            <img src="{{ comment.user.photo.url }}" class="rounded-circle" width="40" height="40"
+                                style="object-fit: cover;">
+                            {% else %}
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center text-secondary flex-shrink-0"
+                                style="width: 40px; height: 40px;">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            {% endif %}
+                            <div class="flex-grow-1">
+                                <div class="bg-light p-3 rounded-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <h6 class="fw-bold mb-0">{{ comment.user.full_name }}</h6>
+                                        <small class="text-muted">{{ comment.created_at|timesince }} oldin</small>
+                                    </div>
+                                    <p class="mb-0 text-secondary">{{ comment.content }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted text-center my-4">Hozircha izohlar yo'q. Birinchi bo'lib fikr bildiring!</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
