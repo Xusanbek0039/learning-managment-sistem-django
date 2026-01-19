@@ -39,12 +39,27 @@
                         <td>{{ profession.description|truncatewords:10 }}</td>
                         <td>{{ profession.created_at|date:"d.m.Y" }}</td>
                         <td class="action-btns">
-                            <a href="{% url 'admin_profession_edit' profession.pk %}" class="btn btn-sm btn-outline-primary" title="Tahrirlash">
+                            <a href="{% url 'admin_profession_edit' profession.pk %}"
+                                class="btn btn-sm btn-outline-primary" title="Tahrirlash">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <a href="{% url 'admin_profession_delete' profession.pk %}" class="btn btn-sm btn-outline-danger" title="O'chirish">
+                            <a href="{% url 'admin_profession_delete' profession.pk %}"
+                                class="btn btn-sm btn-outline-danger" title="O'chirish">
                                 <i class="bi bi-trash"></i>
                             </a>
+                            <a href="{% url 'profession_detail' profession.pk %}" class="btn btn-sm btn-outline-primary"
+                                title="Batafsil">
+                                <i class="bi bi-eye"></i>
+                            </a>
+
+                            <a href="{% url 'manage_lessons' profession.pk %}" class="btn btn-sm btn-outline-warning"
+                                title="Mavzularni boshqarish">
+                                <i class="bi bi-journal-text"></i>
+                            </a>
+
+
+
+
                         </td>
                     </tr>
                     {% endfor %}
