@@ -1,83 +1,187 @@
 {% extends 'accounts/admin/base_admin.html' %}
 
-{% block title %}Xabarlar - Admin{% endblock %}
+{% block title %}Xabarlar - Admin Panel | IT Creative{% endblock %}
+
+{% block extra_css %}
+<style>
+:root{
+    --card-bg: rgba(255,255,255,.75);
+    --card-border: rgba(0,0,0,.08);
+    --text-main: #111;
+    --soft-bg: rgba(0,0,0,.05);
+}
+[data-bs-theme="dark"]{
+    --card-bg: rgba(18,18,18,.8);
+    --card-border: rgba(255,255,255,.08);
+    --text-main: #f1f1f1;
+    --soft-bg: rgba(255,255,255,.06);
+}
+
+/* ===== TOP BAR ===== */
+.top-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-bottom:20px;
+}
+
+/* ===== IOS CARD ===== */
+.ios-card{
+    background:var(--card-bg);
+    backdrop-filter:blur(14px);
+    border:1px solid var(--card-border);
+    border-radius:22px;
+    box-shadow:0 12px 35px rgba(0,0,0,.15);
+}
+
+/* ===== TABLE ===== */
+.table{color:var(--text-main);}
+.table thead th{
+    border-bottom:1px solid var(--card-border);
+    font-weight:600;
+}
+.table tbody tr:hover{
+    background:var(--soft-bg);
+}
+
+/* ===== BADGES ===== */
+.badge{
+    border-radius:999px;
+    padding:.45em .75em;
+    font-weight:600;
+}
+
+/* ===== MOBILE TABLE ===== */
+@media(max-width:768px){
+.table thead{display:none;}
+.table tbody tr{
+    display:block;
+    border:1px solid var(--card-border);
+    border-radius:14px;
+    padding:12px;
+    margin-bottom:12px;
+    background:var(--soft-bg);
+}
+.table tbody td{
+    display:flex;
+    justify-content:space-between;
+    padding:6px 0;
+    border:none;
+}
+.table tbody td::before{
+    content:attr(data-label);
+    font-weight:600;
+    opacity:.7;
+}
+}
+</style>
+{% endblock %}
 
 {% block admin_content %}
+
 <div class="top-bar">
-    <h1 class="page-title"><i class="bi bi-envelope me-2"></i>Xabarlar</h1>
-    <a href="{% url 'admin_send_message' %}" class="btn btn-primary">
+    <h3 class="m-0">
+        <i class="bi bi-envelope me-2"></i>Xabarlar
+    </h3>
+
+    <a href="{% url 'admin_send_message' %}" class="btn btn-primary rounded-pill px-4">
         <i class="bi bi-plus-lg me-2"></i>Yangi xabar
     </a>
 </div>
 
-<div class="card">
-    <div class="card-header">
-        <i class="bi bi-list me-2"></i>Yuborilgan xabarlar
-    </div>
-    <div class="card-body">
-        {% if messages_list %}
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Sarlavha</th>
-                        <th>Turi</th>
-                        <th>Qabul qiluvchi</th>
-                        <th>Holat</th>
-                        <th>Sana</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for msg in messages_list %}
-                    <tr>
-                        <td>
-                            <strong>{{ msg.title }}</strong>
-                            <br><small class="text-muted">{{ msg.content|truncatewords:10 }}</small>
-                        </td>
-                        <td>
-                            {% if msg.message_type == 'all' %}
-                            <span class="badge bg-primary">Barchaga</span>
-                            {% elif msg.message_type == 'students' %}
-                            <span class="badge bg-info">O'quvchilar</span>
-                            {% elif msg.message_type == 'teachers' %}
-                            <span class="badge bg-success">O'qituvchilar</span>
-                            {% elif msg.message_type == 'payment' %}
-                            <span class="badge bg-warning">To'lov</span>
-                            {% elif msg.message_type == 'system' %}
-                            <span class="badge bg-secondary">Tizim</span>
-                            {% else %}
-                            <span class="badge bg-dark">Shaxsiy</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if msg.recipient %}
-                            {{ msg.recipient.full_name }}
-                            {% else %}
-                            <span class="text-muted">-</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if msg.is_read %}
-                            <span class="badge bg-success">O'qilgan</span>
-                            {% else %}
-                            <span class="badge bg-warning">O'qilmagan</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ msg.created_at|date:"d.m.Y H:i" }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <div class="text-center py-5">
-            <i class="bi bi-envelope-open text-muted" style="font-size: 4rem;"></i>
-            <h4 class="mt-3">Xabarlar yo'q</h4>
-            <a href="{% url 'admin_send_message' %}" class="btn btn-primary mt-2">
-                <i class="bi bi-plus-lg me-2"></i>Yangi xabar yuborish
-            </a>
-        </div>
-        {% endif %}
-    </div>
+<div class="ios-card">
+
+<div class="p-4 border-bottom" style="border-color:var(--card-border)!important;">
+    <i class="bi bi-list me-2"></i>Yuborilgan xabarlar
 </div>
+
+<div class="p-3">
+
+{% if messages_list %}
+
+<div class="table-responsive">
+<table class="table align-middle mb-0">
+
+<thead>
+<tr>
+    <th>Sarlavha</th>
+    <th>Turi</th>
+    <th>Qabul qiluvchi</th>
+    <th>Holat</th>
+    <th>Sana</th>
+</tr>
+</thead>
+
+<tbody>
+{% for msg in messages_list %}
+<tr>
+
+<td data-label="Sarlavha">
+    <strong>{{ msg.title }}</strong>
+    <br>
+    <small class="text-muted">{{ msg.content|truncatewords:10 }}</small>
+</td>
+
+<td data-label="Turi">
+{% if msg.message_type == 'all' %}
+<span class="badge bg-primary">Barchaga</span>
+{% elif msg.message_type == 'students' %}
+<span class="badge bg-info">O‘quvchilar</span>
+{% elif msg.message_type == 'teachers' %}
+<span class="badge bg-success">O‘qituvchilar</span>
+{% elif msg.message_type == 'payment' %}
+<span class="badge bg-warning text-dark">To‘lov</span>
+{% elif msg.message_type == 'system' %}
+<span class="badge bg-secondary">Tizim</span>
+{% else %}
+<span class="badge bg-dark">Shaxsiy</span>
+{% endif %}
+</td>
+
+<td data-label="Qabul qiluvchi">
+{% if msg.recipient %}
+{{ msg.recipient.full_name }}
+{% else %}
+<span class="text-muted">—</span>
+{% endif %}
+</td>
+
+<td data-label="Holat">
+{% if msg.is_read %}
+<span class="badge bg-success">O‘qilgan</span>
+{% else %}
+<span class="badge bg-warning text-dark">O‘qilmagan</span>
+{% endif %}
+</td>
+
+<td data-label="Sana">
+<small class="text-muted">
+<i class="bi bi-clock me-1"></i>{{ msg.created_at|date:"d.m.Y H:i" }}
+</small>
+</td>
+
+</tr>
+{% endfor %}
+</tbody>
+
+</table>
+</div>
+
+{% else %}
+
+<div class="text-center py-5 text-muted">
+    <i class="bi bi-envelope-open fs-1"></i>
+    <h5 class="mt-3">Xabarlar yo‘q</h5>
+    <a href="{% url 'admin_send_message' %}" class="btn btn-primary mt-2 rounded-pill px-4">
+        <i class="bi bi-plus-lg me-2"></i>Yangi xabar yuborish
+    </a>
+</div>
+
+{% endif %}
+
+</div>
+</div>
+
 {% endblock %}

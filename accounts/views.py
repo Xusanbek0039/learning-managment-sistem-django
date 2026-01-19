@@ -767,22 +767,33 @@ def admin_messages(request):
     all_messages = Message.objects.all().order_by('-created_at')[:100]
     return render(request, 'accounts/admin/messages.html', {'messages_list': all_messages})
 
+from django.core.paginator import Paginator
 
 # Admin: Payment management
 @login_required
 def admin_payments(request):
     if not request.user.is_admin:
         return redirect('home')
-    
-    students = CustomUser.objects.filter(role='student').select_related('payment_status')
-    
-    # Ensure all students have payment status
-    for student in students:
-        PaymentStatus.objects.get_or_create(user=student)
-    
-    students = CustomUser.objects.filter(role='student').select_related('payment_status')
-    
-    return render(request, 'accounts/admin/payments.html', {'students': students})
+
+    qs = CustomUser.objects.filter(role='student')
+
+    for s in qs:
+        PaymentStatus.objects.get_or_create(user=s)
+
+    qs = CustomUser.objects.filter(role='student').select_related('payment_status')
+
+    paginator = Paginator(qs, 10)  # har sahifada 10 ta
+    page = request.GET.get('page')
+    students = paginator.get_page(page)
+
+    blocked_students = qs.filter(is_blocked=True).count()
+    today = timezone.now()
+
+    return render(request, 'accounts/admin/payments.html', {
+        'students': students,
+        'blocked_students': blocked_students,
+        'today': today,
+    })
 
 
 @login_required
