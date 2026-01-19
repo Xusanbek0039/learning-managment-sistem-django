@@ -40,14 +40,19 @@ class RegisterForm(UserCreationForm):
 
 
 class LoginForm(forms.Form):
-    username = forms.CharField(widget=forms.TextInput(attrs={
-        'class': 'form-control',
-        'placeholder': 'Username'
-    }))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={
-        'class': 'form-control',
-        'placeholder': 'Parol'
-    }))
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={
+            "class": "form-control ps-5",
+            "placeholder": "Username"
+        })
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control ps-5 pe-5",
+            "placeholder": "Parol"
+        })
+    )
+
 
 
 

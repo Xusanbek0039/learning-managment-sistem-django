@@ -106,6 +106,52 @@
         filter: brightness(1.05);
         transform: translateY(-1px);
     }
+
+    /* password field wrapper & toggle */
+    .pwd-wrap {
+        position: relative;
+    }
+    .pwd-toggle-btn {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        background: transparent;
+        padding: .25rem;
+        color: #6b7280;
+        cursor: pointer;
+    }
+    [data-bs-theme="dark"] .pwd-toggle-btn { color: #cbd5e1; }
+
+    /* password strength meter */
+    .password-meter {
+        height: 8px;
+        background: rgba(0,0,0,0.06);
+        border-radius: 8px;
+        overflow: hidden;
+        margin-top: .6rem;
+    }
+    [data-bs-theme="dark"] .password-meter { background: rgba(255,255,255,0.06); }
+
+    .password-meter .meter-bar {
+        height: 100%;
+        width: 0%;
+        transition: width .25s ease, background-color .25s ease;
+    }
+
+    .meter-label {
+        font-size: .8rem;
+        margin-top: .45rem;
+        color: #6b7280;
+    }
+    [data-bs-theme="dark"] .meter-label { color: #cbd5e1; }
+
+    .meter-very-weak { background: #ef4444; }   /* red */
+    .meter-weak { background: #f97316; }        /* orange */
+    .meter-fair { background: #f59e0b; }        /* yellow */
+    .meter-good { background: #84cc16; }        /* lime */
+    .meter-strong { background: #16a34a; }      /* green */
 </style>
 {% endblock %}
 
@@ -133,8 +179,11 @@
             {% endfor %}
         {% endif %}
 
-        <form method="POST">
+        <form method="POST" novalidate>
             {% csrf_token %}
+
+            <!-- Hidden role: avtomatik "oquvchi" bo'lib ro'yxatga olinadi -->
+            <input type="hidden" name="role" value="student" id="role-field" />
 
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
@@ -163,25 +212,31 @@
                         <label for="{{ form.phone.id_for_label }}">Telefon</label>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        {{ form.role }}
-                        <label for="{{ form.role.id_for_label }}">Rol</label>
-                    </div>
-                </div>
+                <!-- role removed from UI; backend will receive hidden input "role=student" -->
             </div>
 
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
-                    <div class="form-floating">
+                    <div class="form-floating pwd-wrap">
                         {{ form.password1 }}
                         <label for="{{ form.password1.id_for_label }}">Parol</label>
+                        <button type="button" class="pwd-toggle-btn" aria-label="Parolni ko‘rsatish" data-target="{{ form.password1.id_for_label }}">
+                            <i class="bi bi-eye" id="toggle-{{ form.password1.id_for_label }}"></i>
+                        </button>
+
+                        <div class="password-meter" id="pwd-meter-{{ form.password1.id_for_label }}" aria-hidden="true">
+                            <div class="meter-bar" id="pwd-meter-bar-{{ form.password1.id_for_label }}"></div>
+                        </div>
+                        <div class="meter-label" id="pwd-meter-label-{{ form.password1.id_for_label }}">Parol kuchi: —</div>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="form-floating">
+                    <div class="form-floating pwd-wrap">
                         {{ form.password2 }}
                         <label for="{{ form.password2.id_for_label }}">Tasdiqlash</label>
+                        <button type="button" class="pwd-toggle-btn" aria-label="Parolni ko‘rsatish" data-target="{{ form.password2.id_for_label }}">
+                            <i class="bi bi-eye" id="toggle-{{ form.password2.id_for_label }}"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -200,4 +255,96 @@
 
     </div>
 </div>
+
+<!-- JS: parol ko'rish togglesi va kuch o'lchagichi -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Helper: toggle visibility for given input id
+    function setupToggle(targetId) {
+        const btn = document.querySelector('.pwd-toggle-btn[data-target="' + targetId + '"]');
+        const icon = btn.querySelector('i');
+        const input = document.getElementById(targetId);
+        if (!input) return;
+
+        btn.addEventListener('click', function () {
+            const isPwd = input.type === 'password';
+            input.type = isPwd ? 'text' : 'password';
+            icon.className = isPwd ? 'bi bi-eye-slash' : 'bi bi-eye';
+            btn.setAttribute('aria-pressed', isPwd ? 'true' : 'false');
+        });
+    }
+
+    // Password strength calculation
+    function calcStrength(pw) {
+        if (!pw) return { score: 0, label: 'Bo‘sh' };
+        let score = 0;
+
+        // length checks
+        if (pw.length >= 8) score++;
+        if (pw.length >= 12) score++;
+
+        // variety
+        const hasLower = /[a-z]/.test(pw);
+        const hasUpper = /[A-Z]/.test(pw);
+        const hasDigit = /[0-9]/.test(pw);
+        const hasSpecial = /[^A-Za-z0-9]/.test(pw);
+        const variety = [hasLower, hasUpper, hasDigit, hasSpecial].filter(Boolean).length;
+
+        if (variety >= 2) score++;
+        if (variety >= 3) score++;
+
+        // Cap score 0..5
+        if (score > 5) score = 5;
+
+        let label = 'Juda zaif';
+        if (score <= 1) label = 'Juda zaif';
+        else if (score === 2) label = 'Zaif';
+        else if (score === 3) label = 'O‘rta';
+        else if (score === 4) label = 'Yaxshi';
+        else if (score === 5) label = 'Juda kuchli';
+
+        return { score, label };
+    }
+
+    function updateMeter(idBase, pw) {
+        const bar = document.getElementById('pwd-meter-bar-' + idBase);
+        const labelEl = document.getElementById('pwd-meter-label-' + idBase);
+        if (!bar || !labelEl) return;
+
+        const { score, label } = calcStrength(pw);
+        const percent = Math.min(100, Math.round((score / 5) * 100));
+        bar.style.width = percent + '%';
+
+        // remove existing meter classes
+        bar.className = 'meter-bar';
+
+        if (score <= 1) bar.classList.add('meter-very-weak');
+        else if (score === 2) bar.classList.add('meter-weak');
+        else if (score === 3) bar.classList.add('meter-fair');
+        else if (score === 4) bar.classList.add('meter-good');
+        else if (score === 5) bar.classList.add('meter-strong');
+
+        labelEl.textContent = 'Parol kuchi: ' + label;
+    }
+
+    // Setup toggles for both password inputs
+    const pwd1Id = "{{ form.password1.id_for_label }}";
+    const pwd2Id = "{{ form.password2.id_for_label }}";
+    setupToggle(pwd1Id);
+    setupToggle(pwd2Id);
+
+    // Watch password1 for strength
+    const pwd1 = document.getElementById(pwd1Id);
+    if (pwd1) {
+        // ensure meter exists (if template rendering changed the id base interpolation)
+        const idBase = pwd1Id;
+        pwd1.addEventListener('input', function () {
+            updateMeter(idBase, pwd1.value);
+        });
+
+        // initialize on load
+        updateMeter(idBase, pwd1.value);
+    }
+});
+</script>
 {% endblock %}

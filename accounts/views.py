@@ -44,37 +44,53 @@ def register_view(request):
     return render(request, 'accounts/register.html', {'form': form})
 
 
+
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('home')
-    
+
     if request.method == 'POST':
         form = LoginForm(request.POST)
+
         if form.is_valid():
-            user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
-            if user is not None:
-                if user.is_blocked:
-                    messages.error(request, "Sizning akkauntingiz bloklangan!")
-                    return render(request, 'accounts/login.html', {'form': form})
-                login(request, user)
-                user.last_activity = timezone.now()
-                user.save()
-                
-                # Activity log
-                ActivityLog.objects.create(
-                    user=user,
-                    action_type='login',
-                    description="Tizimga kirdi",
-                    ip_address=request.META.get('REMOTE_ADDR')
-                )
-                
-                messages.success(request, "Tizimga muvaffaqiyatli kirdingiz!")
-                return redirect('home')
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+
+            user = authenticate(request, username=username, password=password)
+
+            # ❌ Username yoki parol xato
+            if user is None:
+                messages.error(request, "Username yoki parol noto‘g‘ri ❌")
+                return render(request, 'accounts/login.html', {'form': form})
+
+            # ⛔ Bloklangan user
+            if hasattr(user, "is_blocked") and user.is_blocked:
+                messages.error(request, "Sizning akkauntingiz bloklangan 🚫")
+                return render(request, 'accounts/login.html', {'form': form})
+
+            # ✅ Login successful
+            login(request, user)
+
+            user.last_activity = timezone.now()
+            user.save(update_fields=["last_activity"])
+
+            ActivityLog.objects.create(
+                user=user,
+                action_type='login',
+                description="Tizimga kirdi",
+                ip_address=request.META.get('REMOTE_ADDR')
+            )
+
+            messages.success(request, "Tizimga muvaffaqiyatli kirdingiz! 🎉")
+            return redirect('home')
+
         else:
-            messages.error(request, "Username yoki parol noto'g'ri!")
+            # ❗ Form validation xatolari (bo‘sh qoldirilgan va h.k.)
+            messages.error(request, "Iltimos, barcha maydonlarni to‘g‘ri to‘ldiring ⚠️")
+
     else:
         form = LoginForm()
-    
+
     return render(request, 'accounts/login.html', {'form': form})
 
 
@@ -86,8 +102,9 @@ def logout_view(request):
             description="Tizimdan chiqdi",
             ip_address=request.META.get('REMOTE_ADDR')
         )
+
     logout(request)
-    messages.success(request, "Tizimdan chiqdingiz!")
+    messages.success(request, "Tizimdan muvaffaqiyatli chiqdingiz 👋")
     return redirect('login')
 
 

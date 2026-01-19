@@ -4,171 +4,298 @@
 
 {% block extra_css %}
 <style>
-    /* ===== BACKGROUND ===== */
-    body {
-        background: radial-gradient(circle at top, #e0e7ff, #f8fafc);
-        min-height: 100vh;
-    }
+/* ================= BACKGROUND ================= */
+body{
+  background:radial-gradient(circle at top,#e0e7ff,#f8fafc);
+  min-height:100vh;
+}
+[data-bs-theme="dark"] body{
+  background:radial-gradient(circle at top,#0f172a,#020617);
+}
 
-    [data-bs-theme="dark"] body {
-        background: radial-gradient(circle at top, #0f172a, #020617);
-    }
+/* ================= CENTER ================= */
+.page-center{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:1rem;
+  position:relative;
+  overflow:hidden;
+}
 
-    .page-center {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 1rem;
-        position: relative;
-        overflow: hidden;
-    }
+/* ================= BLOBS ================= */
+.blob{
+  position:absolute;
+  width:380px;height:380px;
+  background:linear-gradient(135deg,#6366f1,#22d3ee);
+  filter:blur(140px);
+  opacity:.35;
+  animation:float 12s ease-in-out infinite;
+}
+.blob.one{top:-120px;left:-120px}
+.blob.two{bottom:-120px;right:-120px;animation-delay:6s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(60px)}}
 
-    /* ===== BLOBS ===== */
-    .blob {
-        position: absolute;
-        width: 320px;
-        height: 320px;
-        background: linear-gradient(135deg, #6366f1, #22d3ee);
-        filter: blur(120px);
-        opacity: 0.35;
-        z-index: 0;
-        animation: float 10s ease-in-out infinite;
-    }
-    .blob.one { top: -80px; left: -80px; }
-    .blob.two { bottom: -80px; right: -80px; animation-delay: 4s; }
+/* ================= CARD ================= */
+.auth-card{
+  position:relative;
+  z-index:2;
+  width:100%;
+  max-width:440px;
+  background:rgba(255,255,255,.9);
+  backdrop-filter:blur(22px);
+  border-radius:26px;
+  padding:2.2rem;
+  border:1px solid rgba(0,0,0,.06);
+  box-shadow:0 30px 70px rgba(0,0,0,.2);
+}
+[data-bs-theme="dark"] .auth-card{
+  background:rgba(15,23,42,.9);
+  border-color:rgba(255,255,255,.1);
+}
 
-    @keyframes float {
-        0%,100% { transform: translateY(0); }
-        50% { transform: translateY(40px); }
-    }
+/* ================= LOGO ================= */
+.auth-logo{
+  width:72px;height:72px;border-radius:50%;
+  background:linear-gradient(135deg,#6366f1,#22d3ee);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:2rem;
+  box-shadow:0 15px 35px rgba(99,102,241,.5);
+}
 
-    /* ===== CARD ===== */
-    .auth-card {
-        position: relative;
-        z-index: 2;
-        width: 100%;
-        max-width: 420px;
-        background: rgba(255,255,255,0.85);
-        backdrop-filter: blur(20px);
-        border: 1px solid rgba(0,0,0,0.05);
-        border-radius: 22px;
-        box-shadow: 0 25px 50px rgba(0,0,0,.15);
-        color: #0f172a;
-        padding: 2rem;
-    }
+/* ================= INPUT ================= */
+.form-floating>.form-control{
+  border-radius:14px;
+  padding-left:3rem;
+}
+.input-icon{
+  position:absolute;left:14px;top:50%;
+  transform:translateY(-50%);
+  color:#94a3b8;
+}
+[data-bs-theme="dark"] .form-control{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.2);
+  color:#fff;
+}
+.form-control:focus{
+  border-color:#6366f1;
+  box-shadow:0 0 0 3px rgba(99,102,241,.35);
+}
 
-    [data-bs-theme="dark"] .auth-card {
-        background: rgba(30,41,59,0.8);
-        border-color: rgba(255,255,255,.12);
-        box-shadow: 0 25px 50px rgba(0,0,0,.45);
-        color: #fff;
-    }
+/* ================= SHOW PASSWORD ================= */
+.show-pass{
+  position:absolute;right:12px;top:50%;
+  transform:translateY(-50%);
+  background:none;border:none;
+  color:#64748b;
+}
+.show-pass:hover{color:#0a84ff}
 
-    /* ===== LOGO ===== */
-    .auth-logo {
-        width: 64px;
-        height: 64px;
-        border-radius: 50%;
-        background: linear-gradient(135deg,#6366f1,#22d3ee);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.8rem;
-        margin: auto;
-        color: #fff;
-        box-shadow: 0 10px 25px rgba(99,102,241,.5);
-    }
+/* ================= ERROR ================= */
+.is-invalid{
+  border-color:#ef4444!important;
+  box-shadow:0 0 0 3px rgba(239,68,68,.35)!important;
+}
 
-    /* ===== INPUTS ===== */
-    .form-control {
-        border-radius: 14px;
-    }
+/* ================= BUTTON ================= */
+.btn-primary{
+  background:linear-gradient(135deg,#6366f1,#22d3ee);
+  border:none;border-radius:14px;
+}
 
-    [data-bs-theme="dark"] .form-control {
-        background: rgba(255,255,255,.08);
-        border: 1px solid rgba(255,255,255,.2);
-        color: #fff;
-    }
+/* ================= TOAST ================= */
+.toast-box{
+  position:fixed;
+  top:20px;right:20px;
+  z-index:9999;
+}
+.toast-ios{
+  background:rgba(255,255,255,.9);
+  backdrop-filter:blur(16px);
+  border-radius:16px;
+  padding:12px 16px;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+  margin-bottom:10px;
+  animation:slideIn .4s ease;
+}
+[data-bs-theme="dark"] .toast-ios{
+  background:rgba(15,23,42,.95);
+  color:#fff;
+}
 
-    [data-bs-theme="dark"] .form-control:focus {
-        background: rgba(255,255,255,.12);
-        border-color: #6366f1;
-        box-shadow: 0 0 0 3px rgba(99,102,241,.35);
-        color: #fff;
-    }
 
-    .form-floating > label {
-        color: #64748b;
-    }
+/* ===== iOS INPUT FIX ===== */
 
-    [data-bs-theme="dark"] .form-floating > label {
-        color: #cbd5f5;
-    }
+.ios-input .form-control{
+  padding-left:3.2rem !important;  /* icon uchun joy */
+  border-radius:14px;
+}
 
-    /* ===== BUTTON ===== */
-    .btn-primary {
-        background: linear-gradient(135deg,#6366f1,#22d3ee);
-        border: none;
-        border-radius: 14px;
-    }
+/* icon joyi */
+.input-icon{
+  position:absolute;
+  left:14px;
+  top:50%;
+  transform:translateY(-50%);
+  color:#94a3b8;
+  z-index:4;
+}
 
-    .btn-primary:hover {
-        filter: brightness(1.05);
-        transform: translateY(-1px);
-    }
+/* label chapdan siljiydi */
+.ios-input label{
+  padding-left:2.4rem !important;
+}
+
+/* show password */
+.show-pass{
+  position:absolute;
+  right:14px;
+  top:50%;
+  transform:translateY(-50%);
+  background:none;
+  border:none;
+  color:#64748b;
+  z-index:4;
+}
+
+.show-pass:hover{ color:#0a84ff; }
+
+/* password input o‘ng tomondan ham joy qoldirsin */
+.ios-input input[type="password"],
+.ios-input input[type="text"]{
+  padding-right:3rem !important;
+}
+
+@keyframes slideIn{
+  from{transform:translateX(50px);opacity:0}
+  to{transform:translateX(0);opacity:1}
+}
+
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="page-center">
 
-    <div class="blob one"></div>
-    <div class="blob two"></div>
+<div class="blob one"></div>
+<div class="blob two"></div>
 
-    <div class="auth-card">
+<div class="toast-box" id="toastBox"></div>
 
-        <div class="text-center mb-4">
-            <div class="auth-logo mb-3">
-                <i class="bi bi-code-slash"></i>
-            </div>
-            <h4 class="fw-bold mb-1">LMS tizimiga kirish</h4>
-            <p class="text-secondary small mb-0">Developer mode: ON 😎</p>
-        </div>
+<div class="auth-card">
 
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} border-0 small py-2">
-                {{ message }}
-            </div>
-            {% endfor %}
-        {% endif %}
-
-        <form method="POST">
-            {% csrf_token %}
-
-            <div class="form-floating mb-3">
-                {{ form.username }}
-                <label for="{{ form.username.id_for_label }}">Username</label>
-            </div>
-
-            <div class="form-floating mb-4">
-                {{ form.password }}
-                <label for="{{ form.password.id_for_label }}">Parol</label>
-            </div>
-
-            <button class="btn btn-primary w-100 py-3 fw-semibold mb-3">
-                <i class="bi bi-box-arrow-in-right me-2"></i>Kirish
-            </button>
-        </form>
-
-        <div class="text-center small">
-            Akkauntingiz yo‘qmi?
-            <a href="{% url 'register' %}" class="text-info text-decoration-none fw-semibold">
-                Ro‘yxatdan o‘tish →
-            </a>
-        </div>
-
+  <div class="text-center mb-4">
+    <div class="auth-logo mb-3 mx-auto">
+      <i class="bi bi-code-slash"></i>
     </div>
+    <h4 class="fw-bold mb-1">LMS tizimiga kirish</h4>
+    <p class="text-secondary small mb-0">Developer mode: ON 😎</p>
+  </div>
+
+  <form method="POST" id="loginForm">
+    {% csrf_token %}
+
+  <!-- ========== USERNAME ========== -->
+<div class="form-floating mb-3 position-relative ios-input">
+
+  <!-- icon -->
+  <span class="input-icon">
+    <i class="bi bi-person"></i>
+  </span>
+
+  <!-- input -->
+  {{ form.username }}
+
+  <!-- label -->
+  <label for="{{ form.username.id_for_label }}">Username</label>
+
 </div>
+
+
+<!-- ========== PASSWORD ========== -->
+<div class="form-floating mb-4 position-relative ios-input">
+
+  <!-- icon -->
+  <span class="input-icon">
+    <i class="bi bi-lock"></i>
+  </span>
+
+  <!-- input -->
+  {{ form.password }}
+
+  <!-- show password -->
+  <button type="button" class="show-pass" onclick="togglePass()">
+    <i id="eyeIcon" class="bi bi-eye"></i>
+  </button>
+
+  <!-- label -->
+  <label for="{{ form.password.id_for_label }}">Parol</label>
+
+</div>
+
+
+    <button class="btn btn-primary w-100 py-3 fw-semibold">
+      <i class="bi bi-box-arrow-in-right me-2"></i>Kirish
+    </button>
+  </form>
+
+  <div class="text-center small mt-3">
+    Akkauntingiz yo‘qmi?
+    <a href="{% url 'register' %}" class="text-info fw-semibold text-decoration-none">
+      Ro‘yxatdan o‘tish →
+    </a>
+  </div>
+
+</div>
+</div>
+
+<!-- ================= JS ================= -->
+<script>
+
+function togglePass(){
+  const input = document.getElementById("{{ form.password.id_for_label }}");
+  const icon = document.getElementById("eyeIcon");
+  if(input.type === "password"){
+    input.type = "text";
+    icon.className = "bi bi-eye-slash";
+  }else{
+    input.type = "password";
+    icon.className = "bi bi-eye";
+  }
+}
+
+function showToast(text){
+  const box = document.getElementById("toastBox");
+  const div = document.createElement("div");
+  div.className = "toast-ios";
+  div.innerHTML = `<i class="bi bi-exclamation-triangle me-2 text-danger"></i> ${text}`;
+  box.appendChild(div);
+
+  setTimeout(()=>{ div.style.opacity="0"; },4500);
+  setTimeout(()=>{ div.remove(); },5000);
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+  {% if messages %}
+    {% for message in messages %}
+      showToast("{{ message|escapejs }}");
+    {% endfor %}
+  {% endif %}
+
+  {% if form.username.errors %}
+      showToast("Username noto‘g‘ri yoki mavjud emas");
+      document.getElementById("{{ form.username.id_for_label }}").classList.add("is-invalid");
+  {% endif %}
+
+  {% if form.password.errors %}
+      showToast("Parol noto‘g‘ri kiritildi");
+      document.getElementById("{{ form.password.id_for_label }}").classList.add("is-invalid");
+  {% endif %}
+
+});
+
+</script>
 {% endblock %}
