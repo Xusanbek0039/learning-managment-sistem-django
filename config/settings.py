@@ -27,9 +27,9 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 SECRET_KEY = 'django-insecure-)fxm1vrhjd!nfp46v$6v2*_bx&*7t8=mg&ic(6w8#ubez4y+&u'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -162,6 +162,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'accounts.middleware.BirthdayCheckMiddleware',
     'accounts.middleware.UpdateLastActivityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'accounts.middleware.BlockedUserMiddleware',
     'accounts.middleware.PaymentCheckMiddleware',
 ]
@@ -231,9 +232,18 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+# Static files (CSS, JS, Images)
+
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [ BASE_DIR / "static" ]
+
+# bu yerda sening static papkang (development paytida)
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
+# collectstatic qilganda hamma fayllar shu yerga yig‘iladi
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 
 # Media files
 MEDIA_URL = '/media/'
@@ -247,3 +257,4 @@ LOGIN_REDIRECT_URL = 'home'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"

@@ -1,0 +1,164 @@
+/* ================= BACKGROUND ================= */
+body{
+  min-height:100vh;
+}
+
+
+/* ================= CENTER ================= */
+.page-center{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:1rem;
+  position:relative;
+  overflow:hidden;
+}
+
+/* ================= BLOBS ================= */
+.blob{
+  position:absolute;
+  width:380px;height:380px;
+  filter:blur(140px);
+  opacity:.35;
+  animation:float 12s ease-in-out infinite;
+}
+.blob.one{top:-120px;left:-120px}
+.blob.two{bottom:-120px;right:-120px;animation-delay:6s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(60px)}}
+
+/* ================= CARD ================= */
+.auth-card{
+  position:relative;
+  z-index:2;
+  width:100%;
+  max-width:440px;
+  background:rgba(255,255,255,.9);
+  backdrop-filter:blur(22px);
+  border-radius:26px;
+  padding:2.2rem;
+  border:1px solid rgba(0,0,0,.06);
+  box-shadow:0 30px 70px rgba(0,0,0,.2);
+}
+[data-bs-theme="dark"] .auth-card{
+  background:rgba(15,23,42,.9);
+  border-color:rgba(255,255,255,.1);
+}
+
+/* ================= LOGO ================= */
+.auth-logo{
+  width:72px;height:72px;border-radius:50%;
+  background:linear-gradient(135deg,#6366f1,#22d3ee);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:2rem;
+  box-shadow:0 15px 35px rgba(99,102,241,.5);
+}
+
+/* ================= INPUT ================= */
+.form-floating>.form-control{
+  border-radius:14px;
+  padding-left:3rem;
+}
+.input-icon{
+  position:absolute;left:14px;top:50%;
+  transform:translateY(-50%);
+  color:#94a3b8;
+}
+[data-bs-theme="dark"] .form-control{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.2);
+  color:#fff;
+}
+.form-control:focus{
+  border-color:#6366f1;
+  box-shadow:0 0 0 3px rgba(99,102,241,.35);
+}
+
+/* ================= SHOW PASSWORD ================= */
+.show-pass{
+  position:absolute;right:12px;top:50%;
+  transform:translateY(-50%);
+  background:none;border:none;
+  color:#64748b;
+}
+.show-pass:hover{color:#0a84ff}
+
+/* ================= ERROR ================= */
+.is-invalid{
+  border-color:#ef4444!important;
+  box-shadow:0 0 0 3px rgba(239,68,68,.35)!important;
+}
+
+/* ================= BUTTON ================= */
+.btn-primary{
+  background:linear-gradient(135deg,#6366f1,#22d3ee);
+  border:none;border-radius:14px;
+}
+
+/* ================= TOAST ================= */
+.toast-box{
+  position:fixed;
+  top:20px;right:20px;
+  z-index:9999;
+}
+.toast-ios{
+  background:rgba(255,255,255,.9);
+  backdrop-filter:blur(16px);
+  border-radius:16px;
+  padding:12px 16px;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+  margin-bottom:10px;
+  animation:slideIn .4s ease;
+}
+[data-bs-theme="dark"] .toast-ios{
+  background:rgba(15,23,42,.95);
+  color:#fff;
+}
+
+
+/* ===== iOS INPUT FIX ===== */
+
+.ios-input .form-control{
+  padding-left:3.2rem !important;  /* icon uchun joy */
+  border-radius:14px;
+}
+
+/* icon joyi */
+.input-icon{
+  position:absolute;
+  left:14px;
+  top:50%;
+  transform:translateY(-50%);
+  color:#94a3b8;
+  z-index:4;
+}
+
+/* label chapdan siljiydi */
+.ios-input label{
+  padding-left:2.4rem !important;
+}
+
+/* show password */
+.show-pass{
+  position:absolute;
+  right:14px;
+  top:50%;
+  transform:translateY(-50%);
+  background:none;
+  border:none;
+  color:#64748b;
+  z-index:4;
+}
+
+.show-pass:hover{ color:#0a84ff; }
+
+/* password input o‘ng tomondan ham joy qoldirsin */
+.ios-input input[type="password"],
+.ios-input input[type="text"]{
+  padding-right:3rem !important;
+}
+
+@keyframes slideIn{
+  from{transform:translateX(50px);opacity:0}
+  to{transform:translateX(0);opacity:1}
+}
