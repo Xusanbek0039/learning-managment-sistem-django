@@ -227,3 +227,22 @@ class CertificateForm(forms.ModelForm):
     class Meta:
         model = Certificate
         fields = ['file']
+
+
+class SectionForm(forms.ModelForm):
+    title = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': "Bo'lim nomi"})
+    )
+    description = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Tavsif (ixtiyoriy)', 'rows': 3})
+    )
+    order = forms.IntegerField(
+        initial=0,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Tartib raqami'})
+    )
+
+    class Meta:
+        model = Section
+        fields = ['title', 'description', 'order']

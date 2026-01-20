@@ -10,10 +10,11 @@ from datetime import timedelta
 from .forms import (
     RegisterForm, LoginForm, ProfessionForm, UserProfileForm, 
     AdminUserEditForm, ChangePasswordForm, VideoLessonForm, HomeworkForm,
-    HomeworkSubmissionForm, HomeworkGradeForm, TestForm, TestQuestionForm, CertificateForm
+    HomeworkSubmissionForm, HomeworkGradeForm, TestForm, TestQuestionForm, CertificateForm,
+    SectionForm
 )
 from .models import (
-    Profession, CustomUser, CourseEnrollment, Lesson, VideoLesson, VideoProgress,
+    Profession, Section, CustomUser, CourseEnrollment, Lesson, VideoLesson, VideoProgress,
     Homework, HomeworkSubmission, Test, TestQuestion, TestAnswer, TestResult,
     TestUserAnswer, Certificate, Message, PaymentStatus
 )
@@ -148,12 +149,18 @@ def profession_detail(request, pk):
     if request.user.is_student:
         is_enrolled = CourseEnrollment.objects.filter(user=request.user, profession=profession).exists()
     
-    lessons = profession.lessons.all() if is_enrolled or request.user.is_teacher or request.user.is_admin else []
+    sections = []
+    lessons_without_section = []
+    
+    if is_enrolled or request.user.is_teacher or request.user.is_admin:
+        sections = profession.sections.filter(is_active=True).prefetch_related('lessons')
+        lessons_without_section = profession.lessons.filter(section__isnull=True)
     
     return render(request, 'accounts/profession_detail.html', {
         'profession': profession,
         'is_enrolled': is_enrolled,
-        'lessons': lessons,
+        'sections': sections,
+        'lessons_without_section': lessons_without_section,
     })
 
 
@@ -851,11 +858,13 @@ def manage_lessons(request, pk):
         return redirect('home')
     
     profession = get_object_or_404(Profession, pk=pk)
-    lessons = profession.lessons.all()
+    sections = profession.sections.all().prefetch_related('lessons')
+    lessons_without_section = profession.lessons.filter(section__isnull=True)
     
     return render(request, 'accounts/manage/lessons.html', {
         'profession': profession,
-        'lessons': lessons,
+        'sections': sections,
+        'lessons_without_section': lessons_without_section,
     })
 
 
