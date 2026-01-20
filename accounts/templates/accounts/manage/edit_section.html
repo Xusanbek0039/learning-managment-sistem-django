@@ -1,0 +1,60 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Bo'limni tahrirlash - LMS{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <a href="{% url 'manage_lessons' section.profession.pk %}" class="btn btn-outline-secondary mb-4">
+        <i class="bi bi-arrow-left me-2"></i>Orqaga
+    </a>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header" style="background: transparent; border-bottom: 1px solid var(--border-color);">
+                    <h4 style="color: var(--primary-blue); margin: 0;">
+                        <i class="bi bi-folder2-open me-2"></i>Bo'limni tahrirlash
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label" style="color: var(--text);">Bo'lim nomi</label>
+                            <input type="text" name="title" class="form-control" value="{{ section.title }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label" style="color: var(--text);">Tavsif (ixtiyoriy)</label>
+                            <textarea name="description" class="form-control" rows="3">{{ section.description|default:'' }}</textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label" style="color: var(--text);">Tartib raqami</label>
+                            <input type="number" name="order" class="form-control" value="{{ section.order }}" min="0">
+                        </div>
+                        
+                        <div class="form-check mb-4">
+                            <input type="checkbox" name="is_active" class="form-check-input" id="isActive" {% if section.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="isActive" style="color: var(--text);">Faol</label>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-2"></i>Saqlash
+                            </button>
+                            <a href="{% url 'delete_section' section.pk %}" class="btn btn-outline-danger">
+                                <i class="bi bi-trash me-2"></i>O'chirish
+                            </a>
+                            <a href="{% url 'manage_lessons' section.profession.pk %}" class="btn btn-outline-secondary">
+                                Bekor qilish
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

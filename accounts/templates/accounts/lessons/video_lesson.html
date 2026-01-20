@@ -221,7 +221,11 @@ const thumb = document.getElementById('thumbLayer');
 const iframe = document.getElementById('videoFrame');
 
 thumb.addEventListener('click', function(){
-    iframe.src = "{{ video.get_embed_url }}?autoplay=1";
+    // YouTube embed with privacy-enhanced mode and additional params
+    let embedUrl = "{{ video.get_embed_url }}";
+    // Use nocookie domain to avoid some restrictions
+    embedUrl = embedUrl.replace('youtube.com', 'youtube-nocookie.com');
+    iframe.src = embedUrl + "?autoplay=1&rel=0&modestbranding=1&enablejsapi=1";
     iframe.classList.remove('d-none');
     thumb.classList.add('d-none');
 });
