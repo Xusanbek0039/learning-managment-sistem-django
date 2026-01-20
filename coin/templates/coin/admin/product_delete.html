@@ -1,0 +1,115 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Mahsulotni o'chirish - Admin | IT Creative{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --card-bg: rgba(255, 255, 255, .8);
+        --card-border: rgba(0, 0, 0, .08);
+        --text-main: #111;
+        --soft-bg: rgba(0, 0, 0, .05);
+    }
+
+    [data-bs-theme="dark"] {
+        --card-bg: rgba(18, 18, 18, .85);
+        --card-border: rgba(255, 255, 255, .08);
+        --text-main: #f1f1f1;
+        --soft-bg: rgba(255, 255, 255, .06);
+    }
+
+    /* ===== IOS CARD ===== */
+    .ios-card {
+        background: var(--card-bg);
+        backdrop-filter: blur(14px);
+        border: 1px solid var(--card-border);
+        border-radius: 24px;
+        box-shadow: 0 14px 40px rgba(0, 0, 0, .2);
+    }
+
+    /* ===== IMAGE ===== */
+    .product-img {
+        max-height: 150px;
+        object-fit: cover;
+        border-radius: 14px;
+    }
+
+    /* ===== BADGES ===== */
+    .badge {
+        border-radius: 999px;
+        padding: .5em .9em;
+    }
+
+    /* ===== BUTTONS ===== */
+    .ios-btn {
+        border-radius: 14px;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4 my-md-5">
+
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+
+            <div class="ios-card text-center p-4 p-md-5">
+
+                <div class="mb-3">
+                    <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size:4rem;"></i>
+                </div>
+
+                <h4 class="fw-bold mb-3">Mahsulotni o'chirish</h4>
+
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="product-img mb-3" alt="{{ product.name }}">
+                {% endif %}
+
+                <h5 class="mb-2">{{ product.name }}</h5>
+
+                <p class="text-muted small mb-4">
+                    Ushbu mahsulotni o'chirishni xohlaysizmi?<br>
+                    <span class="text-danger">Bu amalni qaytarib bo'lmaydi!</span>
+                </p>
+
+                <div class="d-flex justify-content-center gap-4 mb-4">
+
+                    <div class="text-center">
+                        <small class="text-muted d-block">Narxi</small>
+                        <span class="badge bg-warning text-dark">
+                            <i class="bi bi-coin me-1"></i>{{ product.coin_price }}
+                        </span>
+                    </div>
+
+                    <div class="text-center">
+                        <small class="text-muted d-block">Zaxira</small>
+                        <span class="badge bg-info">
+                            {{ product.stock }} ta
+                        </span>
+                    </div>
+
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex gap-3 justify-content-center flex-wrap">
+
+                        <a href="{% url 'coin:admin_products' %}" class="btn btn-outline-secondary ios-btn px-4">
+                            <i class="bi bi-arrow-left me-2"></i>Ortga
+                        </a>
+
+                        <button type="submit" class="btn btn-danger ios-btn px-4">
+                            <i class="bi bi-trash me-2"></i>O'chirish
+                        </button>
+
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

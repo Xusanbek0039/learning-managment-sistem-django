@@ -4,7 +4,7 @@ from django.utils.html import format_html
 from .models import (
     CustomUser, Profession, CourseEnrollment, Lesson, VideoLesson, VideoProgress,
     Homework, HomeworkSubmission, Test, TestQuestion, TestAnswer, TestResult,
-    Certificate, CoinTransaction, Message, PaymentStatus
+    Certificate, Message, PaymentStatus
 )
 
 
@@ -153,15 +153,6 @@ class CertificateAdmin(admin.ModelAdmin):
     search_fields = ['student__username', 'profession__name']
     autocomplete_fields = ['student', 'profession', 'issued_by']
     date_hierarchy = 'issued_at'
-
-
-@admin.register(CoinTransaction)
-class CoinTransactionAdmin(admin.ModelAdmin):
-    list_display = ['user', 'amount', 'reason', 'created_at']
-    list_filter = ['created_at']
-    search_fields = ['user__username', 'reason']
-    date_hierarchy = 'created_at'
-    readonly_fields = ['user', 'amount', 'reason', 'created_at']
 
 
 @admin.register(Message)

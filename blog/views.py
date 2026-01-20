@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.db.models import Q
 from .models import Post, PostComment, PostLike
 from .forms import PostForm, CommentForm
-from accounts.models import ActivityLog
+from coin.models import ActivityLog
 
 @login_required
 def post_list(request):

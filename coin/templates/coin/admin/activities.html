@@ -1,0 +1,270 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Faoliyat jurnali - Admin | IT Creative{% endblock %}
+
+{% block extra_css %}
+<style>
+:root{
+    --card-bg: rgba(255,255,255,.75);
+    --card-border: rgba(0,0,0,.08);
+    --text-main: #111;
+    --soft-bg: rgba(0,0,0,.05);
+}
+[data-bs-theme="dark"]{
+    --card-bg: rgba(18,18,18,.8);
+    --card-border: rgba(255,255,255,.08);
+    --text-main: #f1f1f1;
+    --soft-bg: rgba(255,255,255,.06);
+}
+
+/* ===== CARDS ===== */
+.ios-card{
+    background:var(--card-bg);
+    backdrop-filter:blur(14px);
+    border:1px solid var(--card-border);
+    border-radius:22px;
+    box-shadow:0 12px 35px rgba(0,0,0,.15);
+}
+
+/* ===== FILTER FORM ===== */
+.ios-input, .ios-select{
+    border-radius:14px;
+}
+.filter-btn{
+    border-radius:14px;
+}
+
+/* ===== TABLE ===== */
+.table{color:var(--text-main);}
+.table thead th{
+    border-bottom:1px solid var(--card-border);
+    font-weight:600;
+}
+.table tbody tr{transition:.2s;}
+.table tbody tr:hover{
+    background:var(--soft-bg);
+}
+
+/* ===== USER AVATAR ===== */
+.avatar{
+    width:36px;height:36px;border-radius:50%;object-fit:cover;
+}
+
+/* ===== BADGES ===== */
+.badge{
+    border-radius:999px;
+    padding:.45em .75em;
+    font-weight:600;
+}
+
+/* ===== MOBILE ===== */
+@media(max-width:768px){
+    .table thead{display:none;}
+    .table tbody tr{
+        display:block;
+        border:1px solid var(--card-border);
+        border-radius:14px;
+        padding:12px;
+        margin-bottom:12px;
+        background:var(--soft-bg);
+    }
+    .table tbody td{
+        display:flex;
+        justify-content:space-between;
+        padding:6px 0;
+        border:none;
+    }
+    .table tbody td::before{
+        content:attr(data-label);
+        font-weight:600;
+        opacity:.7;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4 my-md-5">
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h3 class="m-0">
+        <i class="bi bi-activity me-2"></i>Faoliyat jurnali
+    </h3>
+</div>
+
+<!-- ===== FILTER ===== -->
+<div class="ios-card mb-4">
+<div class="p-4">
+
+<form method="get" class="row g-3 align-items-end">
+
+    <div class="col-md-3">
+        <label class="form-label small fw-semibold">Boshlanish</label>
+        <input type="date" name="date_from"
+               class="form-control ios-input"
+               value="{{ request.GET.date_from }}">
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label small fw-semibold">Tugash</label>
+        <input type="date" name="date_to"
+               class="form-control ios-input"
+               value="{{ request.GET.date_to }}">
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label small fw-semibold">Amal turi</label>
+        <select name="action_type" class="form-select ios-select">
+            <option value="">Barchasi</option>
+            <option value="login" {% if request.GET.action_type == 'login' %}selected{% endif %}>Kirish</option>
+            <option value="logout" {% if request.GET.action_type == 'logout' %}selected{% endif %}>Chiqish</option>
+            <option value="like" {% if request.GET.action_type == 'like' %}selected{% endif %}>Like</option>
+            <option value="comment" {% if request.GET.action_type == 'comment' %}selected{% endif %}>Izoh</option>
+            <option value="purchase" {% if request.GET.action_type == 'purchase' %}selected{% endif %}>Xarid</option>
+            <option value="coin_earned" {% if request.GET.action_type == 'coin_earned' %}selected{% endif %}>Coin olish</option>
+            <option value="coin_spent" {% if request.GET.action_type == 'coin_spent' %}selected{% endif %}>Coin sarflash</option>
+            <option value="lesson_complete" {% if request.GET.action_type == 'lesson_complete' %}selected{% endif %}>Dars</option>
+            <option value="homework_submit" {% if request.GET.action_type == 'homework_submit' %}selected{% endif %}>Vazifa</option>
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label small fw-semibold">Foydalanuvchi</label>
+        <select name="user" class="form-select ios-select">
+            <option value="">Barchasi</option>
+            {% for u in users %}
+            <option value="{{ u.pk }}" {% if request.GET.user == u.pk|stringformat:"i" %}selected{% endif %}>
+                {{ u.full_name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-md-1 d-grid">
+        <button class="btn btn-primary filter-btn">
+            <i class="bi bi-funnel"></i>
+        </button>
+    </div>
+
+</form>
+
+</div>
+</div>
+
+<!-- ===== TABLE ===== -->
+<div class="ios-card">
+
+<div class="p-3">
+
+<div class="table-responsive">
+<table class="table align-middle mb-0">
+
+<thead>
+<tr>
+    <th>Foydalanuvchi</th>
+    <th>Amal</th>
+    <th>Tavsif</th>
+    <th>Sana</th>
+</tr>
+</thead>
+
+<tbody>
+{% for activity in activities %}
+<tr>
+
+<td data-label="Foydalanuvchi">
+    <div class="d-flex align-items-center gap-2">
+        {% if activity.user.photo %}
+        <img src="{{ activity.user.photo.url }}" class="avatar">
+        {% else %}
+        <div class="avatar bg-secondary bg-opacity-25 d-flex align-items-center justify-content-center">
+            <i class="bi bi-person-fill text-muted"></i>
+        </div>
+        {% endif %}
+        <strong>{{ activity.user.full_name }}</strong>
+    </div>
+</td>
+
+<td data-label="Amal">
+{% if activity.action_type == 'login' %}
+<span class="badge bg-info"><i class="bi bi-box-arrow-in-right me-1"></i>Kirish</span>
+{% elif activity.action_type == 'logout' %}
+<span class="badge bg-secondary"><i class="bi bi-box-arrow-right me-1"></i>Chiqish</span>
+{% elif activity.action_type == 'like_product' or activity.action_type == 'like_post' %}
+<span class="badge bg-danger"><i class="bi bi-heart-fill me-1"></i>Like</span>
+{% elif activity.action_type == 'comment_product' or activity.action_type == 'comment_post' %}
+<span class="badge bg-primary"><i class="bi bi-chat-fill me-1"></i>Izoh</span>
+{% elif activity.action_type == 'purchase_product' %}
+<span class="badge bg-success"><i class="bi bi-cart-fill me-1"></i>Xarid</span>
+{% elif activity.action_type == 'earn_coins' %}
+<span class="badge bg-warning text-dark"><i class="bi bi-coin me-1"></i>Coin</span>
+{% elif activity.action_type == 'watch_video' %}
+<span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Dars</span>
+{% elif activity.action_type == 'submit_homework' %}
+<span class="badge bg-primary"><i class="bi bi-file-earmark-check me-1"></i>Vazifa</span>
+{% else %}
+<span class="badge bg-light text-dark">{{ activity.action_type }}</span>
+{% endif %}
+</td>
+
+<td data-label="Tavsif" class="text-muted small">
+    {{ activity.description }}
+</td>
+
+<td data-label="Sana">
+    <small class="text-muted">
+        <i class="bi bi-clock me-1"></i>{{ activity.created_at|date:"d.m.Y, H:i" }}
+    </small>
+</td>
+
+</tr>
+
+{% empty %}
+<tr>
+<td colspan="4" class="text-center py-5 text-muted">
+    <i class="bi bi-activity fs-1"></i>
+    <p class="mt-2 mb-0">Faoliyatlar topilmadi</p>
+</td>
+</tr>
+{% endfor %}
+</tbody>
+
+</table>
+</div>
+
+</div>
+</div>
+
+<!-- ===== PAGINATION ===== -->
+{% if activities.has_other_pages %}
+<nav class="mt-4">
+<ul class="pagination justify-content-center">
+
+{% if activities.has_previous %}
+<li class="page-item">
+<a class="page-link" href="?page={{ activities.previous_page_number }}&{{ request.GET.urlencode }}">‹</a>
+</li>
+{% endif %}
+
+{% for num in activities.paginator.page_range %}
+{% if activities.number == num %}
+<li class="page-item active"><span class="page-link">{{ num }}</span></li>
+{% elif num > activities.number|add:'-3' and num < activities.number|add:'3' %}
+<li class="page-item">
+<a class="page-link" href="?page={{ num }}&{{ request.GET.urlencode }}">{{ num }}</a>
+</li>
+{% endif %}
+{% endfor %}
+
+{% if activities.has_next %}
+<li class="page-item">
+<a class="page-link" href="?page={{ activities.next_page_number }}&{{ request.GET.urlencode }}">›</a>
+</li>
+{% endif %}
+
+</ul>
+</nav>
+{% endif %}
+
+</div>
+{% endblock %}

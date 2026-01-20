@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'accounts',
     'blog',
     'ai_yordamchi',
+    'coin',
 ]
 
 # Jazzmin Admin UI Settings
