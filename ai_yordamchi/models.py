@@ -21,7 +21,7 @@ class ChatSession(models.Model):
 class ChatMessage(models.Model):
     ROLE_CHOICES = (
         ('user', 'Foydalanuvchi'),
-        ('assistant', 'AI Yordamchi'),
+        ('assistant', 'Creative AI'),
     )
     
     session = models.ForeignKey(ChatSession, on_delete=models.CASCADE, related_name='messages')
