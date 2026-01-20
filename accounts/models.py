@@ -170,21 +170,43 @@ class VideoLesson(models.Model):
     def get_video_id(self):
         url = self.video_url or self.youtube_url or ''
         
-        # Vimeo
+        # Vimeo: https://vimeo.com/123456789 or https://vimeo.com/123456789?share=copy
+        # or https://player.vimeo.com/video/123456789
         if 'vimeo.com' in url:
-            # https://vimeo.com/123456789 or https://player.vimeo.com/video/123456789
             if '/video/' in url:
-                return url.split('/video/')[1].split('?')[0].split('/')[0]
+                video_id = url.split('/video/')[1].split('?')[0].split('/')[0]
             else:
-                return url.split('vimeo.com/')[1].split('?')[0].split('/')[0]
+                # Extract number after vimeo.com/
+                import re
+                match = re.search(r'vimeo\.com/(\d+)', url)
+                if match:
+                    video_id = match.group(1)
+                else:
+                    video_id = url.split('vimeo.com/')[1].split('?')[0].split('/')[0]
+            return video_id
         
-        # YouTube
-        if 'watch?v=' in url:
-            return url.split('watch?v=')[1].split('&')[0]
-        elif 'youtu.be/' in url:
-            return url.split('youtu.be/')[1].split('?')[0]
-        elif 'youtube.com/embed/' in url:
-            return url.split('/embed/')[1].split('?')[0]
+        # YouTube formats:
+        # https://www.youtube.com/watch?v=VIDEO_ID
+        # https://youtu.be/VIDEO_ID
+        # https://www.youtube.com/embed/VIDEO_ID?si=xxx
+        # https://youtube.com/embed/VIDEO_ID
+        if 'youtube.com' in url or 'youtu.be' in url:
+            import re
+            # Try embed format first
+            if '/embed/' in url:
+                match = re.search(r'/embed/([a-zA-Z0-9_-]+)', url)
+                if match:
+                    return match.group(1)
+            # Try watch?v= format
+            if 'watch?v=' in url:
+                match = re.search(r'watch\?v=([a-zA-Z0-9_-]+)', url)
+                if match:
+                    return match.group(1)
+            # Try youtu.be format
+            if 'youtu.be/' in url:
+                match = re.search(r'youtu\.be/([a-zA-Z0-9_-]+)', url)
+                if match:
+                    return match.group(1)
         
         return None
     
