@@ -1211,6 +1211,13 @@ def admin_dashboard(request):
     pending_homeworks = HomeworkSubmission.objects.filter(status='pending').count()
     graded_homeworks = HomeworkSubmission.objects.filter(status='graded').count()
     
+    # Mahsulot statistikasi
+    from coin.models import Product, ProductPurchase
+    total_products = Product.objects.count()
+    active_products = Product.objects.filter(is_active=True).count()
+    total_purchases = ProductPurchase.objects.count()
+    total_coins_spent = ProductPurchase.objects.aggregate(total=Sum('coins_spent'))['total'] or 0
+    
     profession_stats = Profession.objects.annotate(
         student_count=Count('enrollments', filter=Q(enrollments__user__role='student')),
         teacher_count=Count('students', filter=Q(students__role='teacher'))
@@ -1251,6 +1258,10 @@ def admin_dashboard(request):
         'profession_stats': profession_stats,
         'recent_users': recent_users,
         'daily_stats': daily_stats,
+        'total_products': total_products,
+        'active_products': active_products,
+        'total_purchases': total_purchases,
+        'total_coins_spent': total_coins_spent,
     }
     return render(request, 'accounts/admin/dashboard.html', context)
 
