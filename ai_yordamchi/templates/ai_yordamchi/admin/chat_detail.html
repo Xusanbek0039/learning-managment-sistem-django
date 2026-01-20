@@ -1,0 +1,147 @@
+{% extends 'accounts/admin/base_admin.html' %}
+
+{% block title %}Suhbat #{{ session.pk }} - Admin{% endblock %}
+
+{% block admin_content %}
+<style>
+    .chat-message {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        border-radius: 12px;
+        background: var(--card-bg);
+    }
+    
+    .chat-message.user {
+        background: rgba(13, 110, 253, 0.1);
+    }
+    
+    .chat-message.assistant {
+        background: rgba(16, 185, 129, 0.1);
+    }
+    
+    .message-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: white;
+        flex-shrink: 0;
+    }
+    
+    .chat-message.user .message-avatar {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    }
+    
+    .chat-message.assistant .message-avatar {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+    
+    .message-body {
+        flex: 1;
+    }
+    
+    .message-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .message-sender {
+        font-weight: 600;
+    }
+    
+    .message-time {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+    }
+    
+    .message-content {
+        line-height: 1.7;
+    }
+    
+    .message-image {
+        max-width: 300px;
+        border-radius: 8px;
+        margin-top: 0.75rem;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <a href="{% url 'ai_yordamchi:admin_chats' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <div>
+                <h2 class="mb-1">
+                    <i class="bi bi-chat-dots me-2"></i>{{ session.title }}
+                </h2>
+                <p class="text-muted mb-0">
+                    <strong>{{ session.user.full_name }}</strong> (@{{ session.user.username }})
+                    • Yaratilgan: {{ session.created_at|date:"d.m.Y H:i" }}
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="bi bi-chat-left-text me-2"></i>
+                Xabarlar ({{ chat_messages.count }})
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if chat_messages %}
+                {% for msg in chat_messages %}
+                <div class="chat-message {{ msg.role }}">
+                    <div class="message-avatar">
+                        {% if msg.role == 'user' %}
+                            {{ session.user.first_name.0 }}{{ session.user.last_name.0 }}
+                        {% else %}
+                            <i class="bi bi-robot"></i>
+                        {% endif %}
+                    </div>
+                    <div class="message-body">
+                        <div class="message-header">
+                            <span class="message-sender">
+                                {% if msg.role == 'user' %}
+                                    {{ session.user.full_name }}
+                                {% else %}
+                                    AI Yordamchi
+                                {% endif %}
+                            </span>
+                            <span class="message-time">
+                                {{ msg.created_at|date:"d.m.Y H:i" }}
+                                {% if msg.coins_spent %}
+                                <span class="badge bg-warning text-dark ms-2">
+                                    <i class="bi bi-coin"></i> -{{ msg.coins_spent }}
+                                </span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="message-content">
+                            {{ msg.content|linebreaks }}
+                            {% if msg.image %}
+                            <img src="{{ msg.image.url }}" alt="Uploaded image" class="message-image">
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-chat-square-dots fs-1 d-block mb-2"></i>
+                    <p>Bu suhbatda xabarlar yo'q</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

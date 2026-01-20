@@ -1,0 +1,108 @@
+{% extends 'accounts/admin/base_admin.html' %}
+
+{% block title %}AI Chatlar - Admin{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">
+                <i class="bi bi-robot me-2"></i>AI Chatlar
+            </h2>
+            <p class="text-muted mb-0">Barcha foydalanuvchilarning AI suhbatlari</p>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Foydalanuvchi</th>
+                            <th>Suhbat nomi</th>
+                            <th>Xabarlar</th>
+                            <th>Yaratilgan</th>
+                            <th>Yangilangan</th>
+                            <th>Holat</th>
+                            <th>Amallar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for session in sessions %}
+                        <tr>
+                            <td>{{ session.pk }}</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar-sm rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                        {{ session.user.first_name.0 }}{{ session.user.last_name.0 }}
+                                    </div>
+                                    <div>
+                                        <div class="fw-medium">{{ session.user.full_name }}</div>
+                                        <small class="text-muted">@{{ session.user.username }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ session.title|truncatechars:40 }}</td>
+                            <td>
+                                <span class="badge bg-info">{{ session.messages.count }}</span>
+                            </td>
+                            <td>{{ session.created_at|date:"d.m.Y H:i" }}</td>
+                            <td>{{ session.updated_at|date:"d.m.Y H:i" }}</td>
+                            <td>
+                                {% if session.is_active %}
+                                <span class="badge bg-success">Faol</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Nofaol</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'ai_yordamchi:admin_chat_detail' pk=session.pk %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted">
+                                <i class="bi bi-chat-square-dots fs-1 d-block mb-2"></i>
+                                Hali chatlar yo'q
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            {% if sessions.has_other_pages %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if sessions.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ sessions.previous_page_number }}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in sessions.paginator.page_range %}
+                    <li class="page-item {% if sessions.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+                    
+                    {% if sessions.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ sessions.next_page_number }}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -63,17 +63,17 @@
                 <i class="bi bi-file-check"></i>
                 <span>Vazifalar</span>
             </a>
-            <a href="{% url 'admin_products' %}"
+            <a href="{% url 'coin:admin_products' %}"
                 class="nav-link {% if 'product' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="bi bi-shop"></i>
                 <span>Mahsulotlar</span>
             </a>
-            <a href="{% url 'admin_purchases' %}"
+            <a href="{% url 'coin:admin_purchases' %}"
                 class="nav-link {% if 'purchase' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="bi bi-bag-check"></i>
                 <span>Xaridlar</span>
             </a>
-            <a href="{% url 'admin_activities' %}"
+            <a href="{% url 'coin:admin_activities' %}"
                 class="nav-link {% if 'activities' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="bi bi-activity"></i>
                 <span>Harakatlar</span>
@@ -81,6 +81,10 @@
             <a href="{% url 'blog:admin_posts' %}" class="nav-link {% if 'blog' in request.path %}active{% endif %}">
                 <i class="bi bi-newspaper"></i>
                 <span>Blog</span>
+            </a>
+            <a href="{% url 'ai_yordamchi:admin_chats' %}" class="nav-link {% if 'ai_yordamchi' in request.path %}active{% endif %}">
+                <i class="bi bi-robot"></i>
+                <span>AI Chatlar</span>
             </a>
 
         </nav>

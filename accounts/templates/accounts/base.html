@@ -103,12 +103,17 @@
 
                     <li class="nav-item">
                         <a class="nav-link {% if 'market' in request.resolver_match.url_name %}active{% endif %}"
-                            href="{% url 'market_list' %}">
+                            href="{% url 'coin:market_list' %}">
                             <i class="bi bi-shop me-1"></i>Market
                         </a>
                     </li>
 
-
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'ai_yordamchi' in request.resolver_match.app_names %}active{% endif %}"
+                            href="{% url 'ai_yordamchi:chat_home' %}">
+                            <i class="bi bi-robot me-1"></i>AI Yordamchi
+                        </a>
+                    </li>
 
                     {% if user.is_teacher or user.is_admin %}
                     <li class="nav-item">
