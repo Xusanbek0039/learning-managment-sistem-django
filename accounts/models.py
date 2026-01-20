@@ -149,17 +149,72 @@ class Lesson(models.Model):
 
 class VideoLesson(models.Model):
     lesson = models.OneToOneField(Lesson, on_delete=models.CASCADE, related_name='video')
-    youtube_url = models.URLField(verbose_name="YouTube havolasi")
+    video_url = models.URLField(verbose_name="Video havolasi", blank=True, null=True, help_text="YouTube yoki Vimeo havolasi")
+    youtube_url = models.URLField(verbose_name="YouTube havolasi", blank=True, null=True)
     duration = models.IntegerField(default=0, verbose_name="Davomiyligi (daqiqa)")
     
+    @property
+    def has_video(self):
+        return bool(self.video_url) or bool(self.youtube_url)
+    
+    @property
+    def is_vimeo(self):
+        url = self.video_url or ''
+        return 'vimeo.com' in url
+    
+    @property
+    def is_youtube(self):
+        url = self.video_url or self.youtube_url or ''
+        return 'youtube.com' in url or 'youtu.be' in url
+    
+    def get_video_id(self):
+        url = self.video_url or self.youtube_url or ''
+        
+        # Vimeo
+        if 'vimeo.com' in url:
+            # https://vimeo.com/123456789 or https://player.vimeo.com/video/123456789
+            if '/video/' in url:
+                return url.split('/video/')[1].split('?')[0].split('/')[0]
+            else:
+                return url.split('vimeo.com/')[1].split('?')[0].split('/')[0]
+        
+        # YouTube
+        if 'watch?v=' in url:
+            return url.split('watch?v=')[1].split('&')[0]
+        elif 'youtu.be/' in url:
+            return url.split('youtu.be/')[1].split('?')[0]
+        elif 'youtube.com/embed/' in url:
+            return url.split('/embed/')[1].split('?')[0]
+        
+        return None
+    
     def get_embed_url(self):
-        if 'watch?v=' in self.youtube_url:
-            video_id = self.youtube_url.split('watch?v=')[1].split('&')[0]
-            return f"https://www.youtube.com/embed/{video_id}"
-        elif 'youtu.be/' in self.youtube_url:
-            video_id = self.youtube_url.split('youtu.be/')[1].split('?')[0]
-            return f"https://www.youtube.com/embed/{video_id}"
-        return self.youtube_url
+        video_id = self.get_video_id()
+        if not video_id:
+            return None
+        
+        if self.is_vimeo:
+            return f"https://player.vimeo.com/video/{video_id}?autoplay=1&title=0&byline=0&portrait=0"
+        else:
+            return f"https://www.youtube-nocookie.com/embed/{video_id}?autoplay=1&rel=0&modestbranding=1"
+    
+    def get_youtube_url(self):
+        """Original YouTube URL for 'Watch on YouTube' button"""
+        url = self.youtube_url or self.video_url or ''
+        if 'youtube.com' in url or 'youtu.be' in url:
+            return url
+        return None
+    
+    def get_thumbnail(self):
+        video_id = self.get_video_id()
+        if not video_id:
+            return None
+        
+        if self.is_vimeo:
+            # Vimeo thumbnails need API call, use placeholder
+            return None
+        else:
+            return f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg"
     
     def __str__(self):
         return self.lesson.title
