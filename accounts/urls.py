@@ -73,4 +73,9 @@ urlpatterns = [
     path('dashboard/payments/', views.admin_payments, name='admin_payments'),
     path('dashboard/payments/<int:pk>/paid/', views.admin_mark_paid, name='admin_mark_paid'),
     
+    # Admin: Sections
+    path('dashboard/sections/', views.admin_sections, name='admin_sections'),
+    path('dashboard/sections/add/', views.admin_section_add, name='admin_section_add'),
+    path('dashboard/sections/<int:pk>/edit/', views.admin_section_edit, name='admin_section_edit'),
+    path('dashboard/sections/<int:pk>/delete/', views.admin_section_delete, name='admin_section_delete'),
 ]

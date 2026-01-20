@@ -1,0 +1,80 @@
+{% extends 'accounts/admin/base_admin.html' %}
+
+{% block title %}{% if section %}Bo'limni tahrirlash{% else %}Bo'lim qo'shish{% endif %} - Admin{% endblock %}
+
+{% block admin_content %}
+<div class="top-bar">
+    <h1 class="page-title">
+        <i class="bi bi-folder-plus me-2"></i>
+        {% if section %}Bo'limni tahrirlash{% else %}Yangi bo'lim qo'shish{% endif %}
+    </h1>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label" style="color: var(--text-color);">Kurs</label>
+                        <select name="profession" class="form-select" required>
+                            <option value="">Kursni tanlang</option>
+                            {% for p in professions %}
+                            <option value="{{ p.pk }}" {% if section.profession.pk == p.pk %}selected{% endif %}>{{ p.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label" style="color: var(--text-color);">Bo'lim nomi</label>
+                        <input type="text" name="title" class="form-control form-control-lg" 
+                               value="{{ section.title|default:'' }}" 
+                               placeholder="Masalan: 1-bo'lim: Kirish" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label" style="color: var(--text-color);">Tavsif (ixtiyoriy)</label>
+                        <textarea name="description" class="form-control" rows="4" 
+                                  placeholder="Bo'lim haqida qisqacha ma'lumot...">{{ section.description|default:'' }}</textarea>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: var(--text-color);">Tartib raqami</label>
+                            <input type="number" name="order" class="form-control" 
+                                   value="{{ section.order|default:0 }}" min="0">
+                            <small class="text-muted">Kichik raqamli bo'limlar birinchi ko'rsatiladi</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: var(--text-color);">&nbsp;</label>
+                            <div class="form-check mt-2">
+                                <input type="checkbox" name="is_active" class="form-check-input" id="isActive" 
+                                       {% if section.is_active or not section %}checked{% endif %}>
+                                <label class="form-check-label" for="isActive" style="color: var(--text-color);">
+                                    Faol holatda
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-check-lg me-2"></i>Saqlash
+                        </button>
+                        <a href="{% url 'admin_sections' %}" class="btn btn-outline-secondary">
+                            Bekor qilish
+                        </a>
+                        {% if section %}
+                        <a href="{% url 'admin_section_delete' section.pk %}" class="btn btn-outline-danger ms-auto">
+                            <i class="bi bi-trash me-2"></i>O'chirish
+                        </a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

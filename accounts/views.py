@@ -1583,4 +1583,94 @@ def delete_section(request, pk):
     return render(request, 'accounts/manage/delete_section.html', {'section': section})
 
 
+# ============== ADMIN: SECTIONS ==============
+
+@login_required
+def admin_sections(request):
+    if not request.user.is_admin:
+        return redirect('home')
+    
+    sections = Section.objects.all().select_related('profession').prefetch_related('lessons')
+    
+    profession_id = request.GET.get('profession')
+    if profession_id:
+        sections = sections.filter(profession_id=profession_id)
+    
+    q = request.GET.get('q')
+    if q:
+        sections = sections.filter(title__icontains=q)
+    
+    professions = Profession.objects.all()
+    
+    return render(request, 'accounts/admin/sections.html', {
+        'sections': sections,
+        'professions': professions,
+    })
+
+
+@login_required
+def admin_section_add(request):
+    if not request.user.is_admin:
+        return redirect('home')
+    
+    if request.method == 'POST':
+        profession_id = request.POST.get('profession')
+        title = request.POST.get('title')
+        description = request.POST.get('description', '')
+        order = request.POST.get('order', 0)
+        is_active = 'is_active' in request.POST
+        
+        if profession_id and title:
+            Section.objects.create(
+                profession_id=profession_id,
+                title=title,
+                description=description,
+                order=int(order),
+                is_active=is_active
+            )
+            messages.success(request, "Bo'lim qo'shildi!")
+            return redirect('admin_sections')
+    
+    professions = Profession.objects.all()
+    return render(request, 'accounts/admin/section_form.html', {'professions': professions})
+
+
+@login_required
+def admin_section_edit(request, pk):
+    if not request.user.is_admin:
+        return redirect('home')
+    
+    section = get_object_or_404(Section, pk=pk)
+    
+    if request.method == 'POST':
+        section.profession_id = request.POST.get('profession')
+        section.title = request.POST.get('title')
+        section.description = request.POST.get('description', '')
+        section.order = int(request.POST.get('order', 0))
+        section.is_active = 'is_active' in request.POST
+        section.save()
+        messages.success(request, "Bo'lim yangilandi!")
+        return redirect('admin_sections')
+    
+    professions = Profession.objects.all()
+    return render(request, 'accounts/admin/section_form.html', {
+        'section': section,
+        'professions': professions,
+    })
+
+
+@login_required
+def admin_section_delete(request, pk):
+    if not request.user.is_admin:
+        return redirect('home')
+    
+    section = get_object_or_404(Section, pk=pk)
+    
+    if request.method == 'POST':
+        section.delete()
+        messages.success(request, "Bo'lim o'chirildi!")
+        return redirect('admin_sections')
+    
+    return render(request, 'accounts/admin/section_delete.html', {'section': section})
+
 

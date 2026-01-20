@@ -378,3 +378,44 @@
          margin-left: 80px;
      }
  }
+
+
+
+
+ .topbar{
+    height:64px;
+    background: var(--card-bg, #fff);
+    border-bottom:1px solid var(--border-color, #dee2e6);
+}
+
+.profile-btn{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    border: none;
+    background: transparent;
+}
+
+.profile-avatar{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#2563eb,#7c3aed);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+}
+
+.profile-name{
+    font-weight:600;
+}
+
+.theme-toggle-admin{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    border:none;
+    background:rgba(0,0,0,.05);
+}

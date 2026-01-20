@@ -78,6 +78,11 @@
                 <i class="bi bi-activity"></i>
                 <span>Harakatlar</span>
             </a>
+            <a href="{% url 'admin_sections' %}"
+                class="nav-link {% if 'section' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="bi bi-folder2-open"></i>
+                <span>Bo'limlar</span>
+            </a>
             <a href="{% url 'blog:admin_posts' %}" class="nav-link {% if 'blog' in request.path %}active{% endif %}">
                 <i class="bi bi-newspaper"></i>
                 <span>Blog</span>
@@ -89,20 +94,42 @@
 
         </nav>
 
-        <div class="sidebar-footer">
-            <button class="theme-toggle-admin w-100 mb-3" id="themeToggle">
-                <i class="bi bi-moon-fill" id="themeIcon"></i>
-            </button>
-            <div class="user-info">
-                <div class="user-avatar">
-                    {{ user.first_name.0 }}{{ user.last_name.0 }}
-                </div>
-                <div>
-                    <div class="user-name">{{ user.first_name }} {{ user.last_name }}</div>
-                    <div class="user-role">Administrator</div>
-                </div>
+        <!-- SEO META -->
+<meta name="keywords" content="Suyunov Husan, IT Creative, Django admin panel, profile dropdown, responsive navbar">
+<meta name="description" content="Responsive admin profile dropdown by Suyunov Husan - IT Creative.">
+
+<div class="topbar d-flex justify-content-end align-items-center px-3">
+
+    <!-- 🌙 Theme Toggle -->
+    <button class="theme-toggle-admin me-3" id="themeToggle">
+        <i class="bi bi-moon-fill" id="themeIcon"></i>
+    </button>
+
+    <!-- 👤 Profile Dropdown -->
+    <div class="dropdown">
+        <button class="btn profile-btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <div class="profile-avatar">
+                {{ user.first_name.0 }}{{ user.last_name.0 }}
             </div>
-        </div>
+            <span class="profile-name d-none d-md-inline">
+                {{ user.first_name }} {{ user.last_name }}
+            </span>
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end shadow">
+            
+            <li><hr class="dropdown-divider"></li>
+           
+            <li>
+                <a class="dropdown-item text-danger" href="{% url 'logout' %}">
+                    <i class="bi bi-box-arrow-right me-2"></i>Chiqish
+                </a>
+            </li>
+        </ul>
+    </div>
+
+</div>
+
     </div>
 
     <!-- Main Content -->

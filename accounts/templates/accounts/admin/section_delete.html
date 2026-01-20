@@ -1,0 +1,47 @@
+{% extends 'accounts/admin/base_admin.html' %}
+
+{% block title %}Bo'limni o'chirish - Admin{% endblock %}
+
+{% block admin_content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-lg-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-exclamation-triangle me-2"></i>Bo'limni o'chirish
+                </h5>
+            </div>
+            <div class="card-body text-center p-5">
+                <i class="bi bi-folder-x text-danger" style="font-size: 5rem;"></i>
+                
+                <h4 class="mt-4" style="color: var(--text-color);">
+                    Haqiqatan ham ushbu bo'limni o'chirmoqchimisiz?
+                </h4>
+                
+                <div class="my-4 p-3" style="background: var(--bg-color); border-radius: 12px;">
+                    <h5 style="color: var(--text-color);">{{ section.title }}</h5>
+                    <p class="text-muted mb-0">{{ section.profession.name }}</p>
+                    <span class="badge bg-primary mt-2">{{ section.lessons.count }} ta dars</span>
+                </div>
+                
+                <div class="alert alert-warning text-start">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>Diqqat!</strong> Bu bo'limga tegishli darslar o'chirilmaydi, faqat bo'limsiz qoladi.
+                </div>
+                
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-center gap-3 mt-4">
+                        <a href="{% url 'admin_sections' %}" class="btn btn-secondary px-4">
+                            <i class="bi bi-x-lg me-2"></i>Bekor qilish
+                        </a>
+                        <button type="submit" class="btn btn-danger px-4">
+                            <i class="bi bi-trash me-2"></i>O'chirish
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
