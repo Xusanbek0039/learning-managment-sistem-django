@@ -886,9 +886,11 @@ def add_lesson(request, pk):
                     lesson_type='video',
                     created_by=request.user
                 )
+                video_url = form.cleaned_data.get('video_url') or ''
                 VideoLesson.objects.create(
                     lesson=lesson,
-                    youtube_url=form.cleaned_data['youtube_url'],
+                    video_url=video_url,
+                    youtube_url=video_url if ('youtube.com' in video_url or 'youtu.be' in video_url) else '',
                     duration=form.cleaned_data.get('duration') or 0
                 )
                 messages.success(request, "Video darslik qo'shildi!")

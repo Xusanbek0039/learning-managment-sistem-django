@@ -47,7 +47,7 @@ setInterval(createWeather, density);
 window.addEventListener("load",()=>{
   const loader = document.getElementById("pageLoader");
   if(loader){
-    loader.style.opacity="3";
+    loader.style.opacity="1";
     setTimeout(()=>loader.remove(),600);
   }
 });

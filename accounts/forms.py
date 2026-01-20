@@ -136,8 +136,9 @@ class VideoLessonForm(forms.Form):
         max_length=300,
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Dars nomi'})
     )
-    youtube_url = forms.URLField(
-        widget=forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://www.youtube.com/watch?v=...'})
+    video_url = forms.URLField(
+        required=True,
+        widget=forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'YouTube yoki Vimeo havolasi'})
     )
     duration = forms.IntegerField(
         min_value=1,

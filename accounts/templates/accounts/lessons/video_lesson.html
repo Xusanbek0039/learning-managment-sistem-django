@@ -1,21 +1,84 @@
 {% extends 'accounts/base.html' %}
 
-{% block title %}{{ lesson.title }} - LMS | IT Creative{% endblock %}
+{% block title %}{{ lesson.title }} - LMS{% endblock %}
 
 {% block extra_css %}
 <style>
-:root{
+:root {
     --card-bg: var(--bs-body-bg);
     --card-border: var(--bs-border-color);
     --soft-bg: rgba(0,0,0,.06);
 }
-[data-bs-theme="dark"]{
+[data-bs-theme="dark"] {
     --soft-bg: rgba(255,255,255,.06);
 }
 
-.card{
+.card {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    background: #000;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.video-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.video-placeholder:hover {
+    background: linear-gradient(135deg, #16213e, #1a1a2e);
+}
+
+.video-placeholder .play-btn {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.video-placeholder:hover .play-btn {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.1);
+}
+
+.video-placeholder .play-btn i {
+    font-size: 2.5rem;
+    color: white;
+    margin-left: 5px;
+}
+
+.video-unavailable {
+    background: linear-gradient(135deg, #2d2d44, #1a1a2e);
 }
 
 .video-timer {
@@ -52,16 +115,29 @@
     transition: width 1s linear;
 }
 
-.btn-watch{
-    width:100%;
-    max-width:320px;
+.youtube-btn {
+    background: linear-gradient(135deg, #ff0000, #cc0000);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
 }
 
-@media (max-width: 576px){
-    .video-timer{
-        font-size: .95rem;
-        padding: 12px 16px;
-    }
+.youtube-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255,0,0,0.3);
+    color: white;
+}
+
+.vimeo-badge {
+    background: linear-gradient(135deg, #1ab7ea, #0d95c7);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
 }
 </style>
 {% endblock %}
@@ -79,80 +155,93 @@
                 <h5 class="m-0 text-primary">
                     <i class="bi bi-play-circle me-2"></i>{{ lesson.title }}
                 </h5>
-                {% if progress.watched %}
+                <div class="d-flex gap-2 align-items-center">
+                    {% if video.is_vimeo %}
+                    <span class="vimeo-badge"><i class="bi bi-vimeo me-1"></i>Vimeo</span>
+                    {% elif video.is_youtube %}
+                    <span class="badge" style="background: linear-gradient(135deg, #ff0000, #cc0000);"><i class="bi bi-youtube me-1"></i>YouTube</span>
+                    {% endif %}
+                    {% if progress.watched %}
                     <span class="badge bg-success">
-                        <i class="bi bi-check-circle me-1"></i>Ko‘rilgan
+                        <i class="bi bi-check-circle me-1"></i>Ko'rilgan
                     </span>
-                {% endif %}
+                    {% endif %}
+                </div>
             </div>
         </div>
 
         <div class="card-body">
 
             <!-- VIDEO -->
-<div class="ratio ratio-16x9 mb-4 rounded overflow-hidden position-relative" id="videoBox">
+            <div class="video-container mb-4" id="videoBox">
+                {% if video.has_video %}
+                    <!-- Placeholder -->
+                    <div id="videoPlaceholder" class="video-placeholder">
+                        {% if video.get_thumbnail %}
+                        <img src="{{ video.get_thumbnail }}" class="w-100 h-100 position-absolute" 
+                             style="object-fit: cover; opacity: 0.6;">
+                        {% endif %}
+                        <div class="play-btn position-relative">
+                            <i class="bi bi-play-fill"></i>
+                        </div>
+                        <p class="text-white mt-3 position-relative">Videoni boshlash uchun bosing</p>
+                    </div>
+                    
+                    <!-- Iframe -->
+                    <iframe id="videoFrame" class="d-none" allowfullscreen
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+                    </iframe>
+                {% else %}
+                    <!-- No video available -->
+                    <div class="video-placeholder video-unavailable">
+                        <i class="bi bi-exclamation-triangle text-warning" style="font-size: 4rem;"></i>
+                        <h4 class="text-white mt-3">Video mavjud emas</h4>
+                        <p class="text-white-50">Bu video hali yuklanmagan yoki havola noto'g'ri</p>
+                    </div>
+                {% endif %}
+            </div>
 
-    <!-- Thumbnail -->
-    <div id="thumbLayer" class="w-100 h-100 position-absolute top-0 start-0" style="cursor:pointer;">
-        <img 
-            src="https://img.youtube.com/vi/{{ video.get_embed_url|cut:'https://www.youtube.com/embed/' }}/hqdefault.jpg"
-            class="w-100 h-100 object-fit-cover"
-            alt="Video">
-        <div class="position-absolute top-50 start-50 translate-middle text-white fs-1">
-            <i class="bi bi-play-circle-fill"></i>
-        </div>
-    </div>
+            <!-- YouTube button -->
+            {% if video.get_youtube_url %}
+            <div class="text-center mb-4">
+                <a href="{{ video.get_youtube_url }}" target="_blank" class="youtube-btn">
+                    <i class="bi bi-youtube me-2"></i>YouTubeda ko'rish
+                </a>
+            </div>
+            {% endif %}
 
-    <!-- Iframe (hidden) -->
-    <iframe
-        id="videoFrame"
-        src=""
-        title="{{ lesson.title }}"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowfullscreen
-        class="w-100 h-100 border-0 d-none">
-    </iframe>
+            {% if video.has_video %}
+                {% if not progress.watched %}
+                <div class="text-center">
+                    <!-- TIMER -->
+                    <div class="mb-4">
+                        <div class="video-timer mb-2" id="timerDisplay">
+                            <i class="bi bi-clock"></i>
+                            <span>
+                                Qolgan vaqt: <span id="countdown">00:00</span>
+                            </span>
+                        </div>
 
-</div>
+                        <div class="progress-bar-custom mx-auto" style="max-width:400px;">
+                            <div class="progress-bar-fill" id="progressBar" style="width:0%;"></div>
+                        </div>
 
-
-            {% if not progress.watched %}
-            <div class="text-center">
-
-                <!-- TIMER -->
-                <div class="mb-4">
-
-                    <div class="video-timer mb-2" id="timerDisplay">
-                        <i class="bi bi-clock"></i>
-                        <span>
-                            Qolgan vaqt:
-                            <span id="countdown">00:00</span>
-                        </span>
+                        <p class="text-muted mt-2" id="statusText">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Videoni kamida {% widthratio video.duration 2 1 %} daqiqa ko'ring
+                        </p>
                     </div>
 
-                    <div class="progress-bar-custom mx-auto" style="max-width:400px;">
-                        <div class="progress-bar-fill" id="progressBar" style="width:0%;"></div>
-                    </div>
-
-                    <p class="text-muted mt-2" id="statusText">
-                        <i class="bi bi-info-circle me-1"></i>
-                        Videoni kamida {% widthratio video.duration 2 1 %} daqiqa ko‘ring
-                    </p>
-
+                    <button class="btn btn-success btn-lg mt-2" id="markWatched" disabled>
+                        <i class="bi bi-check-circle me-2"></i>Ko'rdim (+1 coin)
+                    </button>
                 </div>
-
-                <button class="btn btn-success btn-lg btn-watch mt-2" id="markWatched" disabled>
-                    <i class="bi bi-check-circle me-2"></i>Ko‘rdim (+1 coin)
-                </button>
-
-            </div>
-            {% else %}
-
-            <div class="alert alert-success text-center">
-                <i class="bi bi-check-circle me-2"></i>
-                Siz bu videoni ko‘rgansiz va 1 coin oldingiz!
-            </div>
-
+                {% else %}
+                <div class="alert alert-success text-center">
+                    <i class="bi bi-check-circle me-2"></i>
+                    Siz bu videoni ko'rgansiz va 1 coin oldingiz!
+                </div>
+                {% endif %}
             {% endif %}
         </div>
     </div>
@@ -161,11 +250,24 @@
 
 {% block extra_js %}
 <script>
-{% if not progress.watched %}
+{% if video.has_video %}
+const placeholder = document.getElementById('videoPlaceholder');
+const iframe = document.getElementById('videoFrame');
+const embedUrl = "{{ video.get_embed_url|default:'' }}";
 
+if (placeholder && embedUrl) {
+    placeholder.addEventListener('click', function() {
+        iframe.src = embedUrl;
+        iframe.classList.remove('d-none');
+        placeholder.classList.add('d-none');
+    });
+}
+{% endif %}
+
+{% if video.has_video and not progress.watched %}
 const videoMinutes = {{ video.duration|default:1 }};
-const videoDuration = videoMinutes * 60; // sekund
-const requiredTime = Math.floor(videoDuration / 2); // 50%
+const videoDuration = videoMinutes * 60;
+const requiredTime = Math.floor(videoDuration / 2);
 
 let watchedTime = 0;
 let isPaused = false;
@@ -176,14 +278,14 @@ const progressBar = document.getElementById('progressBar');
 const statusText = document.getElementById('statusText');
 const markWatchedBtn = document.getElementById('markWatched');
 
-function formatTime(seconds){
+function formatTime(seconds) {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m}:${s.toString().padStart(2,'0')}`;
 }
 
-function updateTimer(){
-    if(isPaused) return;
+function updateTimer() {
+    if (isPaused) return;
 
     watchedTime++;
 
@@ -193,23 +295,23 @@ function updateTimer(){
     countdownEl.textContent = formatTime(remaining);
     progressBar.style.width = progress + "%";
 
-    if(watchedTime >= requiredTime){
+    if (watchedTime >= requiredTime) {
         clearInterval(timerInterval);
         timerDisplay.classList.add('ready');
         timerDisplay.innerHTML = '<i class="bi bi-check-circle"></i><span>Tayyor! Tugmani bosishingiz mumkin</span>';
-        statusText.innerHTML = '<i class="bi bi-check-circle text-success me-1"></i>Video yetarlicha ko‘rildi';
+        statusText.innerHTML = '<i class="bi bi-check-circle text-success me-1"></i>Video yetarlicha ko\'rildi';
         markWatchedBtn.disabled = false;
     }
 }
 
 document.addEventListener('visibilitychange', () => {
-    if(document.hidden){
+    if (document.hidden) {
         isPaused = true;
-        if(!timerDisplay.classList.contains('ready')){
+        if (!timerDisplay.classList.contains('ready')) {
             timerDisplay.classList.add('paused');
-            statusText.innerHTML = '<i class="bi bi-pause-circle text-warning me-1"></i>Timer to‘xtatildi. Videoga qayting!';
+            statusText.innerHTML = '<i class="bi bi-pause-circle text-warning me-1"></i>Timer to\'xtatildi. Videoga qayting!';
         }
-    }else{
+    } else {
         isPaused = false;
         timerDisplay.classList.remove('paused');
     }
@@ -217,40 +319,25 @@ document.addEventListener('visibilitychange', () => {
 
 countdownEl.textContent = formatTime(requiredTime);
 const timerInterval = setInterval(updateTimer, 1000);
-const thumb = document.getElementById('thumbLayer');
-const iframe = document.getElementById('videoFrame');
 
-thumb.addEventListener('click', function(){
-    // YouTube embed with privacy-enhanced mode and additional params
-    let embedUrl = "{{ video.get_embed_url }}";
-    // Use nocookie domain to avoid some restrictions
-    embedUrl = embedUrl.replace('youtube.com', 'youtube-nocookie.com');
-    iframe.src = embedUrl + "?autoplay=1&rel=0&modestbranding=1&enablejsapi=1";
-    iframe.classList.remove('d-none');
-    thumb.classList.add('d-none');
-});
-markWatchedBtn.addEventListener('click', function(){
-    if(this.disabled) return;
+markWatchedBtn.addEventListener('click', function() {
+    if (this.disabled) return;
 
-    fetch('{% url "mark_video_watched" video.pk %}',{
-        method:'POST',
-        headers:{
+    fetch('{% url "mark_video_watched" video.pk %}', {
+        method: 'POST',
+        headers: {
             'X-CSRFToken': '{{ csrf_token }}',
-            'Content-Type':'application/json'
+            'Content-Type': 'application/json'
         }
     })
-    .then(r=>r.json())
-    .then(data=>{
-        if(data.success){
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
             alert("Tabriklaymiz! 🎉 1 coin oldingiz!");
-            setTimeout(()=>location.reload(),1500);
+            setTimeout(() => location.reload(), 1500);
         }
     });
 });
-
 {% endif %}
 </script>
 {% endblock %}
-
-
-
