@@ -1,0 +1,186 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Coin Market | LMS - IT Creative{% endblock %}
+
+{% block extra_css %}
+<style>
+
+/* ---------------- THEME ---------------- */
+.market-wrap{--card-bg:var(--bs-body-bg);--border:rgba(0,0,0,.08);--shadow:0 12px 30px rgba(0,0,0,.12)}
+[data-bs-theme="dark"] .market-wrap{--border:rgba(255,255,255,.08);--shadow:0 20px 40px rgba(0,0,0,.6)}
+
+/* ---------------- HEADER ---------------- */
+.market-hero{
+    background:linear-gradient(135deg,#6366f1,#8b5cf6);
+    border-radius:1.2rem;padding:2rem;color:#fff;box-shadow:var(--shadow)
+}
+.coin-pill{background:rgba(255,255,255,.2);backdrop-filter:blur(8px);padding:.6rem 1.1rem;border-radius:2rem;font-weight:600}
+
+/* ---------------- SEARCH + FILTER ---------------- */
+.market-tools{margin-top:-1.5rem}
+.search-input{border-radius:2rem;padding:.6rem 1.2rem}
+.filter-btn{border-radius:2rem}
+
+/* ---------------- CARD ---------------- */
+.market-card{
+    background:var(--card-bg);border:1px solid var(--border);border-radius:1.2rem;
+    overflow:hidden;box-shadow:var(--shadow);transition:.25s ease
+}
+.market-card:hover{transform:translateY(-8px) scale(1.02)}
+.market-img{height:190px;object-fit:cover}
+.price-badge{background:linear-gradient(135deg,#facc15,#f59e0b);color:#111;font-weight:700}
+.stock{font-size:.75rem;border-radius:1rem;padding:.35rem .7rem}
+
+/* ---------------- LIKE ---------------- */
+.like-btn{cursor:pointer;transition:.2s}
+.like-btn.liked{color:#ef4444;transform:scale(1.2)}
+
+/* ---------------- SKELETON ---------------- */
+.skeleton{background:linear-gradient(90deg,#ddd,#eee,#ddd);animation:load 1.5s infinite;border-radius:1rem}
+@keyframes load{0%{background-position:0}100%{background-position:200%}}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5 market-wrap">
+
+<!-- ================= HERO ================= -->
+<div class="market-hero mb-5 d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="bi bi-shop me-2"></i>Coin Market</h2>
+        <small class="opacity-75">Coin orqali bonus va sovg'alarni sotib oling 🚀</small>
+    </div>
+    <div class="coin-pill fs-5"><i class="bi bi-coin me-1"></i>{{ user.coins }} coin</div>
+</div>
+
+<!-- ================= SEARCH + FILTER ================= -->
+<div class="market-tools mb-4 p-3 rounded shadow-sm bg-body">
+    <div class="row g-2 align-items-center">
+        <div class="col-md-6">
+            <input id="searchInput" class="form-control search-input" placeholder="Mahsulot qidirish...">
+        </div>
+        <div class="col-md-6 text-md-end">
+            <div class="btn-group">
+                <button class="btn btn-outline-primary filter-btn active" onclick="filterCat('all')">Hammasi</button>
+                <button class="btn btn-outline-primary filter-btn" onclick="filterCat('gift')">Sovg'a</button>
+                <button class="btn btn-outline-primary filter-btn" onclick="filterCat('bonus')">Bonus</button>
+                <button class="btn btn-outline-primary filter-btn" onclick="filterCat('course')">Kurs</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= PRODUCTS ================= -->
+<div class="row g-4" id="productList">
+
+{% for product in products %}
+<div class="col-sm-6 col-lg-4 product-item" data-name="{{ product.name|lower }}" data-cat="gift">
+
+<div class="market-card h-100 d-flex flex-column">
+
+    <img src="{{ product.image.url }}" class="market-img w-100">
+
+    <div class="p-4 d-flex flex-column flex-grow-1">
+
+        <div class="d-flex justify-content-between align-items-start mb-1">
+            <h6 class="fw-bold mb-0">{{ product.name }}</h6>
+            <i class="bi bi-heart like-btn" onclick="toggleLike(this)"></i>
+        </div>
+
+        <p class="small text-body-secondary mb-3">
+            {{ product.description|truncatewords:14 }}
+        </p>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="badge price-badge">
+                <i class="bi bi-coin me-1"></i>{{ product.coin_price }}
+            </span>
+            <small class="text-muted">
+                <i class="bi bi-chat"></i> {{ product.comments_count }}
+            </small>
+        </div>
+
+        <div class="mt-auto d-flex gap-2 align-items-center">
+            <a href="{% url 'coin:market_detail' product.pk %}" class="btn btn-primary w-100 rounded-pill">
+                Ko'rish
+            </a>
+
+            {% if product.stock > 0 %}
+                <span class="badge bg-success stock">{{ product.stock }} ta</span>
+            {% else %}
+                <span class="badge bg-danger stock">Tugagan</span>
+            {% endif %}
+
+            <button class="btn btn-warning rounded-pill px-3" onclick="openBuy('{{ product.name }}', {{ product.coin_price }})">
+                <i class="bi bi-bag"></i>
+            </button>
+        </div>
+
+    </div>
+</div>
+</div>
+{% endfor %}
+
+</div>
+
+
+<!-- ================= BUY MODAL ================= -->
+<div class="modal fade" id="buyModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4">
+      <div class="modal-header">
+        <h5 class="modal-title">Sotib olish</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p id="buyText"></p>
+        <div class="alert alert-warning small mb-0">
+            Bu demo. Backend ulanmagan 😉
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Bekor</button>
+        <button class="btn btn-success">Tasdiqlash</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- ================= JS ================= -->
+<script>
+/* SEARCH */
+document.getElementById("searchInput").addEventListener("keyup", function(){
+    let val = this.value.toLowerCase();
+    document.querySelectorAll(".product-item").forEach(p=>{
+        p.style.display = p.dataset.name.includes(val) ? "block" : "none";
+    });
+});
+
+/* FILTER */
+function filterCat(cat){
+    document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
+    event.target.classList.add("active");
+
+    document.querySelectorAll(".product-item").forEach(p=>{
+        if(cat==="all" || p.dataset.cat===cat) p.style.display="block";
+        else p.style.display="none";
+    });
+}
+
+/* LIKE */
+function toggleLike(el){
+    el.classList.toggle("liked");
+}
+
+/* BUY MODAL */
+function openBuy(name, price){
+    document.getElementById("buyText").innerHTML =
+        `<b>${name}</b> mahsulotini <b>${price} coin</b> ga sotib olmoqchimisiz?`;
+    new bootstrap.Modal(document.getElementById("buyModal")).show();
+}
+</script>
+
+{% endblock %}
