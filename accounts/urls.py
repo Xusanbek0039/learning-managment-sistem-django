@@ -13,6 +13,9 @@ urlpatterns = [
     path('professions/<int:pk>/enroll/', views.enroll_course, name='enroll_course'),
     path('professions/<int:pk>/manage/', views.manage_lessons, name='manage_lessons'),
     path('professions/<int:pk>/add-lesson/', views.add_lesson, name='add_lesson'),
+    path('professions/<int:pk>/add-section/', views.add_section, name='add_section'),
+    path('section/<int:pk>/edit/', views.edit_section, name='edit_section'),
+    path('section/<int:pk>/delete/', views.delete_section, name='delete_section'),
     
     # Lessons
     path('lessons/<int:pk>/', views.lesson_view, name='lesson_view'),

@@ -1509,4 +1509,67 @@ def admin_export_pdf(request):
     return response
 
 
+# Section management views
+@login_required
+def add_section(request, pk):
+    if not (request.user.is_admin or request.user.is_teacher):
+        return redirect('home')
+    
+    profession = get_object_or_404(Profession, pk=pk)
+    
+    if request.method == 'POST':
+        form = SectionForm(request.POST)
+        if form.is_valid():
+            section = form.save(commit=False)
+            section.profession = profession
+            section.save()
+            messages.success(request, "Bo'lim muvaffaqiyatli qo'shildi!")
+            return redirect('manage_lessons', pk=pk)
+    else:
+        form = SectionForm()
+    
+    return render(request, 'accounts/manage/add_section.html', {
+        'profession': profession,
+        'form': form,
+    })
+
+
+@login_required
+def edit_section(request, pk):
+    if not (request.user.is_admin or request.user.is_teacher):
+        return redirect('home')
+    
+    section = get_object_or_404(Section, pk=pk)
+    
+    if request.method == 'POST':
+        form = SectionForm(request.POST, instance=section)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Bo'lim muvaffaqiyatli yangilandi!")
+            return redirect('manage_lessons', pk=section.profession.pk)
+    else:
+        form = SectionForm(instance=section)
+    
+    return render(request, 'accounts/manage/edit_section.html', {
+        'section': section,
+        'form': form,
+    })
+
+
+@login_required
+def delete_section(request, pk):
+    if not (request.user.is_admin or request.user.is_teacher):
+        return redirect('home')
+    
+    section = get_object_or_404(Section, pk=pk)
+    profession_pk = section.profession.pk
+    
+    if request.method == 'POST':
+        section.delete()
+        messages.success(request, "Bo'lim o'chirildi!")
+        return redirect('manage_lessons', pk=profession_pk)
+    
+    return render(request, 'accounts/manage/delete_section.html', {'section': section})
+
+
 
