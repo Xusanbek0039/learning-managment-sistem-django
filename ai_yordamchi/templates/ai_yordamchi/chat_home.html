@@ -1,167 +1,214 @@
 {% extends 'accounts/base.html' %}
 {% load static %}
 
-{% block title %}AI Yordamchi - LMS{% endblock %}
+{% block title %}AI Yordamchi - LMS | IT Creative{% endblock %}
 
 {% block extra_css %}
+
+<!-- SEO META -->
+<meta name="keywords" content="Suyunov Husan, IT Creative, LMS AI yordamchi, Django AI Chat, Python AI tutor">
+<meta name="description" content="LMS ichida ishlovchi AI Yordamchi. Muallif: Suyunov Husan — IT Creative.">
+
 <style>
-    .chat-container {
-        max-width: 900px;
-        margin: 0 auto;
-        padding: 2rem 1rem;
-    }
-    
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
-    }
-    
-    .page-title {
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: var(--text);
-        margin: 0;
-    }
-    
-    .session-list {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .session-card {
-        background: var(--card-bg);
-        border-radius: 12px;
-        padding: 1.25rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        transition: all 0.2s ease;
-        border: 1px solid var(--border);
-    }
-    
-    .session-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    
-    .session-info {
-        flex: 1;
-    }
-    
-    .session-title {
-        font-weight: 600;
-        color: var(--text);
-        margin-bottom: 0.25rem;
-        text-decoration: none;
-    }
-    
-    .session-title:hover {
-        color: var(--primary);
-    }
-    
-    .session-meta {
-        font-size: 0.875rem;
-        color: var(--text-muted);
-    }
-    
-    .session-actions {
-        display: flex;
-        gap: 0.5rem;
-    }
-    
-    .empty-state {
-        text-align: center;
-        padding: 4rem 2rem;
-        color: var(--text-muted);
-    }
-    
-    .empty-state i {
-        font-size: 4rem;
-        margin-bottom: 1rem;
-        opacity: 0.5;
-    }
-    
-    .coin-info {
-        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-        color: #000;
-        padding: 0.75rem 1.25rem;
-        border-radius: 10px;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-weight: 600;
-    }
+
+
+:root{
+    --grad: linear-gradient(135deg,#2563eb,#7c3aed);
+}
+
+.chat-container{
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1rem 3rem;
+}
+
+/* ===== HEADER ===== */
+.page-header{
+    background: var(--grad);
+    border-radius: 18px;
+    padding: 22px 26px;
+    color:#fff;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom: 28px;
+    box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+
+.page-title{
+    font-size:1.9rem;
+    font-weight:700;
+    margin:0;
+}
+
+.page-sub{ opacity:.85; margin:0; }
+
+.coin-info{
+    background: rgba(255,255,255,.2);
+    backdrop-filter: blur(6px);
+    padding:10px 16px;
+    border-radius:12px;
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+/* ===== SESSION LIST ===== */
+.session-list{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px,1fr));
+    gap:18px;
+}
+
+.session-card{
+    background: var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:18px;
+    transition:.25s ease;
+    position:relative;
+    overflow:hidden;
+}
+
+/* overlay — CLICKni to‘smasin */
+.session-card::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background: linear-gradient(135deg,transparent,rgba(124,58,237,.15));
+    opacity:0;
+    transition:.3s;
+    pointer-events:none;
+}
+
+.session-card:hover::before{ opacity:1; }
+
+.session-card:hover{
+    transform: translateY(-4px);
+    box-shadow:0 12px 25px rgba(0,0,0,.18);
+}
+
+.session-title{
+    font-weight:600;
+    font-size:1.05rem;
+    color:var(--text);
+    text-decoration:none;
+    position:relative;
+    z-index:2;
+}
+
+.session-title:hover{ color:#7c3aed; }
+
+.session-meta{
+    font-size:.85rem;
+    color:var(--text-muted);
+    margin-top:6px;
+    position:relative;
+    z-index:2;
+}
+
+.session-actions{
+    display:flex;
+    gap:8px;
+    margin-top:14px;
+    position:relative;
+    z-index:2;
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state{
+    text-align:center;
+    padding:80px 20px;
+    color:var(--text-muted);
+}
+
+.empty-state i{
+    font-size:4rem;
+    margin-bottom:12px;
+    opacity:.6;
+}
+
+/* ===== INFO BOX ===== */
+.info-box{
+    margin-top:30px;
+    border-radius:14px;
+    background: linear-gradient(135deg,rgba(37,99,235,.15),rgba(124,58,237,.15));
+    border:1px solid rgba(124,58,237,.4);
+}
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="chat-container">
+
+    <!-- HEADER -->
     <div class="page-header">
         <div>
             <h1 class="page-title">
                 <i class="bi bi-robot me-2"></i>AI Yordamchi
             </h1>
-            <p class="text-muted mb-0">Sun'iy intellekt bilan suhbatlashing</p>
+            <p class="page-sub">Sun'iy intellekt bilan dasturlashni o‘rganing</p>
         </div>
+
         <div class="d-flex align-items-center gap-3">
             <div class="coin-info">
-                <i class="bi bi-coin"></i>
-                {{ user.coins }} coin
+                <i class="bi bi-coin"></i> {{ user.coins }} coin
             </div>
-            <a href="{% url 'ai_yordamchi:new_session' %}" class="btn btn-primary">
-                <i class="bi bi-plus-lg me-1"></i>Yangi suhbat
+
+            <a href="{% url 'ai_yordamchi:new_session' %}" class="btn btn-light fw-semibold">
+                <i class="bi bi-plus-lg me-1"></i> Yangi suhbat
             </a>
         </div>
     </div>
-    
+
+    <!-- SESSIONS -->
     {% if sessions %}
     <div class="session-list">
         {% for session in sessions %}
         <div class="session-card">
-            <div class="session-info">
-                <a href="{% url 'ai_yordamchi:chat_session' pk=session.pk %}" class="session-title d-block">
-                    <i class="bi bi-chat-dots me-2"></i>{{ session.title }}
-                </a>
-                <div class="session-meta">
-                    <i class="bi bi-clock me-1"></i>
-                    {{ session.updated_at|date:"d.m.Y H:i" }}
-                    <span class="ms-2">
-                        <i class="bi bi-chat-left-text me-1"></i>
-                        {{ session.messages.count }} xabar
-                    </span>
-                </div>
+
+            <a href="{% url 'ai_yordamchi:chat_session' pk=session.pk %}" class="session-title d-block">
+                <i class="bi bi-chat-dots me-2"></i>{{ session.title }}
+            </a>
+
+            <div class="session-meta">
+                <i class="bi bi-clock me-1"></i>
+                {{ session.updated_at|date:"d.m.Y H:i" }}
+                &nbsp;•&nbsp;
+                <i class="bi bi-chat-left-text me-1"></i>
+                {{ session.messages.count }} xabar
             </div>
+
             <div class="session-actions">
-                <a href="{% url 'ai_yordamchi:chat_session' pk=session.pk %}" class="btn btn-sm btn-outline-primary">
-                    <i class="bi bi-arrow-right"></i>
+                <a href="{% url 'ai_yordamchi:chat_session' pk=session.pk %}"
+                   class="btn btn-sm btn-outline-primary w-100">
+                    Davom etish →
                 </a>
-                <form action="{% url 'ai_yordamchi:delete_session' pk=session.pk %}" method="post" class="d-inline" onsubmit="return confirm('Bu suhbatni o\'chirmoqchimisiz?')">
+
+                <form action="{% url 'ai_yordamchi:delete_session' pk=session.pk %}"
+                      method="post"
+                      onsubmit="return confirm('Bu suhbatni o‘chirmoqchimisiz?')">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-sm btn-outline-danger">
                         <i class="bi bi-trash"></i>
                     </button>
                 </form>
             </div>
+
         </div>
         {% endfor %}
     </div>
     {% else %}
-    <div class="empty-state">
-        <i class="bi bi-chat-square-dots"></i>
-        <h4>Hali suhbatlar yo'q</h4>
-        <p>AI yordamchi bilan yangi suhbat boshlang!</p>
-        <a href="{% url 'ai_yordamchi:new_session' %}" class="btn btn-primary btn-lg mt-3">
-            <i class="bi bi-plus-lg me-2"></i>Yangi suhbat boshlash
-        </a>
-    </div>
+  
+
     {% endif %}
-    
-    <div class="alert alert-info mt-4">
+
+    <!-- INFO -->
+    <div class="alert info-box mt-4">
         <i class="bi bi-info-circle me-2"></i>
-        <strong>Eslatma:</strong> Har bir xabar uchun 1 coin sarflanadi. Rasmli savollar ham qo'llab-quvvatlanadi.
+        <strong>Eslatma:</strong> Har bir xabar uchun 1 coin sarflanadi. Rasmli savollar ham qo‘llab-quvvatlanadi.
     </div>
+
 </div>
 {% endblock %}

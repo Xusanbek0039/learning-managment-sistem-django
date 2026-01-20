@@ -249,28 +249,87 @@
 {% endblock %}
 
 {% block extra_js %}
+{% if video.is_vimeo %}
+<script src="https://player.vimeo.com/api/player.js"></script>
+{% endif %}
 <script>
 {% if video.has_video %}
+
 const placeholder = document.getElementById('videoPlaceholder');
 const iframe = document.getElementById('videoFrame');
-const embedUrl = "{{ video.get_embed_url|default:'' }}";
 
-if (placeholder && embedUrl) {
-    placeholder.addEventListener('click', function() {
-        iframe.src = embedUrl;
-        iframe.classList.remove('d-none');
-        placeholder.classList.add('d-none');
-    });
-}
+const isVimeo = {{ video.is_vimeo|yesno:"true,false" }};
+const isYouTube = {{ video.is_youtube|yesno:"true,false" }};
+const videoId = "{{ video.get_video_id|default:'' }}";
+
+let isVideoPlaying = false;
+let vimeoPlayer = null;
+
+/* =========================
+   VIMEO API LOAD
+========================= */
+{% if video.is_vimeo %}
+const vimeoScript = document.createElement('script');
+vimeoScript.src = "https://player.vimeo.com/api/player.js";
+document.head.appendChild(vimeoScript);
 {% endif %}
 
+/* =========================
+   CLICK TO PLAY
+========================= */
+if (placeholder) {
+    placeholder.addEventListener('click', function() {
+
+        placeholder.classList.add('d-none');
+        iframe.classList.remove('d-none');
+
+        /* ===== YOUTUBE ===== */
+        if (isYouTube) {
+            iframe.src = "https://www.youtube.com/embed/" + videoId + "?autoplay=1&rel=0";
+            isVideoPlaying = true;
+            resumeTimer();
+        }
+
+        /* ===== VIMEO ===== */
+        if (isVimeo) {
+            iframe.src = "https://player.vimeo.com/video/" + videoId + "?autoplay=1&title=0&byline=0&portrait=0";
+
+            iframe.onload = function() {
+                vimeoPlayer = new Vimeo.Player(iframe);
+
+                vimeoPlayer.on('play', function() {
+                    isVideoPlaying = true;
+                    resumeTimer();
+                });
+
+                vimeoPlayer.on('pause', function() {
+                    isVideoPlaying = false;
+                    pauseTimer("Video to'xtatildi");
+                });
+
+                vimeoPlayer.on('ended', function() {
+                    isVideoPlaying = false;
+                    pauseTimer("Video tugadi");
+                });
+            };
+        }
+    });
+}
+
+{% endif %}
+
+
+/* =========================
+   TIMER & PROGRESS
+========================= */
 {% if video.has_video and not progress.watched %}
+
 const videoMinutes = {{ video.duration|default:1 }};
 const videoDuration = videoMinutes * 60;
 const requiredTime = Math.floor(videoDuration / 2);
 
 let watchedTime = 0;
-let isPaused = false;
+let isPaused = true;
 
 const timerDisplay = document.getElementById('timerDisplay');
 const countdownEl = document.getElementById('countdown');
@@ -284,8 +343,23 @@ function formatTime(seconds) {
     return `${m}:${s.toString().padStart(2,'0')}`;
 }
 
+function pauseTimer(reason) {
+    if (timerDisplay.classList.contains('ready')) return;
+    isPaused = true;
+    timerDisplay.classList.add('paused');
+    statusText.innerHTML = `<i class="bi bi-pause-circle text-warning me-1"></i>${reason || "Timer to'xtatildi"}`;
+}
+
+function resumeTimer() {
+    if (timerDisplay.classList.contains('ready')) return;
+    if (document.hidden) return;
+    isPaused = false;
+    timerDisplay.classList.remove('paused');
+    statusText.innerHTML = '<i class="bi bi-play-circle text-success me-1"></i>Timer ishlayapti...';
+}
+
 function updateTimer() {
-    if (isPaused) return;
+    if (isPaused || !isVideoPlaying) return;
 
     watchedTime++;
 
@@ -296,30 +370,29 @@ function updateTimer() {
     progressBar.style.width = progress + "%";
 
     if (watchedTime >= requiredTime) {
-        clearInterval(timerInterval);
+        timerDisplay.classList.remove('paused');
         timerDisplay.classList.add('ready');
         timerDisplay.innerHTML = '<i class="bi bi-check-circle"></i><span>Tayyor! Tugmani bosishingiz mumkin</span>';
-        statusText.innerHTML = '<i class="bi bi-check-circle text-success me-1"></i>Video yetarlicha ko\'rildi';
+        statusText.innerHTML = '<i class="bi bi-check-circle text-success me-1"></i>Video yetarlicha ko‘rildi';
         markWatchedBtn.disabled = false;
     }
 }
 
+/* TAB CHANGE */
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
-        isPaused = true;
-        if (!timerDisplay.classList.contains('ready')) {
-            timerDisplay.classList.add('paused');
-            statusText.innerHTML = '<i class="bi bi-pause-circle text-warning me-1"></i>Timer to\'xtatildi. Videoga qayting!';
-        }
-    } else {
-        isPaused = false;
-        timerDisplay.classList.remove('paused');
+        pauseTimer("Sahifadan chiqdingiz");
+    } else if (isVideoPlaying) {
+        resumeTimer();
     }
 });
 
+/* INIT */
 countdownEl.textContent = formatTime(requiredTime);
-const timerInterval = setInterval(updateTimer, 1000);
+statusText.innerHTML = '<i class="bi bi-info-circle me-1"></i>Videoni boshlang';
+setInterval(updateTimer, 1000);
 
+/* MARK WATCHED */
 markWatchedBtn.addEventListener('click', function() {
     if (this.disabled) return;
 
@@ -333,11 +406,13 @@ markWatchedBtn.addEventListener('click', function() {
     .then(r => r.json())
     .then(data => {
         if (data.success) {
-            alert("Tabriklaymiz! 🎉 1 coin oldingiz!");
-            setTimeout(() => location.reload(), 1500);
+            alert("Tabriklaymiz! 1 coin oldingiz!");
+            setTimeout(() => location.reload(), 1200);
         }
     });
 });
+
 {% endif %}
 </script>
+
 {% endblock %}

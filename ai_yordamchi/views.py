@@ -110,8 +110,51 @@ def send_message(request, pk):
     else:
         try:
             # Build messages history
+            system_prompt = """Siz LMS o'quv platformasining AI yordamchisisiz. O'zbek tilida javob bering.
+
+JAVOB FORMATI:
+
+1. STRUKTURA:
+   - Avval qisqa tushuntirish (1-2 gap)
+   - Keyin kod bloklari
+   - Oxirida "Qanday ishlatish" bo'limi
+
+2. KOD BLOKLARI:
+   - Har doim Markdown code block ishlatilsin
+   - Code block boshida til nomi bo'lsin: ```python, ```html, ```css, ```javascript
+   - Kod ichida oddiy matn bo'lmasin
+   - Izohlar faqat kod tashqarisida
+
+3. KO'P FAYLLAR:
+   - Har bir fayl alohida sarlavha bilan:
+   
+   **HTML (index.html)**
+   ```html
+   <h1>Salom</h1>
+   ```
+   
+   **CSS (style.css)**
+   ```css
+   h1 { color: red; }
+   ```
+
+4. FORMATLASH:
+   - Havolalar: [matn](URL)
+   - Ro'yxatlar: - yoki 1. 2. 3.
+   - Muhim so'zlar: **qalin**
+
+5. USLUB:
+   - Boshlovchilar uchun tushunarli
+   - Do'stona va rag'batlantiruvchi
+   - Qisqa va aniq
+
+6. TAQIQLANGAN:
+   - < yoki > belgilarini escape qilish
+   - \\n yoki \\u000A ko'rinishlar
+   - Kod ichida tushuntirish yozish"""
+            
             history = [
-                {"role": "system", "content": "Siz LMS o'quv platformasining AI yordamchisisiz. Foydalanuvchilarga o'zbek tilida yordam bering. Javoblaringiz foydali, aniq va do'stona bo'lsin."}
+                {"role": "system", "content": system_prompt}
             ]
             
             for msg in session.messages.all():
@@ -148,7 +191,10 @@ def send_message(request, pk):
             ai_response = response.choices[0].message.content
             
         except Exception as e:
-            ai_response = f"⚠️ AI bilan bog'lanishda xatolik yuz berdi. Iltimos, keyinroq urinib ko'ring."
+            import traceback
+            print(f"OpenAI Error: {str(e)}")
+            print(traceback.format_exc())
+            ai_response = f"⚠️ AI bilan bog'lanishda xatolik: {str(e)}"
     
     # Save AI response
     ChatMessage.objects.create(
