@@ -24,6 +24,23 @@ class Profession(models.Model):
         ordering = ['-created_at']
 
 
+class Section(models.Model):
+    profession = models.ForeignKey(Profession, on_delete=models.CASCADE, related_name='sections')
+    title = models.CharField(max_length=200, verbose_name="Bo'lim nomi")
+    description = models.TextField(blank=True, null=True, verbose_name="Tavsif")
+    order = models.IntegerField(default=0, verbose_name="Tartib")
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['order', 'created_at']
+        verbose_name = "Bo'lim"
+        verbose_name_plural = "Bo'limlar"
+    
+    def __str__(self):
+        return f"{self.profession.name} - {self.title}"
+
+
 class CustomUser(AbstractUser):
     ROLE_CHOICES = (
         ('admin', 'Admin'),
@@ -114,6 +131,7 @@ class Lesson(models.Model):
     )
     
     profession = models.ForeignKey(Profession, on_delete=models.CASCADE, related_name='lessons')
+    section = models.ForeignKey(Section, on_delete=models.SET_NULL, null=True, blank=True, related_name='lessons', verbose_name="Bo'lim")
     title = models.CharField(max_length=300, verbose_name="Dars nomi")
     lesson_type = models.CharField(max_length=20, choices=LESSON_TYPES, verbose_name="Dars turi")
     order = models.IntegerField(default=0, verbose_name="Tartib")
