@@ -41,72 +41,147 @@ class Section(models.Model):
         return f"{self.profession.name} - {self.title}"
 
 
+from django.db import models
+from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
+
 class CustomUser(AbstractUser):
+
     ROLE_CHOICES = (
         ('admin', 'Admin'),
-        ('teacher', 'O\'qituvchi'),
-        ('student', 'O\'quvchi'),
+        ('teacher', "O'qituvchi"),
+        ('student', "O'quvchi"),
     )
-    
+
+    # Basic info
     first_name = models.CharField(max_length=100, verbose_name="Ism")
     last_name = models.CharField(max_length=100, verbose_name="Familiya")
     phone = models.CharField(max_length=20, unique=True, verbose_name="Telefon raqam")
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='student', verbose_name="Rol")
-    photo = models.ImageField(upload_to='profiles/', blank=True, null=True, verbose_name="Profil rasmi")
-    profession = models.ForeignKey(Profession, on_delete=models.SET_NULL, null=True, blank=True, related_name='students', verbose_name="Yo'nalish")
+
+    role = models.CharField(
+        max_length=20,
+        choices=ROLE_CHOICES,
+        default='student',
+        verbose_name="Rol"
+    )
+
+    photo = models.ImageField(
+        upload_to='profiles/',
+        blank=True,
+        null=True,
+        verbose_name="Profil rasmi"
+    )
+
+    profession = models.ForeignKey(
+        'Profession',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='students',
+        verbose_name="Yo'nalish"
+    )
+
     is_blocked = models.BooleanField(default=False, verbose_name="Bloklangan")
     last_activity = models.DateTimeField(null=True, blank=True, verbose_name="Oxirgi faollik")
+
     bio = models.TextField(blank=True, null=True, verbose_name="O'zi haqida")
+
+    # Gamification
     coins = models.IntegerField(default=0, verbose_name="Coinlar")
     total_online_time = models.IntegerField(default=0, verbose_name="Jami online vaqt (daqiqa)")
-    
-    # New fields
+
+    # Documents
     address = models.CharField(max_length=300, blank=True, null=True, verbose_name="Yashash manzili")
     birth_date = models.DateField(null=True, blank=True, verbose_name="Tug'ilgan kuni")
-    id_card = models.FileField(upload_to='documents/id_cards/', blank=True, null=True, verbose_name="ID karta/Pasport")
-    birth_certificate = models.FileField(upload_to='documents/birth_certificates/', blank=True, null=True, verbose_name="Tug'ilganlik haqida guvohnoma")
-    
-    def __str__(self):
-        return self.username
-    
+
+    id_card = models.FileField(
+        upload_to='documents/id_cards/',
+        blank=True,
+        null=True,
+        verbose_name="ID karta / Pasport"
+    )
+
+    birth_certificate = models.FileField(
+        upload_to='documents/birth_certificates/',
+        blank=True,
+        null=True,
+        verbose_name="Tug'ilganlik haqida guvohnoma"
+    )
+
+    # ---------------- PROPERTIES ----------------
+
     @property
     def is_admin(self):
         return self.role == 'admin'
-    
+
     @property
     def is_teacher(self):
         return self.role == 'teacher'
-    
+
     @property
     def is_student(self):
         return self.role == 'student'
-    
+
     @property
     def is_online(self):
-        if self.last_activity:
-            now = timezone.now()
-            diff = now - self.last_activity
-            return diff.total_seconds() < 300
-        return False
-    
+        if not self.last_activity:
+            return False
+        return (timezone.now() - self.last_activity).total_seconds() < 300
+
     @property
     def full_name(self):
-        return f"{self.first_name} {self.last_name}"
-    
+        return f"{self.first_name} {self.last_name}".strip()
+
     def get_initials(self):
         first = self.first_name[0] if self.first_name else ''
         last = self.last_name[0] if self.last_name else ''
         return f"{first}{last}".upper()
-    
-    def add_coins(self, amount, reason=''):
+
+    # ---------------- COINS ----------------
+
+    def add_coins(self, amount: int, reason: str = ''):
         from coin.models import CoinTransaction
+
+        if amount <= 0:
+            return
+
         self.coins += amount
-        self.save()
-        CoinTransaction.objects.create(user=self, amount=amount, reason=reason)
-    
+        self.save(update_fields=['coins'])
+
+        CoinTransaction.objects.create(
+            user=self,
+            amount=amount,
+            action='add',
+            reason=reason
+        )
+
+    def remove_coins(self, amount: int, reason: str = ''):
+        from coin.models import CoinTransaction
+
+        if amount <= 0:
+            return
+
+        if self.coins < amount:
+            return
+
+        self.coins -= amount
+        self.save(update_fields=['coins'])
+
+        CoinTransaction.objects.create(
+            user=self,
+            amount=amount,
+            action='remove',
+            reason=reason
+        )
+
+    # ---------------- META ----------------
+
     class Meta:
         verbose_name = "Foydalanuvchi"
         verbose_name_plural = "Foydalanuvchilar"
+
+    def __str__(self):
+        return self.username
 
 
 class CourseEnrollment(models.Model):
