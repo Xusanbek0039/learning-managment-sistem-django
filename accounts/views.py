@@ -16,7 +16,7 @@ from .forms import (
 from .models import (
     Profession, Section, CustomUser, CourseEnrollment, Lesson, VideoLesson, VideoProgress,
     Homework, HomeworkSubmission, Test, TestQuestion, TestAnswer, TestResult,
-    TestUserAnswer, Certificate, Message, PaymentStatus
+    TestUserAnswer, Certificate, Message, PaymentStatus, HelpRequest
 )
 from coin.models import ActivityLog
 
@@ -1674,5 +1674,73 @@ def admin_section_delete(request, pk):
         return redirect('admin_sections')
     
     return render(request, 'accounts/admin/section_delete.html', {'section': section})
+
+
+# ==================== YORDAM SO'ROVLARI ====================
+
+@login_required
+def submit_help_request(request):
+    if request.method == 'POST':
+        subject = request.POST.get('subject', '').strip()
+        message = request.POST.get('message', '').strip()
+        image = request.FILES.get('image')
+        
+        if not subject or not message:
+            return JsonResponse({'success': False, 'error': "Mavzu va xabar to'ldirilishi shart!"})
+        
+        HelpRequest.objects.create(
+            user=request.user,
+            subject=subject,
+            message=message,
+            image=image
+        )
+        
+        return JsonResponse({'success': True, 'message': "Xabaringiz yuborildi! Tez orada javob beramiz."})
+    
+    return JsonResponse({'success': False, 'error': 'Noto\'g\'ri so\'rov'})
+
+
+@login_required
+def admin_help_requests(request):
+    if not request.user.is_admin:
+        messages.error(request, "Sizda bu sahifaga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    status_filter = request.GET.get('status', '')
+    requests_list = HelpRequest.objects.select_related('user').all()
+    
+    if status_filter:
+        requests_list = requests_list.filter(status=status_filter)
+    
+    context = {
+        'requests': requests_list,
+        'status_filter': status_filter,
+        'pending_count': HelpRequest.objects.filter(status='pending').count(),
+    }
+    return render(request, 'accounts/admin/help_requests.html', context)
+
+
+@login_required
+def admin_help_request_detail(request, pk):
+    if not request.user.is_admin:
+        messages.error(request, "Sizda bu sahifaga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    help_request = get_object_or_404(HelpRequest, pk=pk)
+    
+    if request.method == 'POST':
+        status = request.POST.get('status')
+        admin_response = request.POST.get('admin_response', '').strip()
+        
+        if status:
+            help_request.status = status
+        if admin_response:
+            help_request.admin_response = admin_response
+        help_request.save()
+        
+        messages.success(request, "So'rov yangilandi!")
+        return redirect('admin_help_request_detail', pk=pk)
+    
+    return render(request, 'accounts/admin/help_request_detail.html', {'help_request': help_request})
 
 
