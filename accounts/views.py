@@ -151,16 +151,52 @@ def profession_detail(request, pk):
     
     sections = []
     lessons_without_section = []
+    lesson_progress = {}
     
     if is_enrolled or request.user.is_teacher or request.user.is_admin:
         sections = profession.sections.filter(is_active=True).prefetch_related('lessons')
         lessons_without_section = profession.lessons.filter(section__isnull=True)
+        
+        # Get user progress for lessons
+        if request.user.is_authenticated:
+            # Video progress
+            watched_videos = VideoProgress.objects.filter(
+                user=request.user, 
+                watched=True,
+                video__lesson__profession=profession
+            ).values_list('video__lesson_id', flat=True)
+            
+            # Test results
+            completed_tests = TestResult.objects.filter(
+                user=request.user,
+                test__lesson__profession=profession
+            ).values_list('test__lesson_id', flat=True)
+            
+            # Homework submissions
+            submitted_homeworks = HomeworkSubmission.objects.filter(
+                user=request.user,
+                homework__lesson__profession=profession
+            ).values('homework__lesson_id', 'grade')
+            
+            for vid in watched_videos:
+                lesson_progress[vid] = {'completed': True, 'type': 'video'}
+            
+            for test_id in completed_tests:
+                lesson_progress[test_id] = {'completed': True, 'type': 'test'}
+            
+            for hw in submitted_homeworks:
+                lesson_progress[hw['homework__lesson_id']] = {
+                    'completed': True, 
+                    'type': 'homework',
+                    'graded': hw['grade'] is not None
+                }
     
     return render(request, 'accounts/profession_detail.html', {
         'profession': profession,
         'is_enrolled': is_enrolled,
         'sections': sections,
         'lessons_without_section': lessons_without_section,
+        'lesson_progress': lesson_progress,
     })
 
 
