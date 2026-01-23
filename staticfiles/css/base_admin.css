@@ -37,8 +37,23 @@
      width: 280px;
      background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
      padding: 20px;
+     padding-bottom: 100px;
      z-index: 1000;
      overflow-y: auto;
+     overflow-x: hidden;
+ }
+ 
+ .sidebar::-webkit-scrollbar {
+     width: 6px;
+ }
+ 
+ .sidebar::-webkit-scrollbar-thumb {
+     background: rgba(255,255,255,0.2);
+     border-radius: 3px;
+ }
+ 
+ .sidebar-nav {
+     padding-bottom: 50px;
  }
 
  .sidebar-brand {
