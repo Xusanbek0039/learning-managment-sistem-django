@@ -168,13 +168,13 @@ def profession_detail(request, pk):
             
             # Test results
             completed_tests = TestResult.objects.filter(
-                user=request.user,
+                student=request.user,
                 test__lesson__profession=profession
             ).values_list('test__lesson_id', flat=True)
             
             # Homework submissions
             submitted_homeworks = HomeworkSubmission.objects.filter(
-                user=request.user,
+                student=request.user,
                 homework__lesson__profession=profession
             ).values('homework__lesson_id', 'grade')
             
