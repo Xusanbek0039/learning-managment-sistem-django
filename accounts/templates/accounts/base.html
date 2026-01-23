@@ -24,6 +24,62 @@
 </head>
 
 <body>
+<!-- 🎉 Bayram va Eslatma Banner -->
+<div class="announcement-bar" id="announcementBar">
+    <div class="announcement-content">
+        <span class="announcement-text" id="announcementText"></span>
+        <span class="announcement-text" id="announcementText2"></span>
+    </div>
+</div>
+
+<style>
+.announcement-bar {
+    background: linear-gradient(90deg, #0d6efd, #6610f2, #d63384, #fd7e14, #0d6efd);
+    background-size: 300% 100%;
+    animation: gradientMove 8s ease infinite;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    height: 36px;
+    display: flex;
+    align-items: center;
+}
+
+@keyframes gradientMove {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.announcement-content {
+    display: flex;
+    animation: marquee 25s linear infinite;
+}
+
+@keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.announcement-text {
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0 50px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.announcement-text i {
+    font-size: 1.1rem;
+}
+
+.announcement-bar.holiday {
+    background: linear-gradient(90deg, #198754, #20c997, #0dcaf0, #20c997, #198754);
+    background-size: 300% 100%;
+}
+</style>
+
 <!-- 🌦 Weather Effect -->
 <div id="weather_effect"></div>
 
