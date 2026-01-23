@@ -287,9 +287,17 @@ class HomeworkSubmission(models.Model):
 
 
 class Test(models.Model):
+    TEST_TYPES = (
+        ('lesson', 'Dars yuzasidan'),
+        ('midterm', 'Oraliq test'),
+        ('practice', 'Tajriba oshirish'),
+    )
+    
     lesson = models.OneToOneField(Lesson, on_delete=models.CASCADE, related_name='test')
+    test_type = models.CharField(max_length=20, choices=TEST_TYPES, default='lesson', verbose_name="Test turi")
     time_limit = models.IntegerField(default=30, verbose_name="Vaqt chegarasi (daqiqa)")
     passing_score = models.IntegerField(default=60, verbose_name="O'tish bali (%)")
+    allow_retry = models.BooleanField(default=False, verbose_name="Qayta ishlashga ruxsat")
     
     def __str__(self):
         return self.lesson.title

@@ -63,6 +63,10 @@
                             {{ form.description }}
                         </div>
                         {% else %}
+                        <div class="mb-3">
+                            <label class="form-label" style="color: var(--text-color);">Test turi</label>
+                            {{ form.test_type }}
+                        </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label" style="color: var(--text-color);">Vaqt chegarasi (daqiqa)</label>
@@ -72,6 +76,10 @@
                                 <label class="form-label" style="color: var(--text-color);">O'tish bali (%)</label>
                                 {{ form.passing_score }}
                             </div>
+                        </div>
+                        <div class="mb-3 form-check">
+                            {{ form.allow_retry }}
+                            <label class="form-check-label" style="color: var(--text-color);">Qayta ishlashga ruxsat berish</label>
                         </div>
                         {% endif %}
                         

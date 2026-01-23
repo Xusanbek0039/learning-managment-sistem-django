@@ -178,9 +178,20 @@ class HomeworkGradeForm(forms.Form):
 
 
 class TestForm(forms.Form):
+    TEST_TYPE_CHOICES = (
+        ('lesson', 'Dars yuzasidan'),
+        ('midterm', 'Oraliq test'),
+        ('practice', 'Tajriba oshirish'),
+    )
+    
     title = forms.CharField(
         max_length=300,
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Test nomi'})
+    )
+    test_type = forms.ChoiceField(
+        choices=TEST_TYPE_CHOICES,
+        initial='lesson',
+        widget=forms.Select(attrs={'class': 'form-select'})
     )
     time_limit = forms.IntegerField(
         initial=30,
@@ -189,6 +200,11 @@ class TestForm(forms.Form):
     passing_score = forms.IntegerField(
         initial=60,
         widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'O\'tish bali (%)'})
+    )
+    allow_retry = forms.BooleanField(
+        required=False,
+        initial=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
     )
 
 

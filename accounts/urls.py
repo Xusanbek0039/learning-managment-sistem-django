@@ -83,4 +83,7 @@ urlpatterns = [
     path('help/submit/', views.submit_help_request, name='submit_help_request'),
     path('dashboard/help-requests/', views.admin_help_requests, name='admin_help_requests'),
     path('dashboard/help-requests/<int:pk>/', views.admin_help_request_detail, name='admin_help_request_detail'),
+    
+    # Coin Management
+    path('dashboard/coins/', views.admin_manage_coins, name='admin_manage_coins'),
 ]

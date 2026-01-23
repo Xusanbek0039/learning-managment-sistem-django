@@ -301,6 +301,12 @@ def start_test(request, pk):
         if not CourseEnrollment.objects.filter(user=request.user, profession=profession).exists():
             messages.error(request, "Avval kursga yoziling!")
             return redirect('profession_detail', pk=profession.pk)
+        
+        # Check if already taken and retry not allowed
+        existing_result = TestResult.objects.filter(test=test, student=request.user).first()
+        if existing_result and not test.allow_retry:
+            messages.info(request, "Siz bu testni allaqachon topshirgansiz.")
+            return redirect('test_result', pk=existing_result.pk)
     
     questions = test.questions.all()
     request.session[f'test_{test.pk}_start'] = timezone.now().isoformat()
@@ -971,8 +977,10 @@ def add_lesson(request, pk):
                 )
                 Test.objects.create(
                     lesson=lesson,
+                    test_type=form.cleaned_data['test_type'],
                     time_limit=form.cleaned_data['time_limit'],
-                    passing_score=form.cleaned_data['passing_score']
+                    passing_score=form.cleaned_data['passing_score'],
+                    allow_retry=form.cleaned_data.get('allow_retry', False)
                 )
                 messages.success(request, "Test qo'shildi! Endi savollarni qo'shing.")
                 return redirect('manage_test_questions', pk=lesson.test.pk)
@@ -1726,6 +1734,67 @@ def admin_section_delete(request, pk):
         return redirect('admin_sections')
     
     return render(request, 'accounts/admin/section_delete.html', {'section': section})
+
+
+# ==================== COIN BOSHQARUVI ====================
+
+@login_required
+def admin_manage_coins(request):
+    if not request.user.is_admin:
+        messages.error(request, "Sizda bu sahifaga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    users = CustomUser.objects.filter(role='student').order_by('-coins', 'first_name')
+    
+    if request.method == 'POST':
+        user_id = request.POST.get('user_id')
+        amount = request.POST.get('amount')
+        action = request.POST.get('action')  # 'add' or 'remove'
+        reason = request.POST.get('reason', '').strip()
+        
+        try:
+            amount = int(amount)
+            user = CustomUser.objects.get(pk=user_id)
+            
+            if action == 'add':
+                user.coins += amount
+                user.save()
+                
+                # Send message to user
+                Message.objects.create(
+                    sender=request.user,
+                    recipient=user,
+                    subject="Coin rag'batlantirish",
+                    content=f"Sizga {amount} coin rag'batlantirish sifatida berildi! 🎉\n\nSabab: {reason}" if reason else f"Sizga {amount} coin rag'batlantirish sifatida berildi! 🎉"
+                )
+                
+                messages.success(request, f"{user.full_name}ga {amount} coin berildi!")
+                
+            elif action == 'remove':
+                if user.coins >= amount:
+                    user.coins -= amount
+                    user.save()
+                    
+                    # Send message to user
+                    Message.objects.create(
+                        sender=request.user,
+                        recipient=user,
+                        subject="Coin ayirildi",
+                        content=f"Sizdan {amount} coin ayirildi.\n\nSabab: {reason}" if reason else f"Sizdan {amount} coin ayirildi."
+                    )
+                    
+                    messages.success(request, f"{user.full_name}dan {amount} coin ayirildi!")
+                else:
+                    messages.error(request, f"{user.full_name}da yetarli coin yo'q! (Mavjud: {user.coins})")
+                    
+        except (ValueError, CustomUser.DoesNotExist):
+            messages.error(request, "Xatolik yuz berdi!")
+        
+        return redirect('admin_manage_coins')
+    
+    return render(request, 'accounts/admin/manage_coins.html', {
+        'users': users,
+    })
 
 
 # ==================== YORDAM SO'ROVLARI ====================

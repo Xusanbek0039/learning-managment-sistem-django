@@ -108,10 +108,15 @@
                 </div>
             </div>
             
-            <div class="text-center mt-4">
-                <a href="{% url 'lesson_view' result.test.lesson.pk %}" class="btn btn-primary">
-                    <i class="bi bi-arrow-left me-2"></i>Testga qaytish
+            <div class="text-center mt-4 d-flex justify-content-center gap-3">
+                <a href="{% url 'profession_detail' result.test.lesson.profession.pk %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Kursga qaytish
                 </a>
+                {% if result.test.allow_retry %}
+                <a href="{% url 'start_test' result.test.pk %}" class="btn btn-warning">
+                    <i class="bi bi-arrow-repeat me-2"></i>Qayta ishlash
+                </a>
+                {% endif %}
             </div>
         </div>
     </div>

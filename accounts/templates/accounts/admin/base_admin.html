@@ -95,6 +95,10 @@
                 <i class="bi bi-question-circle"></i>
                 <span>Yordam xatlari</span>
             </a>
+            <a href="{% url 'admin_manage_coins' %}" class="nav-link {% if '/coins/' in request.path %}active{% endif %}">
+                <i class="bi bi-coin"></i>
+                <span>Coin berish</span>
+            </a>
 
         </nav>
 
