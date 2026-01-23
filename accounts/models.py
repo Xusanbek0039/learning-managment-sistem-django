@@ -399,4 +399,30 @@ class PaymentStatus(models.Model):
         return f"{self.user.full_name} - {status}"
 
 
+class HelpRequest(models.Model):
+    STATUS_CHOICES = (
+        ('pending', 'Kutilmoqda'),
+        ('in_progress', 'Ko\'rib chiqilmoqda'),
+        ('resolved', 'Hal qilindi'),
+        ('closed', 'Yopildi'),
+    )
+    
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='help_requests')
+    subject = models.CharField(max_length=200, verbose_name="Mavzu")
+    message = models.TextField(verbose_name="Xabar")
+    image = models.ImageField(upload_to='help_requests/', blank=True, null=True, verbose_name="Rasm")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', verbose_name="Holat")
+    admin_response = models.TextField(blank=True, null=True, verbose_name="Admin javobi")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Yordam so'rovi"
+        verbose_name_plural = "Yordam so'rovlari"
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.user.full_name} - {self.subject}"
+
+
 
