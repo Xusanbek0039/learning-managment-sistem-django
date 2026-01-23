@@ -1,0 +1,125 @@
+{% extends 'accounts/base_admin.html' %}
+
+{% block title %}Yordam so'rovi #{{ help_request.pk }} - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <a href="{% url 'admin_help_requests' %}" class="btn btn-outline-secondary mb-4">
+        <i class="bi bi-arrow-left me-1"></i>Orqaga
+    </a>
+
+    <div class="row">
+        <!-- So'rov ma'lumotlari -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-envelope me-2"></i>{{ help_request.subject }}</h5>
+                    {% if help_request.status == 'pending' %}
+                    <span class="badge bg-warning">Kutilmoqda</span>
+                    {% elif help_request.status == 'in_progress' %}
+                    <span class="badge bg-info">Ko'rilmoqda</span>
+                    {% elif help_request.status == 'resolved' %}
+                    <span class="badge bg-success">Hal qilindi</span>
+                    {% else %}
+                    <span class="badge bg-secondary">Yopildi</span>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <label class="text-muted small">Xabar:</label>
+                        <p class="mb-0" style="white-space: pre-wrap;">{{ help_request.message }}</p>
+                    </div>
+
+                    {% if help_request.image %}
+                    <div class="mb-4">
+                        <label class="text-muted small">Yuklangan rasm:</label>
+                        <div>
+                            <a href="{{ help_request.image.url }}" target="_blank">
+                                <img src="{{ help_request.image.url }}" class="img-fluid rounded" style="max-height: 400px;">
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if help_request.admin_response %}
+                    <div class="alert alert-success">
+                        <label class="text-muted small d-block mb-2"><i class="bi bi-reply me-1"></i>Admin javobi:</label>
+                        <p class="mb-0">{{ help_request.admin_response }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Javob yozish -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-reply me-2"></i>Javob va holat</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Holat</label>
+                            <select name="status" class="form-select">
+                                <option value="pending" {% if help_request.status == 'pending' %}selected{% endif %}>Kutilmoqda</option>
+                                <option value="in_progress" {% if help_request.status == 'in_progress' %}selected{% endif %}>Ko'rib chiqilmoqda</option>
+                                <option value="resolved" {% if help_request.status == 'resolved' %}selected{% endif %}>Hal qilindi</option>
+                                <option value="closed" {% if help_request.status == 'closed' %}selected{% endif %}>Yopildi</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Javob yozish</label>
+                            <textarea name="admin_response" class="form-control" rows="4" placeholder="Foydalanuvchiga javob yozing...">{{ help_request.admin_response|default:'' }}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i>Saqlash
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Foydalanuvchi ma'lumotlari -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-person me-2"></i>Yuboruvchi</h6>
+                </div>
+                <div class="card-body text-center">
+                    {% if help_request.user.photo %}
+                    <img src="{{ help_request.user.photo.url }}" class="rounded-circle mb-3" width="80" height="80" style="object-fit: cover;">
+                    {% else %}
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px; font-size: 1.5rem;">
+                        {{ help_request.user.first_name.0 }}{{ help_request.user.last_name.0 }}
+                    </div>
+                    {% endif %}
+                    <h5 class="mb-1">{{ help_request.user.full_name }}</h5>
+                    <p class="text-muted mb-2">{{ help_request.user.phone }}</p>
+                    <span class="badge {% if help_request.user.role == 'admin' %}bg-danger{% elif help_request.user.role == 'teacher' %}bg-info{% else %}bg-success{% endif %}">
+                        {{ help_request.user.get_role_display }}
+                    </span>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Yuborilgan:</span>
+                        <span>{{ help_request.created_at|date:"d.m.Y H:i" }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Yangilangan:</span>
+                        <span>{{ help_request.updated_at|date:"d.m.Y H:i" }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Coin:</span>
+                        <span class="text-warning fw-bold">{{ help_request.user.coins }}</span>
+                    </li>
+                </ul>
+                <div class="card-body">
+                    <a href="{% url 'admin_user_view' help_request.user.pk %}" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-person me-1"></i>Profilni ko'rish
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

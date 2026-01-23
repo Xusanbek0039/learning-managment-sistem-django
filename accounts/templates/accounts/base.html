@@ -404,6 +404,149 @@
     </script>
     <script src="{% static 'effects/weather_effect.js' %}"></script>
 
+    <!-- Bayramlar va E'lonlar -->
+    <script>
+    (function() {
+        const holidays = [
+            { month: 1, day: 14, name: "Vatan himoyachilari kuni", icon: "bi-shield-check", message: "Barcha Vatan himoyachilarini bayram bilan tabriklaymiz! 🎖️" },
+            { month: 3, day: 8, name: "Xalqaro xotin-qizlar bayrami", icon: "bi-flower1", message: "Barcha ayollarni 8-Mart bayrami bilan tabriklaymiz! 💐" },
+            { month: 3, day: 21, name: "Navro'z bayrami", icon: "bi-sun", message: "Navro'z bayrami muborak bo'lsin! 🌸" },
+            { month: 10, day: 1, name: "Ustoz va murabbiylar kuni", icon: "bi-person-workspace", message: "Barcha ustozlarni kasbiy bayrami bilan tabriklaymiz! 📚" },
+            { month: 12, day: 31, name: "Yangi yil", icon: "bi-stars", message: "Yangi yilingiz bilan! Baxt va omad tilaymiz! 🎄" },
+            { month: 1, day: 1, name: "Yangi yil", icon: "bi-stars", message: "Yangi yilingiz muborak! 🎉" },
+        ];
+        
+        const today = new Date();
+        const month = today.getMonth() + 1;
+        const day = today.getDate();
+        
+        let message = '';
+        let isHoliday = false;
+        
+        for (const h of holidays) {
+            const diff = (month === h.month) ? (day - h.day) : -999;
+            if (diff >= -1 && diff <= 1) {
+                message = `<i class="bi ${h.icon}"></i> ${h.message}`;
+                isHoliday = true;
+                break;
+            }
+        }
+        
+        if (!message) {
+            message = `<i class="bi bi-info-circle"></i> Sayt sinov rejimida ishlamoqda. Xatolik topsangiz <strong>Alt+Enter</strong> tugmasini bosing va bizga xabar bering!`;
+        }
+        
+        const bar = document.getElementById('announcementBar');
+        const text1 = document.getElementById('announcementText');
+        const text2 = document.getElementById('announcementText2');
+        
+        if (text1 && text2) {
+            text1.innerHTML = message;
+            text2.innerHTML = message;
+        }
+        
+        if (isHoliday && bar) {
+            bar.classList.add('holiday');
+        }
+    })();
+    </script>
+
+    {% if user.is_authenticated %}
+    <!-- Yordam Modal -->
+    <div class="modal fade" id="helpModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background: var(--card-bg); border: 1px solid var(--border);">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title"><i class="bi bi-question-circle text-primary me-2"></i>Yordam so'rash</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="helpForm" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div class="text-center mb-3">
+                            <small class="text-muted">{{ user.first_name }} {{ user.last_name }} sifatida yuboriladi</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mavzu <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="subject" id="helpSubject" placeholder="Xatolik yoki savol mavzusi" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Xabar <span class="text-danger">*</span></label>
+                            <textarea class="form-control" name="message" id="helpMessage" rows="4" placeholder="Batafsil yozing..." required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Rasm (ixtiyoriy)</label>
+                            <input type="file" class="form-control" name="image" id="helpImage" accept="image/*">
+                            <div class="form-text">Xatolik skrinshotini yuklashingiz mumkin</div>
+                        </div>
+                        <div id="helpAlert" class="alert d-none"></div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                        <button type="submit" class="btn btn-primary" id="helpSubmitBtn">
+                            <i class="bi bi-send me-1"></i>Yuborish
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Alt+Enter -> Yordam modal
+    document.addEventListener('keydown', function(e) {
+        if (e.altKey && e.key === 'Enter') {
+            e.preventDefault();
+            const modal = new bootstrap.Modal(document.getElementById('helpModal'));
+            modal.show();
+        }
+    });
+    
+    // Yordam formasi
+    document.getElementById('helpForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const btn = document.getElementById('helpSubmitBtn');
+        const alert = document.getElementById('helpAlert');
+        const formData = new FormData(this);
+        
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Yuborilmoqda...';
+        
+        fetch('{% url "submit_help_request" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(r => r.json())
+        .then(data => {
+            alert.classList.remove('d-none', 'alert-danger', 'alert-success');
+            if (data.success) {
+                alert.classList.add('alert-success');
+                alert.innerHTML = '<i class="bi bi-check-circle me-1"></i>' + data.message;
+                document.getElementById('helpForm').reset();
+                setTimeout(() => {
+                    bootstrap.Modal.getInstance(document.getElementById('helpModal')).hide();
+                    alert.classList.add('d-none');
+                }, 2000);
+            } else {
+                alert.classList.add('alert-danger');
+                alert.innerHTML = '<i class="bi bi-x-circle me-1"></i>' + data.error;
+            }
+        })
+        .catch(() => {
+            alert.classList.remove('d-none', 'alert-success');
+            alert.classList.add('alert-danger');
+            alert.innerHTML = 'Xatolik yuz berdi!';
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-send me-1"></i>Yuborish';
+        });
+    });
+    </script>
+    {% endif %}
 
     {% block extra_js %}{% endblock %}
 </body>
