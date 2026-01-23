@@ -2,8 +2,7 @@
 
 {% block title %}Yordam so'rovi #{{ help_request.pk }} - Admin{% endblock %}
 
-{% block content %}
-<div class="container-fluid py-4">
+{% block admin_content %}<div class="container-fluid py-4">
     <a href="{% url 'admin_help_requests' %}" class="btn btn-outline-secondary mb-4">
         <i class="bi bi-arrow-left me-1"></i>Orqaga
     </a>

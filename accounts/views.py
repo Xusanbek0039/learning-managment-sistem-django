@@ -1743,55 +1743,63 @@ def admin_manage_coins(request):
     if not request.user.is_admin:
         messages.error(request, "Sizda bu sahifaga kirish huquqi yo'q!")
         return redirect('home')
-    
+
     users = CustomUser.objects.filter(role='student').order_by('-coins', 'first_name')
-    
+
     if request.method == 'POST':
         user_id = request.POST.get('user_id')
         amount = request.POST.get('amount')
-        action = request.POST.get('action')  # 'add' or 'remove'
+        action = request.POST.get('action')
         reason = request.POST.get('reason', '').strip()
-        
+
         try:
             amount = int(amount)
             user = CustomUser.objects.get(pk=user_id)
-            
+
             if action == 'add':
                 user.coins += amount
                 user.save()
-                
-                # Send message to user
+
+                text = f"Sizga {amount} coin rag'batlantirish sifatida berildi! 🎉"
+                if reason:
+                    text += f"\n\nSabab: {reason}"
+
                 Message.objects.create(
                     sender=request.user,
                     recipient=user,
-                    subject="Coin rag'batlantirish",
-                    content=f"Sizga {amount} coin rag'batlantirish sifatida berildi! 🎉\n\nSabab: {reason}" if reason else f"Sizga {amount} coin rag'batlantirish sifatida berildi! 🎉"
+                    title="Coin rag'batlantirish",   # ✅ subject emas, title
+                    content=text,
+                    message_type='system'
                 )
-                
+
                 messages.success(request, f"{user.full_name}ga {amount} coin berildi!")
-                
+
             elif action == 'remove':
                 if user.coins >= amount:
                     user.coins -= amount
                     user.save()
-                    
-                    # Send message to user
+
+                    text = f"Sizdan {amount} coin ayirildi."
+                    if reason:
+                        text += f"\n\nSabab: {reason}"
+
                     Message.objects.create(
                         sender=request.user,
                         recipient=user,
-                        subject="Coin ayirildi",
-                        content=f"Sizdan {amount} coin ayirildi.\n\nSabab: {reason}" if reason else f"Sizdan {amount} coin ayirildi."
+                        title="Coin ayirildi",        # ✅ title
+                        content=text,
+                        message_type='system'
                     )
-                    
+
                     messages.success(request, f"{user.full_name}dan {amount} coin ayirildi!")
                 else:
                     messages.error(request, f"{user.full_name}da yetarli coin yo'q! (Mavjud: {user.coins})")
-                    
+
         except (ValueError, CustomUser.DoesNotExist):
             messages.error(request, "Xatolik yuz berdi!")
-        
+
         return redirect('admin_manage_coins')
-    
+
     return render(request, 'accounts/admin/manage_coins.html', {
         'users': users,
     })
