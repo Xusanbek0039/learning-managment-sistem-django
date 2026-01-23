@@ -1,95 +1,266 @@
 {% extends 'accounts/base.html' %}
+{% load custom_filters %}
 
-{% block title %}{{ profession.name }} - LMS | IT Creative{% endblock %}
+{% block title %}{{ profession.name }} - LMS{% endblock %}
 
 {% block extra_css %}
 <style>
-/* ===== iOS STYLE COLORS ===== */
-:root{
-    --card-bg: rgba(255,255,255,.75);
+:root {
+    --card-bg: rgba(255,255,255,.85);
     --card-border: rgba(0,0,0,.08);
     --text-main: #111;
     --soft-bg: rgba(0,0,0,.04);
 }
-[data-bs-theme="dark"]{
-    --card-bg: rgba(20,20,20,.75);
+[data-bs-theme="dark"] {
+    --card-bg: rgba(25,25,30,.85);
     --card-border: rgba(255,255,255,.08);
     --text-main: #f1f1f1;
     --soft-bg: rgba(255,255,255,.06);
 }
 
-/* ===== CARDS ===== */
-.ios-card{
+.glass-card {
     background: var(--card-bg);
-    backdrop-filter: blur(14px);
+    backdrop-filter: blur(16px);
     border: 1px solid var(--card-border);
-    border-radius: 22px;
-    box-shadow: 0 12px 35px rgba(0,0,0,.15);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,.12);
 }
 
-/* ===== IMAGE ===== */
-.prof-img{
-    height:240px;
-    object-fit:cover;
-    border-top-left-radius:22px;
-    border-top-right-radius:22px;
+.prof-img {
+    height: 220px;
+    object-fit: cover;
+    border-radius: 20px 20px 0 0;
 }
 
-/* ===== BADGE ===== */
-.ios-badge{
+.section-card {
     background: var(--soft-bg);
-    color: var(--text-main);
-    border-radius: 999px;
-    padding: .4rem .9rem;
-    font-size: .85rem;
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: all 0.3s;
 }
 
-/* ===== LIST ===== */
-.ios-list .list-group-item{
-    background: transparent;
-    border: none;
+.section-header {
+    padding: 16px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s;
+}
+
+.section-header:hover {
+    background: rgba(13, 110, 253, 0.08);
+}
+
+.section-header.active {
+    background: linear-gradient(135deg, rgba(13, 110, 253, 0.15), rgba(102, 16, 242, 0.1));
+}
+
+.section-title {
+    font-weight: 600;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    color: var(--text-main);
+}
+
+.section-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #0d6efd, #6610f2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.1rem;
+}
+
+.section-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.section-count {
+    background: rgba(13, 110, 253, 0.15);
+    color: #0d6efd;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.section-arrow {
+    transition: transform 0.3s;
+    color: var(--text-main);
+    opacity: 0.5;
+}
+
+.section-header.active .section-arrow {
+    transform: rotate(180deg);
+}
+
+.section-body {
+    display: none;
+    border-top: 1px solid var(--card-border);
+}
+
+.section-body.show {
+    display: block;
+}
+
+/* Lesson Cards */
+.lesson-item {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
     border-bottom: 1px solid var(--card-border);
-    padding: .9rem .3rem;
+    transition: all 0.2s;
+    text-decoration: none;
     color: var(--text-main);
-}
-.ios-list .list-group-item:hover{
-    background: var(--soft-bg);
+    gap: 16px;
 }
 
-/* ===== BUTTONS ===== */
-.ios-btn{
+.lesson-item:last-child {
+    border-bottom: none;
+}
+
+.lesson-item:hover {
+    background: var(--soft-bg);
+    padding-left: 28px;
+}
+
+.lesson-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.lesson-icon.video {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+}
+
+.lesson-icon.homework {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+.lesson-icon.test {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.lesson-info {
+    flex: 1;
+}
+
+.lesson-title {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 4px;
+}
+
+.lesson-type {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.lesson-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.status-badge.completed {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.status-badge.pending {
+    background: rgba(107, 114, 128, 0.15);
+    color: #6b7280;
+}
+
+.status-badge.graded {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+}
+
+.progress-ring {
+    width: 36px;
+    height: 36px;
+}
+
+.empty-section {
+    text-align: center;
+    padding: 40px 20px;
+    color: #9ca3af;
+}
+
+.empty-section i {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+}
+
+.add-lesson-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    margin: 12px;
+    border: 2px dashed var(--card-border);
+    border-radius: 12px;
+    color: #6b7280;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.add-lesson-btn:hover {
+    border-color: #0d6efd;
+    color: #0d6efd;
+    background: rgba(13, 110, 253, 0.05);
+}
+
+.ios-btn {
     border-radius: 14px;
     font-weight: 600;
+    padding: 10px 20px;
 }
 
-/* ===== ACCORDION ===== */
-.section-accordion .accordion-item{
-    background: transparent;
-    border: 1px solid var(--card-border);
-    border-radius: 14px !important;
-    margin-bottom: 12px;
+.section-progress {
+    width: 60px;
+    height: 6px;
+    background: rgba(0,0,0,0.1);
+    border-radius: 3px;
     overflow: hidden;
 }
-.section-accordion .accordion-button{
-    background: var(--soft-bg);
-    color: var(--text-main);
-    font-weight: 600;
-    border-radius: 14px !important;
-}
-.section-accordion .accordion-button:not(.collapsed){
-    background: linear-gradient(135deg, #0d6efd22, #6610f222);
-    color: var(--text-main);
-    box-shadow: none;
-}
-.section-accordion .accordion-button::after{
-    filter: var(--bs-accordion-btn-icon-filter);
-}
-.section-accordion .accordion-body{
-    padding: 0;
-}
-.section-badge{
-    font-size: .75rem;
-    padding: .25rem .6rem;
+
+.section-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #059669);
+    border-radius: 3px;
 }
 </style>
 {% endblock %}
@@ -103,144 +274,188 @@
 
 <div class="row g-4">
 
-<!-- ===== LEFT CARD ===== -->
-<div class="col-md-4">
-<div class="ios-card h-100">
-
+<!-- LEFT CARD -->
+<div class="col-lg-4">
+<div class="glass-card h-100">
     <img src="{{ profession.photo.url }}" class="w-100 prof-img" alt="{{ profession.name }}">
-
     <div class="p-4 text-center">
-
         <h4 class="fw-bold mb-2">{{ profession.name }}</h4>
-
-        <p class="text-muted small mb-3">{{ profession.description }}</p>
-
-        <div class="mb-3">
-            <span class="ios-badge">
+        <p class="text-muted small mb-3">{{ profession.description|truncatechars:150 }}</p>
+        
+        <div class="d-flex justify-content-center gap-3 mb-3">
+            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">
                 <i class="bi bi-people me-1"></i>{{ profession.student_count }} o'quvchi
+            </span>
+            <span class="badge bg-success bg-opacity-10 text-success px-3 py-2">
+                <i class="bi bi-collection me-1"></i>{{ profession.lessons.count }} dars
             </span>
         </div>
 
         {% if user.is_student %}
             {% if is_enrolled %}
-                <div class="alert alert-success py-2 small">
-                    <i class="bi bi-check-circle me-1"></i> Siz kursga yozilgansiz
+                <div class="alert alert-success py-2 mb-3">
+                    <i class="bi bi-check-circle me-1"></i> Kursga yozilgansiz
                 </div>
             {% else %}
-                <a href="{% url 'enroll_course' profession.pk %}"
-                   class="btn btn-primary w-100 ios-btn">
+                <a href="{% url 'enroll_course' profession.pk %}" class="btn btn-primary w-100 ios-btn mb-3">
                     <i class="bi bi-play-circle me-2"></i>O'qishni boshlash
                 </a>
             {% endif %}
         {% endif %}
 
         {% if user.is_admin or user.is_teacher %}
-        <a href="{% url 'manage_lessons' profession.pk %}"
-           class="btn btn-outline-primary w-100 mt-2 ios-btn">
-            <i class="bi bi-journal-text me-2"></i>Mavzularni boshqarish
+        <a href="{% url 'manage_lessons' profession.pk %}" class="btn btn-outline-primary w-100 ios-btn">
+            <i class="bi bi-gear me-2"></i>Boshqarish
         </a>
         {% endif %}
-
     </div>
 </div>
 </div>
 
-<!-- ===== RIGHT CARD ===== -->
-<div class="col-md-8">
+<!-- RIGHT CARD -->
+<div class="col-lg-8">
 
 {% if is_enrolled or user.is_admin or user.is_teacher %}
 
-<div class="ios-card">
-
+<div class="glass-card">
     <div class="p-4 border-bottom" style="border-color:var(--card-border)!important;">
-        <h5 class="m-0 fw-semibold">
-            <i class="bi bi-list-ul me-2"></i>Darslar
-        </h5>
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="m-0 fw-bold">
+                <i class="bi bi-book me-2 text-primary"></i>Kurs dasturi
+            </h5>
+            {% if user.is_admin or user.is_teacher %}
+            <a href="{% url 'add_section' profession.pk %}" class="btn btn-sm btn-primary ios-btn">
+                <i class="bi bi-plus-lg me-1"></i>Bo'lim qo'shish
+            </a>
+            {% endif %}
+        </div>
     </div>
 
     <div class="p-3">
-
         {% if sections or lessons_without_section %}
         
-        <!-- Sections with accordion -->
-        {% if sections %}
-        <div class="accordion section-accordion" id="sectionsAccordion">
-            {% for section in sections %}
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" 
-                            data-bs-toggle="collapse" data-bs-target="#section{{ section.pk }}">
-                        <i class="bi bi-folder2-open me-2 text-primary"></i>
+        <!-- Sections -->
+        {% for section in sections %}
+        <div class="section-card">
+            <div class="section-header {% if forloop.first %}active{% endif %}" onclick="toggleSection(this)">
+                <h6 class="section-title">
+                    <div class="section-icon">
+                        <i class="bi bi-folder2"></i>
+                    </div>
+                    <div>
                         {{ section.title }}
-                        <span class="badge bg-primary section-badge ms-2">{{ section.lessons.count }} dars</span>
-                    </button>
-                </h2>
-                <div id="section{{ section.pk }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}"
-                     data-bs-parent="#sectionsAccordion">
-                    <div class="accordion-body">
                         {% if section.description %}
-                        <div class="p-3 text-muted small border-bottom" style="border-color:var(--card-border)!important;">
-                            {{ section.description }}
-                        </div>
-                        {% endif %}
-                        
-                        {% if section.lessons.all %}
-                        <div class="list-group list-group-flush ios-list">
-                            {% for lesson in section.lessons.all %}
-                            <a href="{% url 'lesson_view' lesson.pk %}"
-                               class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-center gap-2">
-                                    {% if lesson.lesson_type == 'video' %}
-                                        <i class="bi bi-play-circle text-primary"></i>
-                                    {% elif lesson.lesson_type == 'homework' %}
-                                        <i class="bi bi-file-earmark-text text-warning"></i>
-                                    {% else %}
-                                        <i class="bi bi-question-circle text-success"></i>
-                                    {% endif %}
-                                    <span>{{ lesson.title }}</span>
-                                </div>
-                                <span class="badge bg-secondary bg-opacity-50">
-                                    {{ lesson.get_lesson_type_display }}
-                                </span>
-                            </a>
-                            {% endfor %}
-                        </div>
-                        {% else %}
-                        <div class="text-center py-4 text-muted">
-                            <i class="bi bi-inbox"></i>
-                            <p class="mb-0 small">Bu bo'limda hali darslar yo'q</p>
-                        </div>
+                        <small class="d-block text-muted fw-normal" style="font-size: 0.8rem;">{{ section.description|truncatechars:50 }}</small>
                         {% endif %}
                     </div>
+                </h6>
+                <div class="section-meta">
+                    <span class="section-count">{{ section.lessons.count }} dars</span>
+                    <i class="bi bi-chevron-down section-arrow"></i>
                 </div>
             </div>
-            {% endfor %}
+            <div class="section-body {% if forloop.first %}show{% endif %}">
+                {% if section.lessons.all %}
+                    {% for lesson in section.lessons.all %}
+                    <a href="{% url 'lesson_view' lesson.pk %}" class="lesson-item">
+                        <div class="lesson-icon {{ lesson.lesson_type }}">
+                            {% if lesson.lesson_type == 'video' %}
+                                <i class="bi bi-play-fill"></i>
+                            {% elif lesson.lesson_type == 'homework' %}
+                                <i class="bi bi-pencil"></i>
+                            {% else %}
+                                <i class="bi bi-patch-question"></i>
+                            {% endif %}
+                        </div>
+                        <div class="lesson-info">
+                            <div class="lesson-title">{{ lesson.title }}</div>
+                            <div class="lesson-type">
+                                {% if lesson.lesson_type == 'video' %}Video darslik
+                                {% elif lesson.lesson_type == 'homework' %}Uy vazifasi
+                                {% else %}Test{% endif %}
+                            </div>
+                        </div>
+                        <div class="lesson-status">
+                            {% with progress=lesson_progress|get_item:lesson.pk %}
+                            {% if progress %}
+                                {% if progress.graded %}
+                                <span class="status-badge graded">
+                                    <i class="bi bi-star-fill"></i>Baholangan
+                                </span>
+                                {% else %}
+                                <span class="status-badge completed">
+                                    <i class="bi bi-check-circle-fill"></i>Bajarilgan
+                                </span>
+                                {% endif %}
+                            {% else %}
+                                <span class="status-badge pending">
+                                    <i class="bi bi-circle"></i>Bajarilmagan
+                                </span>
+                            {% endif %}
+                            {% endwith %}
+                        </div>
+                    </a>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-section">
+                        <i class="bi bi-inbox"></i>
+                        <p class="mb-0">Bu bo'limda hali darslar yo'q</p>
+                    </div>
+                {% endif %}
+                
+                {% if user.is_admin or user.is_teacher %}
+                <a href="{% url 'add_lesson' profession.pk %}?section={{ section.pk }}" class="add-lesson-btn">
+                    <i class="bi bi-plus-circle"></i>Dars qo'shish
+                </a>
+                {% endif %}
+            </div>
         </div>
-        {% endif %}
+        {% endfor %}
         
         <!-- Lessons without section -->
         {% if lessons_without_section %}
-        <div class="mt-3">
-            <h6 class="text-muted mb-3">
-                <i class="bi bi-collection me-2"></i>Boshqa darslar
-            </h6>
-            <div class="list-group list-group-flush ios-list">
-                {% for lesson in lessons_without_section %}
-                <a href="{% url 'lesson_view' lesson.pk %}"
-                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center gap-2">
-                        {% if lesson.lesson_type == 'video' %}
-                            <i class="bi bi-play-circle text-primary"></i>
-                        {% elif lesson.lesson_type == 'homework' %}
-                            <i class="bi bi-file-earmark-text text-warning"></i>
-                        {% else %}
-                            <i class="bi bi-question-circle text-success"></i>
-                        {% endif %}
-                        <span>{{ lesson.title }}</span>
+        <div class="section-card">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h6 class="section-title">
+                    <div class="section-icon" style="background: linear-gradient(135deg, #6b7280, #4b5563);">
+                        <i class="bi bi-collection"></i>
                     </div>
-                    <span class="badge bg-secondary bg-opacity-50">
-                        {{ lesson.get_lesson_type_display }}
-                    </span>
+                    Boshqa darslar
+                </h6>
+                <div class="section-meta">
+                    <span class="section-count">{{ lessons_without_section|length }} dars</span>
+                    <i class="bi bi-chevron-down section-arrow"></i>
+                </div>
+            </div>
+            <div class="section-body">
+                {% for lesson in lessons_without_section %}
+                <a href="{% url 'lesson_view' lesson.pk %}" class="lesson-item">
+                    <div class="lesson-icon {{ lesson.lesson_type }}">
+                        {% if lesson.lesson_type == 'video' %}
+                            <i class="bi bi-play-fill"></i>
+                        {% elif lesson.lesson_type == 'homework' %}
+                            <i class="bi bi-pencil"></i>
+                        {% else %}
+                            <i class="bi bi-patch-question"></i>
+                        {% endif %}
+                    </div>
+                    <div class="lesson-info">
+                        <div class="lesson-title">{{ lesson.title }}</div>
+                        <div class="lesson-type">{{ lesson.get_lesson_type_display }}</div>
+                    </div>
+                    <div class="lesson-status">
+                        {% with progress=lesson_progress|get_item:lesson.pk %}
+                        {% if progress %}
+                        <span class="status-badge completed">
+                            <i class="bi bi-check-circle-fill"></i>Bajarilgan
+                        </span>
+                        {% else %}
+                        <span class="status-badge pending">
+                            <i class="bi bi-circle"></i>Bajarilmagan
+                        </span>
+                        {% endif %}
+                        {% endwith %}
+                    </div>
                 </a>
                 {% endfor %}
             </div>
@@ -248,21 +463,26 @@
         {% endif %}
         
         {% else %}
-        <div class="text-center py-5 text-muted">
-            <i class="bi bi-inbox fs-1"></i>
-            <p class="mt-2 mb-0">Hozircha darslar mavjud emas</p>
+        <div class="text-center py-5">
+            <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+            <p class="text-muted mt-3">Hozircha darslar mavjud emas</p>
+            {% if user.is_admin or user.is_teacher %}
+            <a href="{% url 'add_lesson' profession.pk %}" class="btn btn-primary ios-btn mt-2">
+                <i class="bi bi-plus-lg me-1"></i>Dars qo'shish
+            </a>
+            {% endif %}
         </div>
         {% endif %}
-
     </div>
 </div>
 
 {% else %}
 
-<div class="ios-card text-center p-5">
-    <i class="bi bi-lock fs-1 text-muted"></i>
-    <h5 class="mt-3">Darslarni ko'rish uchun kursga yoziling</h5>
-    <a href="{% url 'enroll_course' profession.pk %}" class="btn btn-primary mt-3 ios-btn">
+<div class="glass-card text-center p-5">
+    <i class="bi bi-lock text-muted" style="font-size: 4rem;"></i>
+    <h5 class="mt-3 mb-2">Darslarni ko'rish uchun kursga yoziling</h5>
+    <p class="text-muted mb-4">Kursga yozilganingizdan so'ng barcha darslarga kirish mumkin bo'ladi</p>
+    <a href="{% url 'enroll_course' profession.pk %}" class="btn btn-primary btn-lg ios-btn">
         <i class="bi bi-play-circle me-2"></i>O'qishni boshlash
     </a>
 </div>
@@ -270,7 +490,26 @@
 {% endif %}
 
 </div>
+</div>
+</div>
 
-</div>
-</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleSection(header) {
+    const body = header.nextElementSibling;
+    const isActive = header.classList.contains('active');
+    
+    // Close all
+    document.querySelectorAll('.section-header').forEach(h => h.classList.remove('active'));
+    document.querySelectorAll('.section-body').forEach(b => b.classList.remove('show'));
+    
+    // Toggle current
+    if (!isActive) {
+        header.classList.add('active');
+        body.classList.add('show');
+    }
+}
+</script>
 {% endblock %}
