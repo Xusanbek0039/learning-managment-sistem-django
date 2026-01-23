@@ -27,6 +27,16 @@
                         {% csrf_token %}
                         
                         <div class="mb-3">
+                            <label class="form-label" style="color: var(--text-color);">Bo'lim</label>
+                            <select name="section" class="form-select">
+                                <option value="">-- Bo'limsiz --</option>
+                                {% for s in sections %}
+                                <option value="{{ s.pk }}" {% if section and section.pk == s.pk %}selected{% endif %}>{{ s.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
                             <label class="form-label" style="color: var(--text-color);">
                                 {% if lesson_type == 'video' %}Dars nomi{% elif lesson_type == 'homework' %}Vazifa nomi{% else %}Test nomi{% endif %}
                             </label>

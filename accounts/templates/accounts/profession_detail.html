@@ -404,9 +404,19 @@
                 {% endif %}
                 
                 {% if user.is_admin or user.is_teacher %}
-                <a href="{% url 'add_lesson' profession.pk %}?section={{ section.pk }}" class="add-lesson-btn">
-                    <i class="bi bi-plus-circle"></i>Dars qo'shish
-                </a>
+                <div class="p-3 border-top" style="border-color: var(--card-border) !important;">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="{% url 'add_lesson' profession.pk %}?section={{ section.pk }}&type=video" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-play-circle me-1"></i>Video
+                        </a>
+                        <a href="{% url 'add_lesson' profession.pk %}?section={{ section.pk }}&type=homework" class="btn btn-sm btn-outline-warning">
+                            <i class="bi bi-pencil me-1"></i>Vazifa
+                        </a>
+                        <a href="{% url 'add_lesson' profession.pk %}?section={{ section.pk }}&type=test" class="btn btn-sm btn-outline-success">
+                            <i class="bi bi-patch-question me-1"></i>Test
+                        </a>
+                    </div>
+                </div>
                 {% endif %}
             </div>
         </div>

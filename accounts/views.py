@@ -911,13 +911,23 @@ def add_lesson(request, pk):
     
     profession = get_object_or_404(Profession, pk=pk)
     lesson_type = request.GET.get('type', 'video')
+    section_id = request.GET.get('section')
+    section = None
+    
+    if section_id:
+        section = get_object_or_404(Section, pk=section_id, profession=profession)
     
     if request.method == 'POST':
+        section_id_post = request.POST.get('section')
+        if section_id_post:
+            section = get_object_or_404(Section, pk=section_id_post, profession=profession)
+        
         if lesson_type == 'video':
             form = VideoLessonForm(request.POST)
             if form.is_valid():
                 lesson = Lesson.objects.create(
                     profession=profession,
+                    section=section,
                     title=form.cleaned_data['title'],
                     lesson_type='video',
                     created_by=request.user
@@ -930,13 +940,14 @@ def add_lesson(request, pk):
                     duration=form.cleaned_data.get('duration') or 0
                 )
                 messages.success(request, "Video darslik qo'shildi!")
-                return redirect('manage_lessons', pk=pk)
+                return redirect('profession_detail', pk=pk)
         
         elif lesson_type == 'homework':
             form = HomeworkForm(request.POST)
             if form.is_valid():
                 lesson = Lesson.objects.create(
                     profession=profession,
+                    section=section,
                     title=form.cleaned_data['title'],
                     lesson_type='homework',
                     created_by=request.user
@@ -946,13 +957,14 @@ def add_lesson(request, pk):
                     description=form.cleaned_data['description']
                 )
                 messages.success(request, "Uyga vazifa qo'shildi!")
-                return redirect('manage_lessons', pk=pk)
+                return redirect('profession_detail', pk=pk)
         
         elif lesson_type == 'test':
             form = TestForm(request.POST)
             if form.is_valid():
                 lesson = Lesson.objects.create(
                     profession=profession,
+                    section=section,
                     title=form.cleaned_data['title'],
                     lesson_type='test',
                     created_by=request.user
@@ -972,10 +984,14 @@ def add_lesson(request, pk):
         else:
             form = TestForm()
     
+    sections = profession.sections.filter(is_active=True)
+    
     return render(request, 'accounts/manage/add_lesson.html', {
         'profession': profession,
         'lesson_type': lesson_type,
         'form': form,
+        'section': section,
+        'sections': sections,
     })
 
 
