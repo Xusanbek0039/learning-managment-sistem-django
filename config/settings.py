@@ -49,9 +49,22 @@ INSTALLED_APPS = [
     'coin',
 ]
 
+
+# ⏱ Session 2 soat (soniyada)
+SESSION_COOKIE_AGE = 60 * 60 * 2  # 7200 sekund = 2 soat
+
+# Browser yopilsa ham session saqlanmasin
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+# Har requestda vaqt yangilanmasin (aniq 2 soat)
+SESSION_SAVE_EVERY_REQUEST = False
+
+
 # ============================
 # 🎨 JAZZMIN — DEV LMS STYLE
 # ============================
+
+
 
 JAZZMIN_SETTINGS = {
     "site_title": "IT Creative LMS Admin",
