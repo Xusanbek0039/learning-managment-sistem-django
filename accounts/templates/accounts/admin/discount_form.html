@@ -1,0 +1,108 @@
+{% extends 'accounts/admin/base_admin.html' %}
+
+{% block title %}{% if discount %}Chegirmani tahrirlash{% else %}Chegirma qo'shish{% endif %} - Admin{% endblock %}
+
+{% block admin_content %}
+<div class="top-bar">
+    <h1 class="page-title">
+        <i class="bi bi-percent me-2"></i>
+        {% if discount %}Chegirmani tahrirlash{% else %}Yangi chegirma qo'shish{% endif %}
+    </h1>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label" style="color: var(--text-color);">Chegirma nomi *</label>
+                        <input type="text" name="name" class="form-control form-control-lg" 
+                               value="{{ discount.name|default:'' }}" 
+                               placeholder="Masalan: Yangi yil chegirmasi" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label" style="color: var(--text-color);">Tavsif (ixtiyoriy)</label>
+                        <textarea name="description" class="form-control" rows="3" 
+                                  placeholder="Chegirma haqida qisqacha ma'lumot...">{{ discount.description|default:'' }}</textarea>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: var(--text-color);">Chegirma turi *</label>
+                            <select name="discount_type" class="form-select" required>
+                                <option value="percentage" {% if discount.discount_type == 'percentage' %}selected{% endif %}>Foiz (%)</option>
+                                <option value="fixed" {% if discount.discount_type == 'fixed' %}selected{% endif %}>Qat'iy summa (coin)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: var(--text-color);">Chegirma qiymati *</label>
+                            <input type="number" name="discount_value" class="form-control" 
+                                   value="{{ discount.discount_value|default:0 }}" min="1" required>
+                            <small class="text-muted">Foiz tanlansa % sifatida, aks holda coin sifatida</small>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: var(--text-color);">Minimal coin talab</label>
+                            <input type="number" name="min_coins_required" class="form-control" 
+                                   value="{{ discount.min_coins_required|default:0 }}" min="0">
+                            <small class="text-muted">Foydalanuvchi ushbu miqdordan ko'p coinga ega bo'lishi kerak</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: var(--text-color);">Kurs (ixtiyoriy)</label>
+                            <select name="profession" class="form-select">
+                                <option value="">Barcha kurslarga</option>
+                                {% for p in professions %}
+                                <option value="{{ p.pk }}" {% if discount.profession_id == p.pk %}selected{% endif %}>{{ p.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: var(--text-color);">Boshlanish sanasi</label>
+                            <input type="datetime-local" name="valid_from" class="form-control" 
+                                   value="{% if discount.valid_from %}{{ discount.valid_from|date:'Y-m-d\TH:i' }}{% endif %}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" style="color: var(--text-color);">Tugash sanasi</label>
+                            <input type="datetime-local" name="valid_until" class="form-control" 
+                                   value="{% if discount.valid_until %}{{ discount.valid_until|date:'Y-m-d\TH:i' }}{% endif %}">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input type="checkbox" name="is_active" class="form-check-input" id="isActive" 
+                                   {% if discount.is_active or not discount %}checked{% endif %}>
+                            <label class="form-check-label" for="isActive" style="color: var(--text-color);">
+                                Faol holatda
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-check-lg me-2"></i>Saqlash
+                        </button>
+                        <a href="{% url 'admin_discounts' %}" class="btn btn-outline-secondary">
+                            Bekor qilish
+                        </a>
+                        {% if discount %}
+                        <a href="{% url 'admin_discount_delete' discount.pk %}" class="btn btn-outline-danger ms-auto">
+                            <i class="bi bi-trash me-2"></i>O'chirish
+                        </a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

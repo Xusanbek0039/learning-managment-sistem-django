@@ -1929,3 +1929,126 @@ def admin_help_request_detail(request, pk):
     return render(request, 'accounts/admin/help_request_detail.html', {'help_request': help_request})
 
 
+# ==================== CHEGIRMALAR (SKIDKALAR) ====================
+
+@login_required
+def admin_discounts(request):
+    if not request.user.is_admin:
+        messages.error(request, "Sizda bu sahifaga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    discounts = Discount.objects.select_related('profession').all()
+    
+    profession_id = request.GET.get('profession')
+    if profession_id:
+        discounts = discounts.filter(profession_id=profession_id)
+    
+    status_filter = request.GET.get('status')
+    if status_filter == 'active':
+        discounts = discounts.filter(is_active=True)
+    elif status_filter == 'inactive':
+        discounts = discounts.filter(is_active=False)
+    
+    q = request.GET.get('q')
+    if q:
+        discounts = discounts.filter(name__icontains=q)
+    
+    professions = Profession.objects.all()
+    
+    context = {
+        'discounts': discounts,
+        'professions': professions,
+        'total_discounts': Discount.objects.count(),
+        'active_discounts': Discount.objects.filter(is_active=True).count(),
+        'inactive_discounts': Discount.objects.filter(is_active=False).count(),
+    }
+    return render(request, 'accounts/admin/discounts.html', context)
+
+
+@login_required
+def admin_discount_add(request):
+    if not request.user.is_admin:
+        messages.error(request, "Sizda bu sahifaga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        description = request.POST.get('description', '').strip()
+        discount_type = request.POST.get('discount_type', 'percentage')
+        discount_value = request.POST.get('discount_value', 0)
+        min_coins_required = request.POST.get('min_coins_required', 0)
+        profession_id = request.POST.get('profession')
+        is_active = 'is_active' in request.POST
+        valid_from = request.POST.get('valid_from') or None
+        valid_until = request.POST.get('valid_until') or None
+        
+        if name and discount_value:
+            Discount.objects.create(
+                name=name,
+                description=description,
+                discount_type=discount_type,
+                discount_value=int(discount_value),
+                min_coins_required=int(min_coins_required) if min_coins_required else 0,
+                profession_id=profession_id if profession_id else None,
+                is_active=is_active,
+                valid_from=valid_from,
+                valid_until=valid_until
+            )
+            messages.success(request, "Chegirma muvaffaqiyatli qo'shildi!")
+            return redirect('admin_discounts')
+        else:
+            messages.error(request, "Chegirma nomi va qiymati kiritilishi shart!")
+    
+    professions = Profession.objects.all()
+    return render(request, 'accounts/admin/discount_form.html', {'professions': professions})
+
+
+@login_required
+def admin_discount_edit(request, pk):
+    if not request.user.is_admin:
+        messages.error(request, "Sizda bu sahifaga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    discount = get_object_or_404(Discount, pk=pk)
+    
+    if request.method == 'POST':
+        discount.name = request.POST.get('name', '').strip()
+        discount.description = request.POST.get('description', '').strip()
+        discount.discount_type = request.POST.get('discount_type', 'percentage')
+        discount.discount_value = int(request.POST.get('discount_value', 0))
+        discount.min_coins_required = int(request.POST.get('min_coins_required', 0) or 0)
+        profession_id = request.POST.get('profession')
+        discount.profession_id = profession_id if profession_id else None
+        discount.is_active = 'is_active' in request.POST
+        valid_from = request.POST.get('valid_from')
+        valid_until = request.POST.get('valid_until')
+        discount.valid_from = valid_from if valid_from else None
+        discount.valid_until = valid_until if valid_until else None
+        discount.save()
+        
+        messages.success(request, "Chegirma muvaffaqiyatli yangilandi!")
+        return redirect('admin_discounts')
+    
+    professions = Profession.objects.all()
+    return render(request, 'accounts/admin/discount_form.html', {
+        'discount': discount,
+        'professions': professions,
+    })
+
+
+@login_required
+def admin_discount_delete(request, pk):
+    if not request.user.is_admin:
+        messages.error(request, "Sizda bu sahifaga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    discount = get_object_or_404(Discount, pk=pk)
+    
+    if request.method == 'POST':
+        discount.delete()
+        messages.success(request, "Chegirma o'chirildi!")
+        return redirect('admin_discounts')
+    
+    return render(request, 'accounts/admin/discount_delete.html', {'discount': discount})
+
+

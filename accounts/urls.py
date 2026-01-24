@@ -88,4 +88,10 @@ urlpatterns = [
     
     # Coin Management
     path('dashboard/coins/', views.admin_manage_coins, name='admin_manage_coins'),
+    
+    # Discounts / Chegirmalar
+    path('dashboard/discounts/', views.admin_discounts, name='admin_discounts'),
+    path('dashboard/discounts/add/', views.admin_discount_add, name='admin_discount_add'),
+    path('dashboard/discounts/<int:pk>/edit/', views.admin_discount_edit, name='admin_discount_edit'),
+    path('dashboard/discounts/<int:pk>/delete/', views.admin_discount_delete, name='admin_discount_delete'),
 ]

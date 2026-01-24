@@ -1,0 +1,261 @@
+{% extends 'accounts/admin/base_admin.html' %}
+
+{% block title %}Chegirmalar - Admin Panel | IT Creative{% endblock %}
+
+{% block extra_css %}
+<style>
+:root{
+    --card-bg: rgba(255,255,255,.75);
+    --card-border: rgba(0,0,0,.08);
+    --text-main: #111;
+    --soft-bg: rgba(0,0,0,.05);
+}
+[data-bs-theme="dark"]{
+    --card-bg: rgba(18,18,18,.8);
+    --card-border: rgba(255,255,255,.08);
+    --text-main: #f1f1f1;
+    --soft-bg: rgba(255,255,255,.06);
+}
+
+.top-bar{
+    display:flex;justify-content:space-between;align-items:center;
+    flex-wrap:wrap;gap:12px;margin-bottom:20px;
+}
+
+.ios-card{
+    background:var(--card-bg);
+    backdrop-filter:blur(14px);
+    border:1px solid var(--card-border);
+    border-radius:22px;
+    box-shadow:0 12px 35px rgba(0,0,0,.15);
+}
+
+.stat-card{
+    background:var(--card-bg);
+    border:1px solid var(--card-border);
+    border-radius:20px;
+    padding:18px;
+    backdrop-filter:blur(12px);
+    transition:.25s;
+}
+.stat-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 14px 30px rgba(0,0,0,.18);
+}
+
+.stat-icon{
+    width:44px;height:44px;border-radius:14px;
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-size:1.2rem;
+}
+.purple{background:linear-gradient(135deg,#6f42c1,#5a32a3);}
+.green{background:linear-gradient(135deg,#198754,#157347);}
+.red{background:linear-gradient(135deg,#dc3545,#b02a37);}
+
+.stat-number{font-size:1.4rem;font-weight:700;color:var(--text-main);}
+.stat-label{font-size:.85rem;opacity:.7}
+
+.table{color:var(--text-main);}
+.table thead th{border-bottom:1px solid var(--card-border);font-weight:600;}
+.table tbody tr:hover{background:var(--soft-bg);}
+
+@media(max-width:768px){
+.table thead{display:none;}
+.table tbody tr{
+    display:block;border:1px solid var(--card-border);
+    border-radius:14px;padding:12px;margin-bottom:12px;
+    background:var(--soft-bg);
+}
+.table tbody td{
+    display:flex;justify-content:space-between;
+    padding:6px 0;border:none;
+}
+.table tbody td::before{
+    content:attr(data-label);
+    font-weight:600;opacity:.7;
+}
+}
+</style>
+{% endblock %}
+
+{% block admin_content %}
+
+<div class="top-bar">
+    <h3 class="m-0"><i class="bi bi-percent me-2"></i>Chegirmalar boshqaruvi</h3>
+    <a href="{% url 'admin_discount_add' %}" class="btn btn-primary rounded-pill">
+        <i class="bi bi-plus-lg me-1"></i>Yangi chegirma
+    </a>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card h-100">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon purple me-3"><i class="bi bi-percent"></i></div>
+                <div>
+                    <div class="stat-number">{{ total_discounts }}</div>
+                    <div class="stat-label">Jami chegirmalar</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card h-100">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon green me-3"><i class="bi bi-check-circle"></i></div>
+                <div>
+                    <div class="stat-number">{{ active_discounts }}</div>
+                    <div class="stat-label">Faol chegirmalar</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card h-100">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon red me-3"><i class="bi bi-x-circle"></i></div>
+                <div>
+                    <div class="stat-number">{{ inactive_discounts }}</div>
+                    <div class="stat-label">Nofaol chegirmalar</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="ios-card mb-4">
+    <div class="p-3">
+        <form method="GET" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small" style="color: var(--text-main);">Qidirish</label>
+                <input type="text" name="q" class="form-control" placeholder="Chegirma nomi..." value="{{ request.GET.q }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small" style="color: var(--text-main);">Kurs</label>
+                <select name="profession" class="form-select">
+                    <option value="">Barchasi</option>
+                    {% for p in professions %}
+                    <option value="{{ p.pk }}" {% if request.GET.profession == p.pk|stringformat:"i" %}selected{% endif %}>{{ p.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small" style="color: var(--text-main);">Holat</label>
+                <select name="status" class="form-select">
+                    <option value="">Barchasi</option>
+                    <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Faol</option>
+                    <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Nofaol</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-primary w-100">
+                    <i class="bi bi-search me-1"></i>Qidirish
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="ios-card">
+    <div class="p-3 border-bottom" style="border-color:var(--card-border)!important;">
+        <i class="bi bi-list me-2"></i>Chegirmalar ro'yxati
+    </div>
+    <div class="p-3">
+        {% if discounts %}
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Nomi</th>
+                        <th>Turi</th>
+                        <th class="text-center">Qiymat</th>
+                        <th class="text-center">Min. coin</th>
+                        <th>Kurs</th>
+                        <th class="text-center">Holat</th>
+                        <th>Muddat</th>
+                        <th>Amallar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for discount in discounts %}
+                    <tr>
+                        <td data-label="Nomi">
+                            <strong>{{ discount.name }}</strong>
+                            {% if discount.description %}
+                            <br><small class="text-muted">{{ discount.description|truncatewords:10 }}</small>
+                            {% endif %}
+                        </td>
+                        <td data-label="Turi">
+                            {% if discount.discount_type == 'percentage' %}
+                            <span class="badge bg-info">Foiz</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">Qat'iy</span>
+                            {% endif %}
+                        </td>
+                        <td data-label="Qiymat" class="text-center">
+                            {% if discount.discount_type == 'percentage' %}
+                            <strong>{{ discount.discount_value }}%</strong>
+                            {% else %}
+                            <strong>{{ discount.discount_value }} coin</strong>
+                            {% endif %}
+                        </td>
+                        <td data-label="Min. coin" class="text-center">
+                            {{ discount.min_coins_required }}
+                        </td>
+                        <td data-label="Kurs">
+                            {% if discount.profession %}
+                            {{ discount.profession.name }}
+                            {% else %}
+                            <span class="text-muted">Barcha kurslar</span>
+                            {% endif %}
+                        </td>
+                        <td data-label="Holat" class="text-center">
+                            {% if discount.is_valid %}
+                            <span class="badge bg-success">Faol</span>
+                            {% elif not discount.is_active %}
+                            <span class="badge bg-secondary">Nofaol</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">Muddati o'tgan</span>
+                            {% endif %}
+                        </td>
+                        <td data-label="Muddat">
+                            {% if discount.valid_from or discount.valid_until %}
+                            <small>
+                                {% if discount.valid_from %}{{ discount.valid_from|date:"d.m.Y" }}{% endif %}
+                                -
+                                {% if discount.valid_until %}{{ discount.valid_until|date:"d.m.Y" }}{% endif %}
+                            </small>
+                            {% else %}
+                            <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td data-label="Amallar">
+                            <a href="{% url 'admin_discount_edit' discount.pk %}" class="btn btn-sm btn-outline-primary rounded-pill me-1">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'admin_discount_delete' discount.pk %}" class="btn btn-sm btn-outline-danger rounded-pill">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-percent fs-1"></i>
+            <h5 class="mt-3">Chegirmalar yo'q</h5>
+            <p>Yangi chegirma qo'shish uchun tugmani bosing</p>
+            <a href="{% url 'admin_discount_add' %}" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i>Yangi chegirma
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
