@@ -49,106 +49,132 @@ INSTALLED_APPS = [
     'coin',
 ]
 
-# Jazzmin Admin UI Settings
+# ============================
+# 🎨 JAZZMIN — DEV LMS STYLE
+# ============================
+
 JAZZMIN_SETTINGS = {
-    "site_title": "LMS Admin",
-    "site_header": "Learning Management System",
-    "site_brand": "LMS",
-    "site_logo": None,
-    "login_logo": None,
-    "login_logo_dark": None,
-    "site_logo_classes": "img-circle",
-    "site_icon": None,
-    "welcome_sign": "LMS Admin Paneliga xush kelibsiz",
-    "copyright": "LMS O'quv Markazi",
-    "search_model": ["accounts.CustomUser", "accounts.Profession"],
-    "user_avatar": None,
-    
+    "site_title": "IT Creative LMS Admin",
+    "site_header": "IT Creative LMS 🚀",
+    "site_brand": "IT Creative",
+    "welcome_sign": "Xush kelibsiz, Developer 😎",
+    "copyright": "Suyunov Husan | IT Creative",
+
+    # LOGO (agar static/images/logo.png bo‘lsa)
+    "site_logo": "images/logo.png",
+    "login_logo": "images/logo.png",
+    "site_icon": "images/favicon.ico",
+
+    "search_model": [
+        "accounts.CustomUser",
+        "accounts.Profession",
+        "accounts.Lesson",
+    ],
+
+    # 🔝 TOP MENU
     "topmenu_links": [
-        {"name": "Bosh sahifa", "url": "admin:index", "permissions": ["auth.view_user"]},
-        {"name": "Saytga o'tish", "url": "/", "new_window": True},
+        {"name": "🌐 Sayt", "url": "/", "new_window": True},
+        {"name": "📊 Statistika", "url": "admin:index"},
+        {"name": "🎥 IT Creative", "url": "https://youtube.com/@ITCreative", "new_window": True},
         {"model": "accounts.CustomUser"},
     ],
 
+    # 👤 USER MENU
     "usermenu_links": [
-        {"name": "Saytga o'tish", "url": "/", "new_window": True},
+        {"name": "🌐 Saytga o‘tish", "url": "/", "new_window": True},
         {"model": "accounts.CustomUser"},
     ],
+
+    # 📂 SIDEBAR TARTIBI
+    "order_with_respect_to": [
+        "accounts",
+        "accounts.CustomUser",
+        "accounts.Profession",
+        "accounts.CourseEnrollment",
+        "accounts.Lesson",
+        "accounts.VideoLesson",
+        "accounts.Homework",
+        "accounts.HomeworkSubmission",
+        "accounts.Test",
+        "accounts.TestQuestion",
+        "accounts.TestResult",
+        "accounts.Certificate",
+        "accounts.CoinTransaction",
+    ],
+
+    # 🎯 ICONS (DEV STYLE)
+    "icons": {
+        "auth": "fas fa-shield-alt",
+
+        "accounts.CustomUser": "fas fa-user-astronaut",
+        "accounts.Profession": "fas fa-laptop-code",
+        "accounts.CourseEnrollment": "fas fa-user-plus",
+
+        "accounts.Lesson": "fas fa-chalkboard-teacher",
+        "accounts.VideoLesson": "fas fa-play-circle",
+
+        "accounts.Homework": "fas fa-tasks",
+        "accounts.HomeworkSubmission": "fas fa-file-code",
+
+        "accounts.Test": "fas fa-brain",
+        "accounts.TestQuestion": "fas fa-question-circle",
+        "accounts.TestResult": "fas fa-chart-line",
+
+        "accounts.Certificate": "fas fa-certificate",
+        "accounts.CoinTransaction": "fas fa-coins",
+    },
+
+    "default_icon_parents": "fas fa-layer-group",
+    "default_icon_children": "fas fa-dot-circle",
 
     "show_sidebar": True,
     "navigation_expanded": True,
-    "hide_apps": [],
-    "hide_models": [],
-    
-    "order_with_respect_to": ["accounts", "accounts.CustomUser", "accounts.Profession"],
-
-    "icons": {
-        "auth": "fas fa-users-cog",
-        "auth.user": "fas fa-user",
-        "auth.Group": "fas fa-users",
-        "accounts.CustomUser": "fas fa-user-graduate",
-        "accounts.Profession": "fas fa-briefcase",
-        "accounts.Lesson": "fas fa-book",
-        "accounts.VideoLesson": "fas fa-video",
-        "accounts.Homework": "fas fa-tasks",
-        "accounts.HomeworkSubmission": "fas fa-file-upload",
-        "accounts.Test": "fas fa-question-circle",
-        "accounts.TestQuestion": "fas fa-question",
-        "accounts.TestResult": "fas fa-chart-bar",
-        "accounts.Certificate": "fas fa-award",
-        "accounts.CourseEnrollment": "fas fa-user-plus",
-        "accounts.CoinTransaction": "fas fa-coins",
-    },
-    
-    "default_icon_parents": "fas fa-folder",
-    "default_icon_children": "fas fa-circle",
-
     "related_modal_active": True,
 
-    "custom_css": None,
-    "custom_js": None,
-    "use_google_fonts_cdn": True,
-    "show_ui_builder": False,
-
-    "changeform_format": "horizontal_tabs",
+    # FORM STYLE
+    "changeform_format": "vertical_tabs",
     "changeform_format_overrides": {
         "accounts.CustomUser": "collapsible",
-        "accounts.TestQuestion": "vertical_tabs",
+        "accounts.Profession": "horizontal_tabs",
     },
+
+    # CUSTOM STYLE
+    "custom_css": "admin/custom.css",
+    "custom_js": None,
+
+    "use_google_fonts_cdn": True,
+    "show_ui_builder": False,
 }
 
 JAZZMIN_UI_TWEAKS = {
-    "navbar_small_text": False,
-    "footer_small_text": False,
-    "body_small_text": False,
-    "brand_small_text": False,
-    "brand_colour": "navbar-primary",
-    "accent": "accent-primary",
-    "navbar": "navbar-dark navbar-primary",
-    "no_navbar_border": False,
-    "navbar_fixed": True,
-    "layout_boxed": False,
-    "footer_fixed": False,
-    "sidebar_fixed": True,
+    "theme": "cyborg",
+    "dark_mode_theme": "cyborg",
+
+    "navbar": "navbar-dark bg-gradient-primary",
     "sidebar": "sidebar-dark-primary",
-    "sidebar_nav_small_text": False,
-    "sidebar_disable_expand": False,
+    "brand_colour": "navbar-primary",
+
+    "accent": "accent-info",
+
+    "navbar_fixed": True,
+    "sidebar_fixed": True,
+    "footer_fixed": False,
+
     "sidebar_nav_child_indent": True,
-    "sidebar_nav_compact_style": False,
-    "sidebar_nav_legacy_style": False,
-    "sidebar_nav_flat_style": False,
-    "theme": "default",
-    "dark_mode_theme": "darkly",
+    "sidebar_disable_expand": False,
+
     "button_classes": {
-        "primary": "btn-primary",
-        "secondary": "btn-secondary",
-        "info": "btn-info",
-        "warning": "btn-warning",
-        "danger": "btn-danger",
-        "success": "btn-success"
+        "primary": "btn btn-info",
+        "secondary": "btn btn-secondary",
+        "success": "btn btn-success",
+        "warning": "btn btn-warning",
+        "danger": "btn btn-danger",
+        "info": "btn btn-outline-info",
     },
-    "actions_sticky_top": True
+
+    "actions_sticky_top": True,
 }
+
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
