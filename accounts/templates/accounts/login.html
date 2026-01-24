@@ -21,7 +21,7 @@
     <div class="auth-logo mb-3 mx-auto">
       <i class="bi bi-code-slash"></i>
     </div>
-    <h4 class="fw-bold mb-1">LMS tizimiga kirish</h4>
+    <h4 class="fw-bold mb-1">Tizimga kirish</h4>
     <p class="text-secondary small mb-0">IT Ijorkorlari Academy</p>
   </div>
 
@@ -73,9 +73,9 @@
   </form>
 
   <div class="text-center small mt-3">
-    Akkauntingiz yo‘qmi?
+    Akkauntingiz mavjud bo'lmasa
     <a href="{% url 'register' %}" class="text-info fw-semibold text-decoration-none">
-      Ro‘yxatdan o‘tish →
+      Ro‘yxatdan o‘ting →
     </a>
   </div>
 
@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   {% endif %}
 
   {% if form.password.errors %}
-      showToast("Parol noto‘g‘ri kiritildi");
+      showToast("Parol noto‘g‘ri kiritildi!");
       document.getElementById("{{ form.password.id_for_label }}").classList.add("is-invalid");
   {% endif %}
 
