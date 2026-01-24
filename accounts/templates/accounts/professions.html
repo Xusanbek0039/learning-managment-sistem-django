@@ -26,30 +26,40 @@
     <div class="row">
         {% for profession in professions %}
         <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <img src="{{ profession.photo.url }}" class="card-img-top" alt="{{ profession.name }}">
-                <div class="card-body">
-                    <h5 class="card-title" style="color: var(--primary-blue);">{{ profession.name }}</h5>
-                    <p class="card-text" style="color: var(--text-color);">{{ profession.description|truncatewords:15 }}</p>
-                    
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="badge bg-primary">
-                            <i class="bi bi-people me-1"></i>{{ profession.student_count }} o'quvchi
-                        </span>
+            <a href="{% url 'profession_detail' profession.pk %}" class="text-decoration-none">
+                <div class="card h-100 profession-card">
+                    <img src="{{ profession.photo.url }}" class="card-img-top" alt="{{ profession.name }}" style="height: 180px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title" style="color: var(--primary-blue);">{{ profession.name }}</h5>
+                        <p class="card-text" style="color: var(--text-color);">{{ profession.description|truncatewords:15 }}</p>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-primary">
+                                <i class="bi bi-people me-1"></i>{{ profession.student_count }} o'quvchi
+                            </span>
+                            {% if profession.pk in enrolled_ids %}
+                            <span class="badge bg-success">
+                                <i class="bi bi-check-circle me-1"></i>Yozilgan
+                            </span>
+                            {% endif %}
+                        </div>
                     </div>
-                    
-                    <a href="{% url 'profession_detail' profession.pk %}" class="btn btn-primary w-100">
-                        {% if profession.pk in enrolled_ids %}
-                            <i class="bi bi-play-circle me-2"></i>Davom ettirish
-                        {% else %}
-                            <i class="bi bi-eye me-2"></i>Batafsil
-                        {% endif %}
-                    </a>
                 </div>
-            </div>
+            </a>
         </div>
         {% endfor %}
     </div>
+    
+    <style>
+    .profession-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    .profession-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    }
+    </style>
     {% else %}
     <div class="text-center py-5">
         <i class="bi bi-inbox text-muted" style="font-size: 5rem;"></i>
