@@ -86,17 +86,26 @@ def post_create(request):
 @login_required
 def toggle_like(request, pk):
     post = get_object_or_404(Post, pk=pk)
-    like, created = PostLike.objects.get_or_create(post=post, user=request.user)
+    like = PostLike.objects.filter(post=post, user=request.user).first()
     
-    if not created:
+    if like:
+        # Unlike - coin qaytarib olinmaydi
         like.delete()
     else:
-        request.user.add_coins(1, f"Postga like bosildi: {post.title}")
-        ActivityLog.objects.create(
-            user=request.user,
-            action_type='Postga like bosdi',
-            description=f"Postga like bosdi: {post.title}"
-        )
+        # Like - avval like bosgan bo'lsa coin berilmaydi
+        previous_like = PostLike.objects.filter(post=post, user=request.user, coin_awarded=True).exists()
+        like = PostLike.objects.create(post=post, user=request.user)
+        
+        if not previous_like:
+            # Birinchi marta like - coin berish
+            request.user.add_coins(1, f"Postga like bosildi: {post.title}")
+            like.coin_awarded = True
+            like.save()
+            ActivityLog.objects.create(
+                user=request.user,
+                action_type='like_post',
+                description=f"Postga like bosdi: {post.title}"
+            )
         
     return redirect('blog:post_detail', pk=pk)
 

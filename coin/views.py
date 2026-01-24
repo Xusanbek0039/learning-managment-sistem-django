@@ -51,17 +51,26 @@ def market_detail(request, pk):
 @login_required
 def market_like(request, pk):
     product = get_object_or_404(Product, pk=pk)
-    like, created = ProductLike.objects.get_or_create(product=product, user=request.user)
+    like = ProductLike.objects.filter(product=product, user=request.user).first()
     
-    if not created:
+    if like:
+        # Unlike - coin qaytarib olinmaydi
         like.delete()
     else:
-        request.user.add_coins(1, f"Mahsulotga like: {product.name}")
-        ActivityLog.objects.create(
-            user=request.user,
-            action_type='like_product',
-            description=f"Mahsulotga like bosdi: {product.name}"
-        )
+        # Like - avval like bosgan bo'lsa coin berilmaydi
+        previous_like = ProductLike.objects.filter(product=product, user=request.user, coin_awarded=True).exists()
+        like = ProductLike.objects.create(product=product, user=request.user)
+        
+        if not previous_like:
+            # Birinchi marta like - coin berish
+            request.user.add_coins(1, f"Mahsulotga like: {product.name}")
+            like.coin_awarded = True
+            like.save()
+            ActivityLog.objects.create(
+                user=request.user,
+                action_type='like_product',
+                description=f"Mahsulotga like bosdi: {product.name}"
+            )
     
     return redirect('coin:market_detail', pk=pk)
 
@@ -93,7 +102,8 @@ def market_purchase(request, pk):
         
         CoinTransaction.objects.create(
             user=request.user,
-            amount=-product.coin_price,
+            amount=product.coin_price,
+            action='remove',
             reason=f"Mahsulot sotib olindi: {product.name}"
         )
         ActivityLog.objects.create(

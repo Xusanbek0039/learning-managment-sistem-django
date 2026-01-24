@@ -40,6 +40,7 @@ class ProductLike(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='likes')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='product_likes')
     created_at = models.DateTimeField(auto_now_add=True)
+    coin_awarded = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('product', 'user')

@@ -18,7 +18,7 @@ from .models import (
     Homework, HomeworkSubmission, Test, TestQuestion, TestAnswer, TestResult,
     TestUserAnswer, Certificate, Message, PaymentStatus, HelpRequest
 )
-from coin.models import ActivityLog
+from coin.models import ActivityLog, CoinTransaction
 
 from django.core.management import call_command
 from django.core.cache import cache
