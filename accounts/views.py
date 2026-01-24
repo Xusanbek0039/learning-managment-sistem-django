@@ -16,7 +16,7 @@ from .forms import (
 from .models import (
     Profession, Section, CustomUser, CourseEnrollment, Lesson, VideoLesson, VideoProgress,
     Homework, HomeworkSubmission, Test, TestQuestion, TestAnswer, TestResult,
-    TestUserAnswer, Certificate, Message, PaymentStatus, HelpRequest
+    TestUserAnswer, Certificate, Message, PaymentStatus, HelpRequest, Discount
 )
 from coin.models import ActivityLog, CoinTransaction
 
@@ -898,6 +898,53 @@ def admin_mark_paid(request, pk):
         )
     
     messages.success(request, f"{user.full_name} to'lovi belgilandi!")
+    return redirect('admin_payments')
+
+
+@login_required
+def send_payment_reminder(request, pk):
+    if not request.user.is_admin:
+        messages.error(request, "Sizda bu sahifaga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    student = get_object_or_404(CustomUser, pk=pk, role='student')
+    
+    Message.objects.create(
+        sender=request.user,
+        recipient=student,
+        title="To'lov eslatmasi",
+        content=f"Hurmatli {student.full_name},\n\nSizning oylik to'lovingiz muddati yaqinlashmoqda. Iltimos, o'z vaqtida to'lov qilishni unutmang.\n\nHurmat bilan,\nIT Creative jamoasi",
+        message_type='payment'
+    )
+    
+    messages.success(request, f"{student.full_name}ga to'lov eslatmasi yuborildi!")
+    return redirect('admin_payments')
+
+
+@login_required
+def send_bulk_payment_reminders(request):
+    if not request.user.is_admin:
+        messages.error(request, "Sizda bu sahifaga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    if request.method == 'POST':
+        unpaid_students = CustomUser.objects.filter(role='student').exclude(
+            payment_status__is_paid=True
+        )
+        
+        count = 0
+        for student in unpaid_students:
+            Message.objects.create(
+                sender=request.user,
+                recipient=student,
+                title="To'lov eslatmasi",
+                content=f"Hurmatli {student.full_name},\n\nSizning oylik to'lovingiz muddati yaqinlashmoqda. Iltimos, o'z vaqtida to'lov qilishni unutmang.\n\nHurmat bilan,\nIT Creative jamoasi",
+                message_type='payment'
+            )
+            count += 1
+        
+        messages.success(request, f"{count} ta o'quvchiga to'lov eslatmasi yuborildi!")
+    
     return redirect('admin_payments')
 
 

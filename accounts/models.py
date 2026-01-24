@@ -508,4 +508,41 @@ class HelpRequest(models.Model):
         return f"{self.user.full_name} - {self.subject}"
 
 
+class Discount(models.Model):
+    DISCOUNT_TYPES = (
+        ('percentage', 'Foiz'),
+        ('fixed', 'Qat\'iy summa'),
+    )
+    
+    name = models.CharField(max_length=200, verbose_name="Chegirma nomi")
+    description = models.TextField(blank=True, null=True, verbose_name="Tavsif")
+    discount_type = models.CharField(max_length=20, choices=DISCOUNT_TYPES, default='percentage', verbose_name="Chegirma turi")
+    discount_value = models.IntegerField(verbose_name="Chegirma qiymati")
+    min_coins_required = models.IntegerField(default=0, verbose_name="Minimal coin talab")
+    profession = models.ForeignKey('Profession', on_delete=models.CASCADE, null=True, blank=True, related_name='discounts', verbose_name="Kurs")
+    is_active = models.BooleanField(default=True, verbose_name="Faol")
+    valid_from = models.DateTimeField(null=True, blank=True, verbose_name="Boshlanish sanasi")
+    valid_until = models.DateTimeField(null=True, blank=True, verbose_name="Tugash sanasi")
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Chegirma"
+        verbose_name_plural = "Chegirmalar"
+    
+    def __str__(self):
+        return self.name
+    
+    @property
+    def is_valid(self):
+        now = timezone.now()
+        if not self.is_active:
+            return False
+        if self.valid_from and now < self.valid_from:
+            return False
+        if self.valid_until and now > self.valid_until:
+            return False
+        return True
+
+
 

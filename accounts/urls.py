@@ -72,6 +72,8 @@ urlpatterns = [
     path('dashboard/messages/send/', views.admin_send_message, name='admin_send_message'),
     path('dashboard/payments/', views.admin_payments, name='admin_payments'),
     path('dashboard/payments/<int:pk>/paid/', views.admin_mark_paid, name='admin_mark_paid'),
+    path('dashboard/payments/<int:pk>/remind/', views.send_payment_reminder, name='send_payment_reminder'),
+    path('dashboard/payments/remind-all/', views.send_bulk_payment_reminders, name='send_bulk_payment_reminders'),
     
     # Admin: Sections
     path('dashboard/sections/', views.admin_sections, name='admin_sections'),
