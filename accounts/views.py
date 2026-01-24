@@ -191,12 +191,21 @@ def profession_detail(request, pk):
                     'graded': hw['grade'] is not None
                 }
     
+    # Kursdoshlar - shu kursga yozilgan o'quvchilar
+    classmates = []
+    if is_enrolled or request.user.is_teacher or request.user.is_admin:
+        classmates = CustomUser.objects.filter(
+            enrollments__profession=profession,
+            role='student'
+        ).exclude(pk=request.user.pk).order_by('-last_activity', '-coins')[:20]
+    
     return render(request, 'accounts/profession_detail.html', {
         'profession': profession,
         'is_enrolled': is_enrolled,
         'sections': sections,
         'lessons_without_section': lessons_without_section,
         'lesson_progress': lesson_progress,
+        'classmates': classmates,
     })
 
 
