@@ -204,6 +204,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'accounts.middleware.BlockedUserMiddleware',
     'accounts.middleware.PaymentCheckMiddleware',
+    'accounts.middleware.SessionTimeoutMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'

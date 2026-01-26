@@ -1,0 +1,201 @@
+{% extends 'accounts/admin/base_admin.html' %}
+
+{% block title %}{{ target_user.full_name }} - Qurilmalar | Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+:root{
+    --card-bg: rgba(255,255,255,.75);
+    --card-border: rgba(0,0,0,.08);
+    --text-main: #111;
+    --soft-bg: rgba(0,0,0,.05);
+}
+[data-bs-theme="dark"]{
+    --card-bg: rgba(18,18,18,.8);
+    --card-border: rgba(255,255,255,.08);
+    --text-main: #f1f1f1;
+    --soft-bg: rgba(255,255,255,.06);
+}
+
+.ios-card{
+    background:var(--card-bg);
+    backdrop-filter:blur(14px);
+    border:1px solid var(--card-border);
+    border-radius:22px;
+    box-shadow:0 12px 35px rgba(0,0,0,.15);
+}
+
+.device-item {
+    padding: 16px;
+    border-bottom: 1px solid var(--card-border);
+    transition: background 0.2s;
+}
+.device-item:last-child { border-bottom: none; }
+.device-item:hover { background: var(--soft-bg); }
+
+.device-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: #fff;
+}
+.device-icon.desktop { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+.device-icon.mobile { background: linear-gradient(135deg, #10b981, #059669); }
+.device-icon.tablet { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+.stat-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 16px;
+}
+.stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.2rem;
+}
+.stat-icon.blue { background: linear-gradient(135deg, #0d6efd, #0b5ed7); }
+.stat-icon.green { background: linear-gradient(135deg, #198754, #157347); }
+.stat-icon.purple { background: linear-gradient(135deg, #6f42c1, #5a32a3); }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2">
+                <li class="breadcrumb-item"><a href="{% url 'admin_users' %}">Foydalanuvchilar</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'admin_user_view' target_user.pk %}">{{ target_user.full_name }}</a></li>
+                <li class="breadcrumb-item active">Qurilmalar</li>
+            </ol>
+        </nav>
+        <h3 class="mb-0"><i class="bi bi-laptop me-2"></i>{{ target_user.full_name }} - Qurilmalar</h3>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'admin_user_view' target_user.pk %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Orqaga
+        </a>
+        {% if devices.count > 0 %}
+        <form method="post" action="{% url 'admin_logout_all_user_devices' target_user.pk %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger" onclick="return confirm('Barcha qurilmalardan chiqarilsinmi?')">
+                <i class="bi bi-box-arrow-right me-1"></i>Barchasidan chiqarish
+            </button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon blue me-3"><i class="bi bi-laptop"></i></div>
+                <div>
+                    <div class="fs-4 fw-bold" style="color: var(--text-main);">{{ devices.count }}</div>
+                    <div class="text-muted small">Jami qurilmalar</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon green me-3"><i class="bi bi-circle-fill"></i></div>
+                <div>
+                    <div class="fs-4 fw-bold" style="color: var(--text-main);">{{ active_sessions.count }}</div>
+                    <div class="text-muted small">Faol sessiyalar</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon purple me-3"><i class="bi bi-shield-check"></i></div>
+                <div>
+                    {% with trusted_count=devices|dictsort:"is_trusted"|last %}
+                    <div class="fs-4 fw-bold" style="color: var(--text-main);">
+                        {% for d in devices %}{% if d.is_trusted %}{% with c=1 %}{{ c }}{% endwith %}{% endif %}{% empty %}0{% endfor %}
+                    </div>
+                    {% endwith %}
+                    <div class="text-muted small">Ishonchli qurilmalar</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Devices List -->
+<div class="ios-card">
+    <div class="p-3 border-bottom" style="border-color: var(--card-border) !important;">
+        <i class="bi bi-list me-2"></i>Qurilmalar ro'yxati
+    </div>
+    
+    {% if devices %}
+    {% for device in devices %}
+    <div class="device-item d-flex align-items-center gap-3">
+        <!-- Icon -->
+        <div class="device-icon {{ device.device_type }}">
+            {% if device.device_type == 'mobile' %}
+            <i class="bi bi-phone"></i>
+            {% elif device.device_type == 'tablet' %}
+            <i class="bi bi-tablet"></i>
+            {% else %}
+            <i class="bi bi-laptop"></i>
+            {% endif %}
+        </div>
+        
+        <!-- Info -->
+        <div class="flex-grow-1">
+            <div class="d-flex align-items-center gap-2">
+                <strong style="color: var(--text-main);">{{ device.device_name }}</strong>
+                {% if device.is_trusted %}
+                <span class="badge bg-success">Ishonchli</span>
+                {% endif %}
+                {% if device.sessions.filter.is_active %}
+                <span class="badge bg-primary">Faol</span>
+                {% endif %}
+            </div>
+            <div class="small text-muted">
+                <span><i class="bi bi-globe me-1"></i>{{ device.browser }}</span>
+                <span class="mx-2">•</span>
+                <span><i class="bi bi-geo-alt me-1"></i>{{ device.ip_address|default:"Noma'lum" }}</span>
+                <span class="mx-2">•</span>
+                <span><i class="bi bi-clock me-1"></i>{{ device.last_login|date:"d.m.Y, H:i" }}</span>
+            </div>
+        </div>
+        
+        <!-- Actions -->
+        <div>
+            <a href="{% url 'admin_logout_user_device' target_user.pk device.pk %}" 
+               class="btn btn-sm btn-outline-danger rounded-pill"
+               onclick="return confirm('Bu qurilmadan chiqarilsinmi?')">
+                <i class="bi bi-box-arrow-right me-1"></i>Chiqarish
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="text-center py-5 text-muted">
+        <i class="bi bi-laptop fs-1"></i>
+        <h5 class="mt-3">Qurilmalar yo'q</h5>
+        <p>Bu foydalanuvchi hali hech qanday qurilmadan kirmagan</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
