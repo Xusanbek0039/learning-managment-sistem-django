@@ -4,120 +4,163 @@
 {% block title %}Kursdoshlar - {{ profession.name }} | IT Creative{% endblock %}
 
 {% block extra_css %}
+<!-- SEO META -->
+<meta name="keywords" content="Suyunov Husan, IT Creative, LMS classmates page, Django student profile UI, dark light bootstrap">
+
 <style>
-.classmate-card {
-    background: var(--card-bg, #fff);
-    border: 1px solid var(--card-border, rgba(0,0,0,.08));
-    border-radius: 16px;
-    padding: 20px;
-    transition: all 0.3s ease;
+:root{
+    --card-bg: #ffffff;
+    --card-border: rgba(0,0,0,.08);
+    --text-muted: #6c757d;
+    --soft-bg: rgba(0,0,0,.04);
 }
-.classmate-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
-}
-
-.avatar-lg {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid rgba(99,102,241,.3);
-}
-.avatar-fallback-lg {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 1.5rem;
-    font-weight: 700;
+[data-bs-theme="dark"]{
+    --card-bg: #0f172a;
+    --card-border: rgba(255,255,255,.08);
+    --text-muted: #9ca3af;
+    --soft-bg: rgba(255,255,255,.05);
 }
 
-.coin-badge {
-    background: linear-gradient(135deg, #facc15, #f59e0b);
-    color: #111;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 0.9rem;
+/* Card */
+.classmate-card{
+    background: var(--card-bg);
+    border:1px solid var(--card-border);
+    border-radius:20px;
+    padding:20px;
+    transition:.3s ease;
+    position:relative;
+    overflow:hidden;
+}
+.classmate-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 18px 40px rgba(0,0,0,.25);
 }
 
-.online-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    display: inline-block;
-    margin-right: 4px;
+/* Avatar */
+.avatar-lg{
+    width:72px;height:72px;border-radius:50%;
+    object-fit:cover;
+    border:3px solid rgba(99,102,241,.4);
 }
-.online-dot.online { background: #22c55e; }
-.online-dot.offline { background: #9ca3af; }
+.avatar-fallback-lg{
+    width:72px;height:72px;border-radius:50%;
+    background:linear-gradient(135deg,#6366f1,#8b5cf6);
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-size:1.4rem;font-weight:700;
+}
+
+/* Online */
+.status-pill{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:4px 10px;border-radius:20px;
+    font-size:.8rem;background:var(--soft-bg);
+}
+.dot{
+    width:10px;height:10px;border-radius:50%;
+}
+.dot.online{background:#22c55e;}
+.dot.offline{background:#9ca3af;}
+
+/* Coin */
+.coin-badge{
+    background:linear-gradient(135deg,#facc15,#f59e0b);
+    color:#111;padding:6px 14px;border-radius:20px;
+    font-weight:700;font-size:.85rem;
+}
+
+/* Bio */
+.bio-box{
+    background:var(--soft-bg);
+    border-radius:12px;
+    padding:10px 12px;
+    font-size:.85rem;
+    color:var(--text-muted);
+}
+
+/* Button */
+.btn-profile{
+    background:linear-gradient(135deg,#2563eb,#7c3aed);
+    border:none;border-radius:999px;
+}
+.btn-profile:hover{opacity:.9}
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container py-4">
-    
-    <!-- Header -->
-    <div class="d-flex align-items-center gap-3 mb-4">
-        <a href="{% url 'profession_detail' profession.pk %}" class="btn btn-outline-secondary rounded-pill">
-            <i class="bi bi-arrow-left"></i>
-        </a>
-        <div>
-            <h2 class="mb-0"><i class="bi bi-people me-2"></i>Kursdoshlar</h2>
-            <p class="text-muted mb-0">{{ profession.name }} - {{ classmates.count }} ta o'quvchi</p>
-        </div>
+
+<!-- HEADER -->
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a href="{% url 'profession_detail' profession.pk %}"
+       class="btn btn-outline-secondary rounded-circle">
+        <i class="bi bi-arrow-left"></i>
+    </a>
+    <div>
+        <h3 class="mb-0"><i class="bi bi-people me-2"></i>Kursdoshlar</h3>
+        <small class="text-muted">{{ profession.name }} • {{ classmates.count }} ta o‘quvchi</small>
     </div>
-    
-    {% if classmates %}
-    <div class="row g-4">
-        {% for student in classmates %}
-        <div class="col-md-6 col-lg-4">
-            <div class="classmate-card h-100">
-                <div class="d-flex align-items-center gap-3 mb-3">
-                    {% if student.photo %}
-                    <img src="{{ student.photo.url }}" class="avatar-lg">
-                    {% else %}
-                    <div class="avatar-fallback-lg">{{ student.get_initials }}</div>
-                    {% endif %}
-                    
-                    <div class="flex-grow-1">
-                        <h5 class="mb-1">{{ student.full_name }}</h5>
-                        <div class="small text-muted">@{{ student.username }}</div>
-                    </div>
-                </div>
-                
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <div>
-                        <span class="online-dot {% if student.is_online %}online{% else %}offline{% endif %}"></span>
-                        <span class="small">{% if student.is_online %}Online{% else %}Offline{% endif %}</span>
-                    </div>
-                    <span class="coin-badge">
-                        <i class="bi bi-coin me-1"></i>{{ student.coins }}
-                    </span>
-                </div>
-                
-                {% if student.bio %}
-                <p class="text-muted small mb-3">{{ student.bio|truncatewords:15 }}</p>
-                {% endif %}
-                
-                <a href="{% url 'student_public_profile' student.pk %}" class="btn btn-primary rounded-pill w-100">
-                    <i class="bi bi-person me-1"></i>Profilni ko'rish
-                </a>
+</div>
+
+{% if classmates %}
+<div class="row g-4">
+
+{% for student in classmates %}
+<div class="col-md-6 col-lg-4">
+    <div class="classmate-card h-100 d-flex flex-column">
+
+        <!-- TOP -->
+        <div class="d-flex align-items-center gap-3 mb-3">
+            {% if student.photo %}
+                <img src="{{ student.photo.url }}" class="avatar-lg">
+            {% else %}
+                <div class="avatar-fallback-lg">{{ student.get_initials }}</div>
+            {% endif %}
+
+            <div class="flex-grow-1">
+                <h6 class="mb-0">{{ student.full_name }}</h6>
+                <small class="text-muted">@{{ student.username }}</small>
             </div>
         </div>
-        {% endfor %}
+
+        <!-- STATUS -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="status-pill">
+                <span class="dot {% if student.is_online %}online{% else %}offline{% endif %}"></span>
+                {% if student.is_online %}Online{% else %}Offline{% endif %}
+            </span>
+
+            <span class="coin-badge">
+                <i class="bi bi-coin me-1"></i>{{ student.coins }}
+            </span>
+        </div>
+
+        <!-- BIO -->
+        {% if student.bio %}
+        <div class="bio-box mb-3">
+            {{ student.bio|truncatewords:18 }}
+        </div>
+        {% endif %}
+
+        <!-- BUTTON -->
+        <a href="{% url 'student_public_profile' student.pk %}"
+           class="btn btn-profile text-white mt-auto w-100">
+            <i class="bi bi-person me-1"></i> Profilni ko‘rish
+        </a>
+
     </div>
-    {% else %}
-    <div class="text-center py-5">
-        <i class="bi bi-people fs-1 text-muted"></i>
-        <h5 class="mt-3">Kursdoshlar yo'q</h5>
-        <p class="text-muted">Hozircha bu kursga siz birinchi bo'lib yozilgansiz!</p>
-    </div>
-    {% endif %}
-    
+</div>
+{% endfor %}
+
+</div>
+
+{% else %}
+<!-- EMPTY -->
+<div class="text-center py-5">
+    <i class="bi bi-people fs-1 text-muted"></i>
+    <h5 class="mt-3">Kursdoshlar yo‘q</h5>
+    <p class="text-muted">Hozircha bu kursga siz birinchi bo‘lib yozilgansiz 🙂</p>
+</div>
+{% endif %}
+
 </div>
 {% endblock %}
