@@ -48,6 +48,11 @@
                 <i class="bi bi-graph-up"></i>
                 <span>Statistika</span>
             </a>
+            <a href="{% url 'admin_lesson_statistics' %}"
+                class="nav-link {% if request.resolver_match.url_name == 'admin_lesson_statistics' %}active{% endif %}">
+                <i class="bi bi-bar-chart"></i>
+                <span>Darslar tahlili</span>
+            </a>
             <a href="{% url 'admin_messages' %}"
                 class="nav-link {% if 'message' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="bi bi-envelope"></i>

@@ -39,6 +39,10 @@ urlpatterns = [
     path('profile/statistics/', views.student_statistics, name='my_statistics'),
     path('profile/statistics/pdf/', views.export_student_pdf, name='my_statistics_pdf'),
     
+    # Kursdoshlar va boshqa o'quvchilar profili
+    path('professions/<int:pk>/classmates/', views.classmates_view, name='classmates'),
+    path('students/<int:pk>/', views.student_public_profile, name='student_public_profile'),
+    
     # Leaderboard
     path('leaderboard/', views.leaderboard, name='leaderboard'),
     
@@ -88,6 +92,9 @@ urlpatterns = [
     
     # Coin Management
     path('dashboard/coins/', views.admin_manage_coins, name='admin_manage_coins'),
+    
+    # Darslar statistikasi
+    path('dashboard/lesson-statistics/', views.admin_lesson_statistics, name='admin_lesson_statistics'),
     
     # Discounts / Chegirmalar
     path('dashboard/discounts/', views.admin_discounts, name='admin_discounts'),

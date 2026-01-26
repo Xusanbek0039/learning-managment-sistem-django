@@ -1,0 +1,338 @@
+{% extends 'accounts/admin/base_admin.html' %}
+
+{% block title %}Darslar statistikasi - Admin Panel{% endblock %}
+
+{% block extra_css %}
+<style>
+:root{
+    --card-bg: rgba(255,255,255,.75);
+    --card-border: rgba(0,0,0,.08);
+    --text-main: #111;
+    --soft-bg: rgba(0,0,0,.05);
+}
+[data-bs-theme="dark"]{
+    --card-bg: rgba(18,18,18,.8);
+    --card-border: rgba(255,255,255,.08);
+    --text-main: #f1f1f1;
+    --soft-bg: rgba(255,255,255,.06);
+}
+
+.ios-card{
+    background:var(--card-bg);
+    backdrop-filter:blur(14px);
+    border:1px solid var(--card-border);
+    border-radius:22px;
+    box-shadow:0 12px 35px rgba(0,0,0,.15);
+    margin-bottom: 24px;
+}
+
+.stat-item {
+    padding: 16px;
+    border-bottom: 1px solid var(--card-border);
+}
+.stat-item:last-child { border-bottom: none; }
+
+.progress-bar-custom {
+    height: 8px;
+    border-radius: 4px;
+    background: var(--soft-bg);
+    overflow: hidden;
+}
+.progress-bar-custom .fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s;
+}
+.progress-bar-custom .fill.success { background: linear-gradient(135deg, #10b981, #059669); }
+.progress-bar-custom .fill.warning { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.progress-bar-custom .fill.danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
+
+.user-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--soft-bg);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    margin: 2px;
+}
+.user-chip img {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-main);
+    padding: 16px;
+    border-bottom: 1px solid var(--card-border);
+}
+.section-title i { margin-right: 8px; }
+
+.badge-stat {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.student-card {
+    background: var(--soft-bg);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 10px;
+}
+</style>
+{% endblock %}
+
+{% block admin_content %}
+
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h3 class="mb-1"><i class="bi bi-bar-chart me-2"></i>Darslar statistikasi</h3>
+        <p class="text-muted mb-0">Eng ko'p tashlab ketilgan darslar va qiynalayotgan o'quvchilar</p>
+    </div>
+    <form method="GET" class="d-flex gap-2">
+        <select name="profession" class="form-select" style="width: 200px;" onchange="this.form.submit()">
+            <option value="">Barcha kurslar</option>
+            {% for p in professions %}
+            <option value="{{ p.pk }}" {% if selected_profession == p.pk|stringformat:"i" %}selected{% endif %}>{{ p.name }}</option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+
+<div class="row">
+
+<!-- ==================== PASSIV O'QUVCHILAR ==================== -->
+<div class="col-lg-6">
+<div class="ios-card">
+    <div class="section-title">
+        <i class="bi bi-moon-stars text-warning"></i>Passiv o'quvchilar
+        <span class="badge bg-warning text-dark ms-2">{{ passive_students|length }}</span>
+    </div>
+    
+    {% if passive_students %}
+    <div class="p-3">
+        {% for student in passive_students %}
+        <div class="student-card d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width:40px;height:40px;font-size:0.9rem;">
+                {{ student.get_initials }}
+            </div>
+            <div class="flex-grow-1">
+                <strong style="color: var(--text-main);">{{ student.full_name }}</strong>
+                <div class="small text-muted">
+                    Oxirgi faollik: 
+                    {% if student.last_activity %}
+                    {{ student.last_activity|date:"d.m.Y" }}
+                    {% else %}
+                    Hech qachon
+                    {% endif %}
+                </div>
+            </div>
+            <a href="{% url 'admin_user_view' student.pk %}" class="btn btn-sm btn-outline-primary rounded-pill">
+                <i class="bi bi-eye"></i>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-4 text-muted">
+        <i class="bi bi-emoji-smile fs-1"></i>
+        <p class="mt-2 mb-0">Passiv o'quvchilar yo'q!</p>
+    </div>
+    {% endif %}
+</div>
+</div>
+
+<!-- ==================== QIYNALAYOTGAN O'QUVCHILAR ==================== -->
+<div class="col-lg-6">
+<div class="ios-card">
+    <div class="section-title">
+        <i class="bi bi-exclamation-triangle text-danger"></i>Qiynalayotgan o'quvchilar
+        <span class="badge bg-danger ms-2">{{ struggling_students|length }}</span>
+    </div>
+    
+    {% if struggling_students %}
+    <div class="p-3">
+        {% for student in struggling_students %}
+        <div class="student-card d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center" style="width:40px;height:40px;font-size:0.9rem;">
+                {{ student.get_initials }}
+            </div>
+            <div class="flex-grow-1">
+                <strong style="color: var(--text-main);">{{ student.full_name }}</strong>
+                <div class="small text-muted">
+                    {{ student.low_score_count }} ta past ball • O'rtacha: {{ student.avg_score|floatformat:0 }}%
+                </div>
+            </div>
+            <a href="{% url 'admin_user_view' student.pk %}" class="btn btn-sm btn-outline-danger rounded-pill">
+                <i class="bi bi-eye"></i>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-4 text-muted">
+        <i class="bi bi-emoji-smile fs-1"></i>
+        <p class="mt-2 mb-0">Qiynalayotgan o'quvchilar yo'q!</p>
+    </div>
+    {% endif %}
+</div>
+</div>
+
+</div>
+
+<!-- ==================== VIDEO DARSLAR ==================== -->
+<div class="ios-card">
+    <div class="section-title">
+        <i class="bi bi-camera-video text-primary"></i>Eng ko'p tashlab ketilgan video darslar
+    </div>
+    
+    {% if video_stats %}
+    {% for item in video_stats %}
+    <div class="stat-item">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+                <strong style="color: var(--text-main);">{{ item.lesson.title }}</strong>
+                <div class="small text-muted">{{ item.lesson.profession.name }}</div>
+            </div>
+            <div class="text-end">
+                <span class="badge-stat {% if item.completion_rate >= 70 %}bg-success{% elif item.completion_rate >= 40 %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                    {{ item.completion_rate }}% ko'rgan
+                </span>
+            </div>
+        </div>
+        
+        <div class="progress-bar-custom mb-2">
+            <div class="fill {% if item.completion_rate >= 70 %}success{% elif item.completion_rate >= 40 %}warning{% else %}danger{% endif %}" style="width: {{ item.completion_rate }}%;"></div>
+        </div>
+        
+        <div class="d-flex justify-content-between small text-muted mb-2">
+            <span><i class="bi bi-check-circle me-1"></i>{{ item.watched }} ko'rgan</span>
+            <span><i class="bi bi-x-circle me-1"></i>{{ item.not_watched }} ko'rmagan</span>
+        </div>
+        
+        {% if item.not_watched_users %}
+        <div>
+            <small class="text-muted">Ko'rmaganlar:</small>
+            {% for user in item.not_watched_users %}
+            <span class="user-chip">{{ user.full_name }}</span>
+            {% endfor %}
+            {% if item.not_watched > 5 %}<span class="user-chip">+{{ item.not_watched|add:"-5" }}</span>{% endif %}
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="text-center py-4 text-muted">
+        <i class="bi bi-camera-video fs-1"></i>
+        <p class="mt-2 mb-0">Video darslar statistikasi yo'q</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- ==================== TESTLAR ==================== -->
+<div class="ios-card">
+    <div class="section-title">
+        <i class="bi bi-clipboard-check text-info"></i>Eng ko'p tashlab ketilgan testlar
+    </div>
+    
+    {% if test_stats %}
+    {% for item in test_stats %}
+    <div class="stat-item">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+                <strong style="color: var(--text-main);">{{ item.lesson.title }}</strong>
+                <div class="small text-muted">{{ item.lesson.profession.name }} • O'rtacha ball: {{ item.avg_score }}%</div>
+            </div>
+            <div class="text-end">
+                <span class="badge-stat {% if item.completion_rate >= 70 %}bg-success{% elif item.completion_rate >= 40 %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                    {{ item.completion_rate }}% yechgan
+                </span>
+            </div>
+        </div>
+        
+        <div class="progress-bar-custom mb-2">
+            <div class="fill {% if item.completion_rate >= 70 %}success{% elif item.completion_rate >= 40 %}warning{% else %}danger{% endif %}" style="width: {{ item.completion_rate }}%;"></div>
+        </div>
+        
+        <div class="d-flex justify-content-between small text-muted mb-2">
+            <span><i class="bi bi-check-circle me-1"></i>{{ item.completed }} yechgan</span>
+            <span><i class="bi bi-x-circle me-1"></i>{{ item.not_completed }} yechmagan</span>
+        </div>
+        
+        {% if item.not_completed_users %}
+        <div>
+            <small class="text-muted">Yechmaganlar:</small>
+            {% for user in item.not_completed_users %}
+            <span class="user-chip">{{ user.full_name }}</span>
+            {% endfor %}
+            {% if item.not_completed > 5 %}<span class="user-chip">+{{ item.not_completed|add:"-5" }}</span>{% endif %}
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="text-center py-4 text-muted">
+        <i class="bi bi-clipboard-check fs-1"></i>
+        <p class="mt-2 mb-0">Test statistikasi yo'q</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- ==================== UYGA VAZIFALAR ==================== -->
+<div class="ios-card">
+    <div class="section-title">
+        <i class="bi bi-journal-text text-success"></i>Eng ko'p tashlab ketilgan uyga vazifalar
+    </div>
+    
+    {% if homework_stats %}
+    {% for item in homework_stats %}
+    <div class="stat-item">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+                <strong style="color: var(--text-main);">{{ item.lesson.title }}</strong>
+                <div class="small text-muted">{{ item.lesson.profession.name }}</div>
+            </div>
+            <div class="text-end">
+                <span class="badge-stat {% if item.completion_rate >= 70 %}bg-success{% elif item.completion_rate >= 40 %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                    {{ item.completion_rate }}% topshirgan
+                </span>
+            </div>
+        </div>
+        
+        <div class="progress-bar-custom mb-2">
+            <div class="fill {% if item.completion_rate >= 70 %}success{% elif item.completion_rate >= 40 %}warning{% else %}danger{% endif %}" style="width: {{ item.completion_rate }}%;"></div>
+        </div>
+        
+        <div class="d-flex justify-content-between small text-muted mb-2">
+            <span><i class="bi bi-check-circle me-1"></i>{{ item.submitted }} topshirgan</span>
+            <span><i class="bi bi-x-circle me-1"></i>{{ item.not_submitted }} topshirmagan</span>
+        </div>
+        
+        {% if item.not_submitted_users %}
+        <div>
+            <small class="text-muted">Topshirmaganlar:</small>
+            {% for user in item.not_submitted_users %}
+            <span class="user-chip">{{ user.full_name }}</span>
+            {% endfor %}
+            {% if item.not_submitted > 5 %}<span class="user-chip">+{{ item.not_submitted|add:"-5" }}</span>{% endif %}
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="text-center py-4 text-muted">
+        <i class="bi bi-journal-text fs-1"></i>
+        <p class="mt-2 mb-0">Uyga vazifa statistikasi yo'q</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

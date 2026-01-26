@@ -25,6 +25,19 @@ from django.core.management import call_command
 from django.core.cache import cache
 
 
+def send_course_notification(profession, title, content, sender=None):
+    """Kursga yozilgan barcha o'quvchilarga xabar yuborish"""
+    enrollments = CourseEnrollment.objects.filter(profession=profession)
+    for enrollment in enrollments:
+        Message.objects.create(
+            sender=sender,
+            recipient=enrollment.user,
+            title=title,
+            content=content,
+            message_type='system'
+        )
+
+
 def register_view(request):
     if request.user.is_authenticated:
         return redirect('home')
@@ -413,12 +426,85 @@ def test_result(request, pk):
 # Profile views
 @login_required
 def profile_view(request):
-    certificates = Certificate.objects.filter(student=request.user)
-    enrollments = request.user.enrollments.all()
+    certificates = Certificate.objects.filter(student=request.user).select_related('profession')
+    enrollments = request.user.enrollments.all().select_related('profession')
+    
+    # Tugallangan kurslar (sertifikat berilgan)
+    completed_profession_ids = certificates.values_list('profession_id', flat=True)
+    completed_courses = []
+    active_courses = []
+    
+    for enrollment in enrollments:
+        if enrollment.profession_id in completed_profession_ids:
+            cert = certificates.filter(profession_id=enrollment.profession_id).first()
+            completed_courses.append({
+                'enrollment': enrollment,
+                'certificate': cert,
+            })
+        else:
+            active_courses.append(enrollment)
     
     return render(request, 'accounts/profile.html', {
         'certificates': certificates,
         'enrollments': enrollments,
+        'completed_courses': completed_courses,
+        'active_courses': active_courses,
+    })
+
+
+@login_required
+def classmates_view(request, pk):
+    """Kursdoshlar ro'yxati"""
+    profession = get_object_or_404(Profession, pk=pk)
+    
+    # Foydalanuvchi shu kursga yozilganmi?
+    if not request.user.is_admin and not request.user.is_teacher:
+        if not CourseEnrollment.objects.filter(user=request.user, profession=profession).exists():
+            messages.error(request, "Avval kursga yoziling!")
+            return redirect('profession_detail', pk=pk)
+    
+    # Kursdoshlar
+    classmates = CustomUser.objects.filter(
+        enrollments__profession=profession,
+        role='student'
+    ).exclude(pk=request.user.pk).order_by('-coins', 'first_name')
+    
+    return render(request, 'accounts/classmates.html', {
+        'profession': profession,
+        'classmates': classmates,
+    })
+
+
+@login_required
+def student_public_profile(request, pk):
+    """Boshqa o'quvchining umumiy profili"""
+    student = get_object_or_404(CustomUser, pk=pk)
+    
+    # Faqat o'quvchilar ko'rinishi mumkin
+    if student.role != 'student':
+        messages.error(request, "Bu sahifa mavjud emas!")
+        return redirect('home')
+    
+    # Umumiy kurslar
+    user_profession_ids = request.user.enrollments.values_list('profession_id', flat=True)
+    student_enrollments = CourseEnrollment.objects.filter(user=student).select_related('profession')
+    
+    common_courses = []
+    for enrollment in student_enrollments:
+        if enrollment.profession_id in user_profession_ids:
+            common_courses.append(enrollment.profession)
+    
+    # Sertifikatlar
+    certificates = Certificate.objects.filter(student=student).select_related('profession')
+    
+    # Tugallangan kurslar soni
+    completed_count = certificates.count()
+    
+    return render(request, 'accounts/student_public_profile.html', {
+        'student': student,
+        'common_courses': common_courses,
+        'certificates': certificates,
+        'completed_count': completed_count,
     })
 
 
@@ -1002,6 +1088,13 @@ def add_lesson(request, pk):
                     youtube_url=video_url if ('youtube.com' in video_url or 'youtu.be' in video_url) else '',
                     duration=form.cleaned_data.get('duration') or 0
                 )
+                # Xabar yuborish
+                send_course_notification(
+                    profession=profession,
+                    title=f"🎬 Yangi video dars: {lesson.title}",
+                    content=f"'{profession.name}' kursiga yangi video dars qo'shildi:\n\n📚 {lesson.title}\n\nDarsni ko'rish uchun kursga kiring!",
+                    sender=request.user
+                )
                 messages.success(request, "Video darslik qo'shildi!")
                 return redirect('profession_detail', pk=pk)
         
@@ -1018,6 +1111,13 @@ def add_lesson(request, pk):
                 Homework.objects.create(
                     lesson=lesson,
                     description=form.cleaned_data['description']
+                )
+                # Xabar yuborish
+                send_course_notification(
+                    profession=profession,
+                    title=f"📝 Yangi uyga vazifa: {lesson.title}",
+                    content=f"'{profession.name}' kursiga yangi uyga vazifa qo'shildi:\n\n📚 {lesson.title}\n\nVazifani bajarish uchun kursga kiring!",
+                    sender=request.user
                 )
                 messages.success(request, "Uyga vazifa qo'shildi!")
                 return redirect('profession_detail', pk=pk)
@@ -1038,6 +1138,13 @@ def add_lesson(request, pk):
                     time_limit=form.cleaned_data['time_limit'],
                     passing_score=form.cleaned_data['passing_score'],
                     allow_retry=form.cleaned_data.get('allow_retry', False)
+                )
+                # Xabar yuborish
+                send_course_notification(
+                    profession=profession,
+                    title=f"📋 Yangi test: {lesson.title}",
+                    content=f"'{profession.name}' kursiga yangi test qo'shildi:\n\n📚 {lesson.title}\n\nTestni yechish uchun kursga kiring!",
+                    sender=request.user
                 )
                 messages.success(request, "Test qo'shildi! Endi savollarni qo'shing.")
                 return redirect('manage_test_questions', pk=lesson.test.pk)
@@ -1076,6 +1183,13 @@ def edit_lesson(request, pk):
                 lesson.video.youtube_url = form.cleaned_data['youtube_url']
                 lesson.video.duration = form.cleaned_data.get('duration') or 0
                 lesson.video.save()
+                # Xabar yuborish
+                send_course_notification(
+                    profession=lesson.profession,
+                    title=f"🔄 Video dars yangilandi: {lesson.title}",
+                    content=f"'{lesson.profession.name}' kursidagi video dars yangilandi:\n\n📚 {lesson.title}\n\nYangilangan darsni ko'rish uchun kursga kiring!",
+                    sender=request.user
+                )
                 messages.success(request, "Dars yangilandi!")
                 return redirect('manage_lessons', pk=lesson.profession.pk)
         elif lesson.lesson_type == 'homework':
@@ -1085,6 +1199,13 @@ def edit_lesson(request, pk):
                 lesson.save()
                 lesson.homework.description = form.cleaned_data['description']
                 lesson.homework.save()
+                # Xabar yuborish
+                send_course_notification(
+                    profession=lesson.profession,
+                    title=f"🔄 Uyga vazifa yangilandi: {lesson.title}",
+                    content=f"'{lesson.profession.name}' kursidagi uyga vazifa yangilandi:\n\n📚 {lesson.title}\n\nVazifani ko'rish uchun kursga kiring!",
+                    sender=request.user
+                )
                 messages.success(request, "Vazifa yangilandi!")
                 return redirect('manage_lessons', pk=lesson.profession.pk)
     else:
@@ -1114,9 +1235,21 @@ def delete_lesson(request, pk):
         return redirect('home')
     
     lesson = get_object_or_404(Lesson, pk=pk)
-    profession_pk = lesson.profession.pk
+    profession = lesson.profession
+    profession_pk = profession.pk
+    lesson_title = lesson.title
+    lesson_type = lesson.lesson_type
     
     if request.method == 'POST':
+        # Xabar yuborish
+        type_names = {'video': 'Video dars', 'homework': 'Uyga vazifa', 'test': 'Test'}
+        type_name = type_names.get(lesson_type, 'Dars')
+        send_course_notification(
+            profession=profession,
+            title=f"🗑️ {type_name} o'chirildi",
+            content=f"'{profession.name}' kursidan quyidagi dars o'chirildi:\n\n📚 {lesson_title}\n\nBu dars endi mavjud emas.",
+            sender=request.user
+        )
         lesson.delete()
         messages.success(request, "Dars o'chirildi!")
         return redirect('manage_lessons', pk=profession_pk)
@@ -2100,6 +2233,160 @@ def admin_discount_delete(request, pk):
         return redirect('admin_discounts')
     
     return render(request, 'accounts/admin/discount_delete.html', {'discount': discount})
+
+
+# ==================== ADMIN: DARSLAR STATISTIKASI ====================
+
+@login_required
+def admin_lesson_statistics(request):
+    if not request.user.is_admin:
+        messages.error(request, "Sizda bu sahifaga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    profession_id = request.GET.get('profession')
+    
+    # Barcha darslar
+    lessons = Lesson.objects.select_related('profession', 'section').all()
+    if profession_id:
+        lessons = lessons.filter(profession_id=profession_id)
+    
+    # Video darslar statistikasi - ko'rilmagan
+    video_lessons = lessons.filter(lesson_type='video')
+    video_stats = []
+    for lesson in video_lessons:
+        try:
+            video = lesson.video
+            total_enrolled = CourseEnrollment.objects.filter(profession=lesson.profession).count()
+            watched_count = VideoProgress.objects.filter(video=video, watched=True).count()
+            not_watched = total_enrolled - watched_count
+            if total_enrolled > 0:
+                completion_rate = (watched_count / total_enrolled) * 100
+            else:
+                completion_rate = 0
+            
+            # Kim ko'rmagan
+            watched_user_ids = VideoProgress.objects.filter(video=video, watched=True).values_list('user_id', flat=True)
+            not_watched_users = CustomUser.objects.filter(
+                enrollments__profession=lesson.profession
+            ).exclude(pk__in=watched_user_ids)[:5]
+            
+            video_stats.append({
+                'lesson': lesson,
+                'total_enrolled': total_enrolled,
+                'watched': watched_count,
+                'not_watched': not_watched,
+                'completion_rate': round(completion_rate, 1),
+                'not_watched_users': not_watched_users,
+            })
+        except:
+            pass
+    
+    # Eng ko'p tashlab ketilgan videolar
+    video_stats_sorted = sorted(video_stats, key=lambda x: x['not_watched'], reverse=True)[:10]
+    
+    # Test statistikasi - yechilmagan
+    test_lessons = lessons.filter(lesson_type='test')
+    test_stats = []
+    for lesson in test_lessons:
+        try:
+            test = lesson.test
+            total_enrolled = CourseEnrollment.objects.filter(profession=lesson.profession).count()
+            completed_count = TestResult.objects.filter(test=test).values('student').distinct().count()
+            not_completed = total_enrolled - completed_count
+            if total_enrolled > 0:
+                completion_rate = (completed_count / total_enrolled) * 100
+            else:
+                completion_rate = 0
+            
+            # O'rtacha ball
+            avg_score = TestResult.objects.filter(test=test).aggregate(avg=Avg('score'))['avg'] or 0
+            
+            # Kim yechmagan
+            completed_user_ids = TestResult.objects.filter(test=test).values_list('student_id', flat=True)
+            not_completed_users = CustomUser.objects.filter(
+                enrollments__profession=lesson.profession
+            ).exclude(pk__in=completed_user_ids)[:5]
+            
+            test_stats.append({
+                'lesson': lesson,
+                'total_enrolled': total_enrolled,
+                'completed': completed_count,
+                'not_completed': not_completed,
+                'completion_rate': round(completion_rate, 1),
+                'avg_score': round(avg_score, 1),
+                'not_completed_users': not_completed_users,
+            })
+        except:
+            pass
+    
+    # Eng ko'p tashlab ketilgan testlar
+    test_stats_sorted = sorted(test_stats, key=lambda x: x['not_completed'], reverse=True)[:10]
+    
+    # Uyga vazifa statistikasi - topshirilmagan
+    homework_lessons = lessons.filter(lesson_type='homework')
+    homework_stats = []
+    for lesson in homework_lessons:
+        try:
+            homework = lesson.homework
+            total_enrolled = CourseEnrollment.objects.filter(profession=lesson.profession).count()
+            submitted_count = HomeworkSubmission.objects.filter(homework=homework).values('student').distinct().count()
+            not_submitted = total_enrolled - submitted_count
+            if total_enrolled > 0:
+                completion_rate = (submitted_count / total_enrolled) * 100
+            else:
+                completion_rate = 0
+            
+            # Kim topshirmagan
+            submitted_user_ids = HomeworkSubmission.objects.filter(homework=homework).values_list('student_id', flat=True)
+            not_submitted_users = CustomUser.objects.filter(
+                enrollments__profession=lesson.profession
+            ).exclude(pk__in=submitted_user_ids)[:5]
+            
+            homework_stats.append({
+                'lesson': lesson,
+                'total_enrolled': total_enrolled,
+                'submitted': submitted_count,
+                'not_submitted': not_submitted,
+                'completion_rate': round(completion_rate, 1),
+                'not_submitted_users': not_submitted_users,
+            })
+        except:
+            pass
+    
+    # Eng ko'p tashlab ketilgan vazifalar
+    homework_stats_sorted = sorted(homework_stats, key=lambda x: x['not_submitted'], reverse=True)[:10]
+    
+    # Passiv o'quvchilar - oxirgi 7 kunda faollik ko'rsatmaganlar
+    week_ago = timezone.now() - timedelta(days=7)
+    passive_students = CustomUser.objects.filter(
+        role='student',
+        is_blocked=False
+    ).filter(
+        Q(last_activity__lt=week_ago) | Q(last_activity__isnull=True)
+    ).order_by('last_activity')[:20]
+    
+    # Qiynalayotgan o'quvchilar - testlardan past ball olganlar
+    struggling_students = CustomUser.objects.filter(
+        role='student',
+        test_results__score__lt=50
+    ).annotate(
+        low_score_count=Count('test_results', filter=Q(test_results__score__lt=50)),
+        avg_score=Avg('test_results__score')
+    ).filter(low_score_count__gte=2).order_by('-low_score_count')[:15]
+    
+    professions = Profession.objects.all()
+    
+    context = {
+        'video_stats': video_stats_sorted,
+        'test_stats': test_stats_sorted,
+        'homework_stats': homework_stats_sorted,
+        'passive_students': passive_students,
+        'struggling_students': struggling_students,
+        'professions': professions,
+        'selected_profession': profession_id,
+    }
+    
+    return render(request, 'accounts/admin/lesson_statistics.html', context)
 
 
 # ==================== QURILMALAR BOSHQARUVI ====================
