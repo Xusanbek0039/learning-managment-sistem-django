@@ -508,6 +508,53 @@ class HelpRequest(models.Model):
         return f"{self.user.full_name} - {self.subject}"
 
 
+class UserDevice(models.Model):
+    user = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='devices')
+    device_id = models.CharField(max_length=255, verbose_name="Qurilma ID")
+    device_name = models.CharField(max_length=200, verbose_name="Qurilma nomi")
+    device_type = models.CharField(max_length=50, verbose_name="Qurilma turi")  # mobile, tablet, desktop
+    browser = models.CharField(max_length=100, blank=True, null=True, verbose_name="Brauzer")
+    os = models.CharField(max_length=100, blank=True, null=True, verbose_name="Operatsion tizim")
+    ip_address = models.GenericIPAddressField(null=True, blank=True, verbose_name="IP manzil")
+    location = models.CharField(max_length=200, blank=True, null=True, verbose_name="Joylashuv")
+    is_trusted = models.BooleanField(default=False, verbose_name="Ishonchli qurilma")
+    first_login = models.DateTimeField(auto_now_add=True, verbose_name="Birinchi kirish")
+    last_login = models.DateTimeField(auto_now=True, verbose_name="Oxirgi kirish")
+    is_active = models.BooleanField(default=True, verbose_name="Faol")
+    
+    class Meta:
+        unique_together = ['user', 'device_id']
+        ordering = ['-last_login']
+        verbose_name = "Foydalanuvchi qurilmasi"
+        verbose_name_plural = "Foydalanuvchi qurilmalari"
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.device_name}"
+
+
+class UserSession(models.Model):
+    user = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='sessions')
+    device = models.ForeignKey(UserDevice, on_delete=models.CASCADE, related_name='sessions', null=True, blank=True)
+    session_key = models.CharField(max_length=255, unique=True, verbose_name="Session kaliti")
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    started_at = models.DateTimeField(auto_now_add=True, verbose_name="Boshlangan vaqt")
+    last_activity = models.DateTimeField(auto_now=True, verbose_name="Oxirgi faollik")
+    expires_at = models.DateTimeField(verbose_name="Tugash vaqti")
+    is_active = models.BooleanField(default=True, verbose_name="Faol")
+    
+    class Meta:
+        ordering = ['-last_activity']
+        verbose_name = "Foydalanuvchi sessiyasi"
+        verbose_name_plural = "Foydalanuvchi sessiyalari"
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.started_at}"
+    
+    @property
+    def is_expired(self):
+        return timezone.now() > self.expires_at
+
+
 class Discount(models.Model):
     DISCOUNT_TYPES = (
         ('percentage', 'Foiz'),

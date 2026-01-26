@@ -16,7 +16,8 @@ from .forms import (
 from .models import (
     Profession, Section, CustomUser, CourseEnrollment, Lesson, VideoLesson, VideoProgress,
     Homework, HomeworkSubmission, Test, TestQuestion, TestAnswer, TestResult,
-    TestUserAnswer, Certificate, Message, PaymentStatus, HelpRequest, Discount
+    TestUserAnswer, Certificate, Message, PaymentStatus, HelpRequest, Discount,
+    UserDevice, UserSession
 )
 from coin.models import ActivityLog, CoinTransaction
 
@@ -2099,5 +2100,142 @@ def admin_discount_delete(request, pk):
         return redirect('admin_discounts')
     
     return render(request, 'accounts/admin/discount_delete.html', {'discount': discount})
+
+
+# ==================== QURILMALAR BOSHQARUVI ====================
+
+@login_required
+def my_devices(request):
+    devices = request.user.devices.filter(is_active=True).order_by('-last_login')
+    current_session_key = request.session.session_key
+    
+    # Find current device
+    current_device = None
+    for device in devices:
+        active_session = device.sessions.filter(session_key=current_session_key, is_active=True).first()
+        if active_session:
+            current_device = device
+            break
+    
+    return render(request, 'accounts/devices.html', {
+        'devices': devices,
+        'current_device': current_device,
+    })
+
+
+@login_required
+def remove_device(request, pk):
+    device = get_object_or_404(UserDevice, pk=pk, user=request.user)
+    current_session_key = request.session.session_key
+    
+    # Check if it's the current device
+    is_current = device.sessions.filter(session_key=current_session_key, is_active=True).exists()
+    
+    if is_current:
+        messages.error(request, "Joriy qurilmani o'chirib bo'lmaydi!")
+        return redirect('my_devices')
+    
+    # Deactivate all sessions for this device
+    device.sessions.update(is_active=False)
+    device.is_active = False
+    device.save()
+    
+    messages.success(request, f"'{device.device_name}' qurilmasi o'chirildi!")
+    return redirect('my_devices')
+
+
+@login_required
+def logout_device(request, pk):
+    device = get_object_or_404(UserDevice, pk=pk, user=request.user)
+    current_session_key = request.session.session_key
+    
+    # Check if it's the current device
+    is_current = device.sessions.filter(session_key=current_session_key, is_active=True).exists()
+    
+    if is_current:
+        messages.error(request, "Joriy qurilmadan chiqish uchun 'Chiqish' tugmasini ishlating!")
+        return redirect('my_devices')
+    
+    # Deactivate all sessions for this device
+    device.sessions.filter(is_active=True).update(is_active=False)
+    
+    messages.success(request, f"'{device.device_name}' qurilmasidan chiqildi!")
+    return redirect('my_devices')
+
+
+@login_required
+def trust_device(request, pk):
+    device = get_object_or_404(UserDevice, pk=pk, user=request.user)
+    device.is_trusted = not device.is_trusted
+    device.save()
+    
+    if device.is_trusted:
+        messages.success(request, f"'{device.device_name}' ishonchli qurilma sifatida belgilandi!")
+    else:
+        messages.success(request, f"'{device.device_name}' ishonchli qurilmalar ro'yxatidan chiqarildi!")
+    
+    return redirect('my_devices')
+
+
+@login_required
+def logout_all_devices(request):
+    if request.method == 'POST':
+        current_session_key = request.session.session_key
+        
+        # Deactivate all sessions except current
+        UserSession.objects.filter(
+            user=request.user,
+            is_active=True
+        ).exclude(session_key=current_session_key).update(is_active=False)
+        
+        messages.success(request, "Barcha boshqa qurilmalardan chiqildi!")
+    
+    return redirect('my_devices')
+
+
+# ==================== ADMIN: QURILMALAR ====================
+
+@login_required
+def admin_user_devices(request, pk):
+    if not request.user.is_admin:
+        messages.error(request, "Sizda bu sahifaga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    user = get_object_or_404(CustomUser, pk=pk)
+    devices = user.devices.filter(is_active=True).order_by('-last_login')
+    active_sessions = UserSession.objects.filter(user=user, is_active=True)
+    
+    return render(request, 'accounts/admin/user_devices.html', {
+        'target_user': user,
+        'devices': devices,
+        'active_sessions': active_sessions,
+    })
+
+
+@login_required
+def admin_logout_user_device(request, user_pk, device_pk):
+    if not request.user.is_admin:
+        messages.error(request, "Sizda bu sahifaga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    device = get_object_or_404(UserDevice, pk=device_pk, user_id=user_pk)
+    device.sessions.filter(is_active=True).update(is_active=False)
+    
+    messages.success(request, f"'{device.device_name}' qurilmasidan chiqildi!")
+    return redirect('admin_user_devices', pk=user_pk)
+
+
+@login_required
+def admin_logout_all_user_devices(request, pk):
+    if not request.user.is_admin:
+        messages.error(request, "Sizda bu sahifaga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    if request.method == 'POST':
+        user = get_object_or_404(CustomUser, pk=pk)
+        UserSession.objects.filter(user=user, is_active=True).update(is_active=False)
+        messages.success(request, f"{user.full_name}ning barcha qurilmalaridan chiqildi!")
+    
+    return redirect('admin_user_devices', pk=pk)
 
 
