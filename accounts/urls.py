@@ -114,7 +114,8 @@ urlpatterns = [
     path('coding/create/', views.create_deploy, name='create_deploy'),
     path('coding/<int:pk>/edit/', views.edit_deploy, name='edit_deploy'),
     path('coding/<int:pk>/delete/', views.delete_deploy, name='delete_deploy'),
-    path('coding/<str:username>/<str:filename>', views.view_deployed_page, name='view_deployed_page'),
+    path('coding/<str:username>/<str:folder_name>/', views.view_deployed_page, name='view_deployed_page'),
+    path('coding/<str:username>/<str:folder_name>/<path:filepath>', views.view_deployed_page, name='view_deployed_file'),
     
     # Admin: Deploys
     path('dashboard/deploys/', views.admin_deploys, name='admin_deploys'),

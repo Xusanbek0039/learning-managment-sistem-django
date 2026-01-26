@@ -179,6 +179,37 @@
 </div>
 {% endif %}
 
+<!-- DEPLOYED PAGES -->
+{% if deploys %}
+<div class="p-card p-4">
+    <h5 class="fw-bold mb-3">
+        <i class="bi bi-code-slash me-2"></i>Deploy qilgan sahifalari
+        <span class="badge bg-primary ms-2">{{ deploys|length }}</span>
+    </h5>
+    
+    <div class="row g-3">
+        {% for deploy in deploys %}
+        <div class="col-md-6">
+            <div class="mini-item">
+                <div class="d-flex align-items-center gap-3 mb-2">
+                    <div class="bg-primary text-white rounded-3 p-2">
+                        <i class="bi bi-file-code fs-5"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <b>{{ deploy.title }}</b><br>
+                        <small class="text-muted">{{ deploy.views_count }} ko'rish</small>
+                    </div>
+                </div>
+                <a href="{{ deploy.get_url }}" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill w-100">
+                    <i class="bi bi-box-arrow-up-right me-1"></i>Ko'rish
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
 <!-- BACK BUTTON -->
 <div class="text-center">
     <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill px-4">

@@ -19,6 +19,7 @@
                             <th>O'quvchi</th>
                             <th>Yo'nalish</th>
                             <th class="text-center">Coinlar</th>
+                            <th class="text-center">Profil</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -58,6 +59,17 @@
                                 <span class="coin-badge">
                                     <i class="bi bi-coin me-1"></i>{{ student.coins }}
                                 </span>
+                            </td>
+                            <td class="text-center">
+                                {% if student != request.user %}
+                                <a href="{% url 'student_public_profile' student.pk %}" class="btn btn-sm btn-outline-primary rounded-pill">
+                                    <i class="bi bi-person"></i>
+                                </a>
+                                {% else %}
+                                <a href="{% url 'profile' %}" class="btn btn-sm btn-primary rounded-pill">
+                                    <i class="bi bi-person-check"></i>
+                                </a>
+                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}

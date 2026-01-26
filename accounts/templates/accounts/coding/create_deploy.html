@@ -1,7 +1,7 @@
 {% extends 'accounts/base.html' %}
 {% load static %}
 
-{% block title %}Yangi sahifa yaratish | IT Creative{% endblock %}
+{% block title %}Yangi loyiha yaratish | IT Creative{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -12,7 +12,7 @@
     color: #d4d4d4;
     border-radius: 12px;
     padding: 16px;
-    min-height: 400px;
+    min-height: 300px;
     resize: vertical;
 }
 .form-card {
@@ -24,7 +24,7 @@
 .upload-zone {
     border: 2px dashed var(--bs-border-color);
     border-radius: 12px;
-    padding: 30px;
+    padding: 40px;
     text-align: center;
     transition: all 0.3s;
     cursor: pointer;
@@ -36,6 +36,29 @@
 .upload-zone.dragover {
     border-color: #0d6efd;
     background: rgba(13, 110, 253, 0.1);
+}
+.file-types {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+}
+.file-type {
+    background: var(--bs-tertiary-bg);
+    padding: 12px 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+.file-type i {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+.nav-pills .nav-link {
+    border-radius: 12px;
+    padding: 12px 24px;
+}
+.nav-pills .nav-link.active {
+    background: linear-gradient(135deg, #0d6efd, #6610f2);
 }
 </style>
 {% endblock %}
@@ -52,7 +75,7 @@
             
             <div class="form-card p-4">
                 <h3 class="mb-4">
-                    <i class="bi bi-code-slash me-2"></i>Yangi sahifa yaratish
+                    <i class="bi bi-rocket me-2"></i>Yangi loyiha yaratish
                 </h3>
                 
                 <form method="POST" enctype="multipart/form-data">
@@ -65,13 +88,12 @@
                                    placeholder="Masalan: Mening portfoliom" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Fayl nomi *</label>
+                            <label class="form-label">Papka nomi (URL uchun) *</label>
                             <div class="input-group">
-                                <input type="text" name="file_name" class="form-control form-control-lg" 
-                                       placeholder="index" required>
-                                <span class="input-group-text">.html</span>
+                                <span class="input-group-text">/coding/{{ user.username }}/</span>
+                                <input type="text" name="folder_name" class="form-control form-control-lg" 
+                                       placeholder="portfolio" required>
                             </div>
-                            <small class="text-muted">URL: /coding/{{ user.username }}/fayl_nomi.html</small>
                         </div>
                     </div>
                     
@@ -92,22 +114,61 @@
                         </div>
                     </div>
                     
-                    <div class="mt-4">
-                        <label class="form-label">HTML fayl yuklash</label>
-                        <div class="upload-zone" onclick="document.getElementById('htmlFile').click()">
-                            <i class="bi bi-cloud-upload fs-1 text-muted"></i>
-                            <p class="mb-0 mt-2">HTML faylni bu yerga tashlang yoki bosing</p>
-                            <small class="text-muted">Faqat .html fayllar</small>
-                        </div>
-                        <input type="file" id="htmlFile" name="html_file" accept=".html,.htm" 
-                               style="display:none" onchange="handleFileSelect(this)">
-                        <div id="fileName" class="mt-2 text-success" style="display:none;"></div>
-                    </div>
+                    <!-- Upload Type Tabs -->
+                    <ul class="nav nav-pills mt-4 mb-3" id="uploadTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="file-tab" data-bs-toggle="pill" data-bs-target="#file-content" type="button">
+                                <i class="bi bi-cloud-upload me-1"></i>Fayl yuklash
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="code-tab" data-bs-toggle="pill" data-bs-target="#code-content" type="button">
+                                <i class="bi bi-code-slash me-1"></i>Kod yozish
+                            </button>
+                        </li>
+                    </ul>
                     
-                    <div class="mt-4">
-                        <label class="form-label">Yoki HTML kodni yozing</label>
-                        <textarea name="html_content" class="code-editor form-control" rows="15" 
-                                  placeholder="<!DOCTYPE html>
+                    <div class="tab-content" id="uploadTabContent">
+                        <!-- File Upload -->
+                        <div class="tab-pane fade show active" id="file-content" role="tabpanel">
+                            <div class="upload-zone" onclick="document.getElementById('uploadedFile').click()">
+                                <i class="bi bi-cloud-upload fs-1 text-primary"></i>
+                                <h5 class="mt-3">Fayl yuklash</h5>
+                                <p class="text-muted mb-0">HTML yoki ZIP faylni bu yerga tashlang yoki bosing</p>
+                                
+                                <div class="file-types">
+                                    <div class="file-type">
+                                        <i class="bi bi-filetype-html text-warning d-block"></i>
+                                        <small>.html</small>
+                                    </div>
+                                    <div class="file-type">
+                                        <i class="bi bi-file-zip text-success d-block"></i>
+                                        <small>.zip</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="file" id="uploadedFile" name="uploaded_file" accept=".html,.htm,.zip" 
+                                   style="display:none" onchange="handleFileSelect(this)">
+                            <div id="fileName" class="mt-3 p-3 bg-success bg-opacity-10 rounded text-success" style="display:none;"></div>
+                            
+                            <div class="alert alert-info mt-3">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <strong>ZIP fayl yuklash:</strong> ZIP ichida HTML, CSS, JS, rasmlar bo'lishi mumkin. 
+                                Tizim avtomatik ravishda <code>index.html</code> ni asosiy fayl sifatida tanlaydi.
+                            </div>
+                            
+                            <div class="mt-3">
+                                <label class="form-label">Asosiy HTML fayl nomi (ZIP uchun, ixtiyoriy)</label>
+                                <input type="text" name="entry_file" class="form-control" 
+                                       placeholder="index.html" value="index.html">
+                                <small class="text-muted">Agar ZIP ichida index.html bo'lmasa, boshqa fayl nomini kiriting</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Code Editor -->
+                        <div class="tab-pane fade" id="code-content" role="tabpanel">
+                            <textarea name="html_content" class="code-editor form-control" rows="15" 
+                                      placeholder="<!DOCTYPE html>
 <html>
 <head>
     <title>Mening sahifam</title>
@@ -116,6 +177,12 @@
     <h1>Salom dunyo!</h1>
 </body>
 </html>"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning mt-4">
+                        <i class="bi bi-megaphone me-2"></i>
+                        <strong>Eslatma:</strong> Loyiha deploy qilinganida barcha o'quvchilarga xabar yuboriladi!
                     </div>
                     
                     <div class="d-flex gap-3 mt-4">
@@ -137,28 +204,47 @@
 <script>
 function handleFileSelect(input) {
     if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const fileName = file.name;
+        const fileSize = (file.size / 1024).toFixed(1);
+        
+        let icon = 'bi-filetype-html';
+        if (fileName.endsWith('.zip')) {
+            icon = 'bi-file-zip';
+        }
+        
         document.getElementById('fileName').style.display = 'block';
-        document.getElementById('fileName').innerHTML = '<i class="bi bi-file-earmark-code me-1"></i>' + input.files[0].name;
+        document.getElementById('fileName').innerHTML = `
+            <i class="bi ${icon} me-2"></i>
+            <strong>${fileName}</strong> (${fileSize} KB)
+        `;
     }
 }
 
 // Drag and drop
 const uploadZone = document.querySelector('.upload-zone');
-uploadZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    uploadZone.classList.add('dragover');
-});
-uploadZone.addEventListener('dragleave', () => {
-    uploadZone.classList.remove('dragover');
-});
-uploadZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    uploadZone.classList.remove('dragover');
-    const file = e.dataTransfer.files[0];
-    if (file && file.name.endsWith('.html')) {
-        document.getElementById('htmlFile').files = e.dataTransfer.files;
-        handleFileSelect(document.getElementById('htmlFile'));
-    }
-});
+if (uploadZone) {
+    uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('dragover');
+    });
+    uploadZone.addEventListener('dragleave', () => {
+        uploadZone.classList.remove('dragover');
+    });
+    uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (file) {
+            const name = file.name.toLowerCase();
+            if (name.endsWith('.html') || name.endsWith('.htm') || name.endsWith('.zip')) {
+                document.getElementById('uploadedFile').files = e.dataTransfer.files;
+                handleFileSelect(document.getElementById('uploadedFile'));
+            } else {
+                alert('Faqat .html yoki .zip fayllar qabul qilinadi!');
+            }
+        }
+    });
+}
 </script>
 {% endblock %}

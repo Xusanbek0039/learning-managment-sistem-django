@@ -500,11 +500,15 @@ def student_public_profile(request, pk):
     # Tugallangan kurslar soni
     completed_count = certificates.count()
     
+    # Deploy qilingan sahifalar
+    deploys = HTMLDeploy.objects.filter(user=student, is_active=True)
+    
     return render(request, 'accounts/student_public_profile.html', {
         'student': student,
         'common_courses': common_courses,
         'certificates': certificates,
         'completed_count': completed_count,
+        'deploys': deploys,
     })
 
 
@@ -2247,43 +2251,119 @@ def my_deploys(request):
 @login_required
 def create_deploy(request):
     """Yangi HTML deploy qilish"""
+    import os
+    import zipfile
+    import shutil
+    from django.conf import settings
+    
     if request.method == 'POST':
         title = request.POST.get('title', '').strip()
-        file_name = request.POST.get('file_name', '').strip()
+        folder_name = request.POST.get('folder_name', '').strip()
         description = request.POST.get('description', '').strip()
         profession_id = request.POST.get('profession')
+        entry_file = request.POST.get('entry_file', 'index.html').strip()
         
-        # Fayl yuklash yoki matn kiritish
-        html_file = request.FILES.get('html_file')
+        # Fayl yuklash
+        uploaded_file = request.FILES.get('uploaded_file')
         html_content = request.POST.get('html_content', '').strip()
         
-        if html_file:
-            html_content = html_file.read().decode('utf-8', errors='ignore')
-        
-        if not title or not file_name or not html_content:
-            messages.error(request, "Barcha maydonlarni to'ldiring!")
+        if not title or not folder_name:
+            messages.error(request, "Loyiha nomi va papka nomini kiriting!")
             return redirect('create_deploy')
         
-        # Fayl nomini tozalash
-        file_name = file_name.lower().replace(' ', '_')
-        if not file_name.endswith('.html'):
-            file_name += '.html'
+        # Papka nomini tozalash
+        folder_name = folder_name.lower().replace(' ', '_').replace('.', '_')
         
         # Mavjudligini tekshirish
-        if HTMLDeploy.objects.filter(user=request.user, file_name=file_name).exists():
-            messages.error(request, f"'{file_name}' nomli fayl allaqachon mavjud!")
+        if HTMLDeploy.objects.filter(user=request.user, folder_name=folder_name).exists():
+            messages.error(request, f"'{folder_name}' nomli loyiha allaqachon mavjud!")
             return redirect('create_deploy')
         
+        deploy_type = 'html'
+        
+        if uploaded_file:
+            file_name = uploaded_file.name.lower()
+            
+            # ZIP fayl
+            if file_name.endswith('.zip'):
+                deploy_type = 'project'
+                
+                # Papka yaratish
+                deploy_folder = os.path.join(settings.MEDIA_ROOT, 'deploys', request.user.username, folder_name)
+                os.makedirs(deploy_folder, exist_ok=True)
+                
+                # ZIP ni ochish
+                try:
+                    import tempfile
+                    with tempfile.NamedTemporaryFile(delete=False, suffix='.zip') as tmp:
+                        for chunk in uploaded_file.chunks():
+                            tmp.write(chunk)
+                        tmp_path = tmp.name
+                    
+                    with zipfile.ZipFile(tmp_path, 'r') as zip_ref:
+                        # HTML fayllarni topish
+                        html_files = [f for f in zip_ref.namelist() if f.endswith('.html') and not f.startswith('__MACOSX')]
+                        
+                        if not html_files:
+                            messages.error(request, "ZIP ichida HTML fayl topilmadi!")
+                            os.unlink(tmp_path)
+                            return redirect('create_deploy')
+                        
+                        # Agar entry_file ko'rsatilmagan bo'lsa
+                        if not entry_file or entry_file == 'index.html':
+                            # index.html ni izlash
+                            for hf in html_files:
+                                if 'index.html' in hf.lower():
+                                    entry_file = os.path.basename(hf)
+                                    break
+                            else:
+                                # Birinchi HTML ni olish
+                                entry_file = os.path.basename(html_files[0])
+                        
+                        zip_ref.extractall(deploy_folder)
+                    
+                    os.unlink(tmp_path)
+                    
+                except Exception as e:
+                    messages.error(request, f"ZIP faylni ochishda xato: {str(e)}")
+                    return redirect('create_deploy')
+            
+            # HTML fayl
+            elif file_name.endswith('.html') or file_name.endswith('.htm'):
+                html_content = uploaded_file.read().decode('utf-8', errors='ignore')
+                entry_file = folder_name + '.html'
+            else:
+                messages.error(request, "Faqat .html yoki .zip fayllar qabul qilinadi!")
+                return redirect('create_deploy')
+        
+        elif not html_content:
+            messages.error(request, "HTML kod yoki fayl yuklang!")
+            return redirect('create_deploy')
+        
+        # Deploy yaratish
         deploy = HTMLDeploy.objects.create(
             user=request.user,
             profession_id=profession_id if profession_id else None,
             title=title,
-            file_name=file_name,
-            html_content=html_content,
+            deploy_type=deploy_type,
+            folder_name=folder_name,
+            entry_file=entry_file,
+            html_content=html_content if deploy_type == 'html' else None,
             description=description,
         )
         
-        messages.success(request, f"Sahifa muvaffaqiyatli deploy qilindi! URL: {deploy.get_url()}")
+        # Barcha foydalanuvchilarga xabar yuborish
+        all_users = CustomUser.objects.filter(role='student', is_blocked=False).exclude(pk=request.user.pk)
+        for user in all_users:
+            Message.objects.create(
+                sender=request.user,
+                recipient=user,
+                title=f"🚀 Yangi loyiha: {title}",
+                content=f"{request.user.full_name} yangi loyiha ishga tushirdi!\n\n📦 {title}\n\n🔗 Ko'rish uchun: {deploy.get_url()}",
+                message_type='system'
+            )
+        
+        messages.success(request, f"Loyiha muvaffaqiyatli deploy qilindi! URL: {deploy.get_url()}")
         return redirect('my_deploys')
     
     professions = Profession.objects.all()
@@ -2326,26 +2406,69 @@ def edit_deploy(request, pk):
 @login_required
 def delete_deploy(request, pk):
     """Deploy qilingan sahifani o'chirish"""
+    import os
+    import shutil
+    
     deploy = get_object_or_404(HTMLDeploy, pk=pk, user=request.user)
     
     if request.method == 'POST':
+        # Agar loyiha bo'lsa, papkani o'chirish
+        if deploy.deploy_type == 'project':
+            folder_path = deploy.get_folder_path()
+            if os.path.exists(folder_path):
+                shutil.rmtree(folder_path)
+        
         deploy.delete()
-        messages.success(request, "Sahifa o'chirildi!")
+        messages.success(request, "Loyiha o'chirildi!")
         return redirect('my_deploys')
     
     return render(request, 'accounts/coding/delete_deploy.html', {'deploy': deploy})
 
 
-def view_deployed_page(request, username, filename):
+def view_deployed_page(request, username, folder_name, filepath=None):
     """Deploy qilingan sahifani ko'rsatish (login talab qilinmaydi)"""
+    import os
+    import mimetypes
+    from django.conf import settings
+    
     user = get_object_or_404(CustomUser, username=username)
-    deploy = get_object_or_404(HTMLDeploy, user=user, file_name=filename, is_active=True)
+    deploy = get_object_or_404(HTMLDeploy, user=user, folder_name=folder_name, is_active=True)
     
-    # Ko'rishlar sonini oshirish
-    deploy.views_count += 1
-    deploy.save(update_fields=['views_count'])
+    # Ko'rishlar sonini oshirish (faqat asosiy sahifa uchun)
+    if not filepath or filepath == deploy.entry_file:
+        deploy.views_count += 1
+        deploy.save(update_fields=['views_count'])
     
-    return HttpResponse(deploy.html_content, content_type='text/html')
+    # HTML fayl (oddiy deploy)
+    if deploy.deploy_type == 'html':
+        return HttpResponse(deploy.html_content, content_type='text/html')
+    
+    # Loyiha (ZIP dan)
+    if not filepath:
+        filepath = deploy.entry_file
+    
+    # Fayl yo'lini tuzish
+    file_path = os.path.join(deploy.get_folder_path(), filepath)
+    
+    # Xavfsizlik tekshiruvi - papkadan tashqariga chiqmaslik
+    real_path = os.path.realpath(file_path)
+    deploy_folder = os.path.realpath(deploy.get_folder_path())
+    if not real_path.startswith(deploy_folder):
+        return HttpResponse("Ruxsat berilmagan", status=403)
+    
+    if not os.path.exists(file_path):
+        return HttpResponse("Fayl topilmadi", status=404)
+    
+    # MIME turini aniqlash
+    mime_type, _ = mimetypes.guess_type(file_path)
+    if not mime_type:
+        mime_type = 'application/octet-stream'
+    
+    # Faylni o'qish va qaytarish
+    with open(file_path, 'rb') as f:
+        content = f.read()
+    
+    return HttpResponse(content, content_type=mime_type)
 
 
 # ==================== ADMIN: HTML DEPLOYS ====================
