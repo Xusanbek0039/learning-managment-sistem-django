@@ -296,6 +296,9 @@
                 <div class="alert alert-success py-2 mb-3">
                     <i class="bi bi-check-circle me-1"></i> Kursga yozilgansiz
                 </div>
+                <a href="{% url 'classmates' profession.pk %}" class="btn btn-outline-primary w-100 ios-btn mb-3">
+                    <i class="bi bi-people me-2"></i>Kursdoshlar
+                </a>
             {% else %}
                 <a href="{% url 'enroll_course' profession.pk %}" class="btn btn-primary w-100 ios-btn mb-3">
                     <i class="bi bi-play-circle me-2"></i>O'qishni boshlash
