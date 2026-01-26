@@ -286,6 +286,11 @@
                                     <i class="bi bi-envelope me-2"></i>Xabarlar
                                 </a>
                             </li>
+                            <li>
+                                <a class="dropdown-item rounded-3" href="{% url 'my_devices' %}">
+                                    <i class="bi bi-laptop me-1"></i>Qurilmalar
+                                </a>
+                            </li>
                             {% if user.is_admin %}
                             <li class="nav-item">
                                 <a class="dropdown-item rounded-3" href="{% url 'admin_dashboard' %}">
