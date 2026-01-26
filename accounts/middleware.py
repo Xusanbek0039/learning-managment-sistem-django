@@ -195,6 +195,13 @@ class SessionTimeoutMiddleware:
                         device.last_login = timezone.now()
                         device.ip_address = ip_address
                         device.save(update_fields=['last_login', 'ip_address'])
+                    else:
+                        # Yangi qurilma - xabar yuborish
+                        try:
+                            from .notifications import check_new_device_login
+                            check_new_device_login(request.user, device_info['device_name'], ip_address)
+                        except:
+                            pass
                     
                     # Create session using get_or_create to avoid unique constraint error
                     UserSession.objects.get_or_create(

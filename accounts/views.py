@@ -295,6 +295,10 @@ def mark_video_watched(request, pk):
             request.user.add_coins(1, f"Video darslik ko'rildi: {video.lesson.title}")
             progress.coin_awarded = True
             progress.save()
+        
+        # Avtomatik xabar yuborish
+        from .notifications import on_video_watched
+        on_video_watched(request.user, progress)
     
     return JsonResponse({'success': True, 'coins': request.user.coins})
 
@@ -408,6 +412,10 @@ def submit_test(request, pk):
         )
         
         messages.success(request, f"Tabriklaymiz! {correct} ta to'g'ri javob uchun {correct} coin oldingiz!")
+    
+    # Avtomatik xabar yuborish
+    from .notifications import on_test_completed
+    on_test_completed(request.user, result)
     
     return redirect('test_result', pk=result.pk)
 
@@ -545,6 +553,11 @@ def change_password_view(request):
                 request.user.set_password(form.cleaned_data['new_password1'])
                 request.user.save()
                 login(request, request.user)
+                
+                # Xavfsizlik xabari
+                from .notifications import check_password_changed
+                check_password_changed(request.user)
+                
                 messages.success(request, "Parol muvaffaqiyatli o'zgartirildi!")
                 return redirect('profile')
     else:
@@ -1388,6 +1401,10 @@ def grade_homework(request, pk):
                     action_type='Vazifa baxosi uchun',
                     description=f"Vazifasi baholandi: {submission.homework.lesson.title} - Baho: {submission.grade}, +5 coin"
                 )
+            
+            # Avtomatik xabar yuborish
+            from .notifications import on_homework_graded
+            on_homework_graded(submission.student, submission, submission.grade)
             
             messages.success(request, "Vazifa baholandi!")
             return redirect('homework_submissions')
