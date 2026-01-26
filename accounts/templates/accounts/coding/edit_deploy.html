@@ -1,0 +1,130 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}{{ deploy.title }} - Tahrirlash | IT Creative{% endblock %}
+
+{% block extra_css %}
+<style>
+.code-editor {
+    font-family: 'Fira Code', 'Consolas', monospace;
+    font-size: 14px;
+    background: #1e1e1e;
+    color: #d4d4d4;
+    border-radius: 12px;
+    padding: 16px;
+    min-height: 400px;
+    resize: vertical;
+}
+.form-card {
+    background: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+}
+.url-box {
+    background: var(--bs-tertiary-bg);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-family: monospace;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            
+            <a href="{% url 'my_deploys' %}" class="btn btn-outline-secondary rounded-pill mb-4">
+                <i class="bi bi-arrow-left me-1"></i>Orqaga
+            </a>
+            
+            <div class="form-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="mb-0">
+                        <i class="bi bi-pencil me-2"></i>Sahifani tahrirlash
+                    </h3>
+                    <a href="{{ deploy.get_url }}" target="_blank" class="btn btn-outline-primary rounded-pill">
+                        <i class="bi bi-box-arrow-up-right me-1"></i>Ko'rish
+                    </a>
+                </div>
+                
+                <div class="url-box mb-4">
+                    <strong>URL:</strong> {{ deploy.get_url }}
+                </div>
+                
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Loyiha nomi *</label>
+                            <input type="text" name="title" class="form-control form-control-lg" 
+                                   value="{{ deploy.title }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fayl nomi</label>
+                            <input type="text" class="form-control form-control-lg" 
+                                   value="{{ deploy.file_name }}" disabled>
+                            <small class="text-muted">Fayl nomini o'zgartirib bo'lmaydi</small>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-4 mt-2">
+                        <div class="col-md-6">
+                            <label class="form-label">Kurs (ixtiyoriy)</label>
+                            <select name="profession" class="form-select">
+                                <option value="">Tanlanmagan</option>
+                                {% for p in professions %}
+                                <option value="{{ p.pk }}" {% if deploy.profession_id == p.pk %}selected{% endif %}>{{ p.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tavsif (ixtiyoriy)</label>
+                            <input type="text" name="description" class="form-control" 
+                                   value="{{ deploy.description|default:'' }}" placeholder="Qisqacha tavsif...">
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <label class="form-label">Yangi HTML fayl yuklash (ixtiyoriy)</label>
+                        <input type="file" name="html_file" class="form-control" accept=".html,.htm">
+                        <small class="text-muted">Agar yangi fayl yuklasangiz, eski kod o'rniga yangi fayl kodi ishlatiladi</small>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <label class="form-label">HTML kodi</label>
+                        <textarea name="html_content" class="code-editor form-control" rows="15">{{ deploy.html_content }}</textarea>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <div class="form-check">
+                            <input type="checkbox" name="is_active" class="form-check-input" id="isActive"
+                                   {% if deploy.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="isActive">
+                                Faol (ommaga ko'rinadi)
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-3 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill">
+                            <i class="bi bi-check-lg me-2"></i>Saqlash
+                        </button>
+                        <a href="{% url 'my_deploys' %}" class="btn btn-outline-secondary btn-lg rounded-pill">
+                            Bekor qilish
+                        </a>
+                        <a href="{% url 'delete_deploy' deploy.pk %}" class="btn btn-outline-danger btn-lg rounded-pill ms-auto">
+                            <i class="bi bi-trash me-1"></i>O'chirish
+                        </a>
+                    </div>
+                </form>
+            </div>
+            
+        </div>
+    </div>
+    
+</div>
+{% endblock %}

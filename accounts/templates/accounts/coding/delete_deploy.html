@@ -1,0 +1,49 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Sahifani o'chirish | IT Creative{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Sahifani o'chirish
+                    </h5>
+                </div>
+                <div class="card-body text-center p-5">
+                    <i class="bi bi-code-slash text-danger" style="font-size: 5rem;"></i>
+                    
+                    <h4 class="mt-4">
+                        Haqiqatan ham ushbu sahifani o'chirmoqchimisiz?
+                    </h4>
+                    
+                    <div class="my-4 p-3 bg-light rounded">
+                        <h5>{{ deploy.title }}</h5>
+                        <code>{{ deploy.get_url }}</code>
+                        <p class="text-muted mb-0 mt-2">{{ deploy.views_count }} ta ko'rish</p>
+                    </div>
+                    
+                    <div class="alert alert-warning text-start">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Bu sahifani o'chirsangiz, unga havola orqali kirish imkonsiz bo'ladi.
+                    </div>
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-center gap-3 mt-4">
+                            <a href="{% url 'my_deploys' %}" class="btn btn-secondary px-4">
+                                <i class="bi bi-x-lg me-2"></i>Bekor qilish
+                            </a>
+                            <button type="submit" class="btn btn-danger px-4">
+                                <i class="bi bi-trash me-2"></i>O'chirish
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -109,6 +109,18 @@ urlpatterns = [
     path('profile/devices/<int:pk>/trust/', views.trust_device, name='trust_device'),
     path('profile/devices/logout-all/', views.logout_all_devices, name='logout_all_devices'),
     
+    # Coding / HTML Deploy
+    path('coding/', views.my_deploys, name='my_deploys'),
+    path('coding/create/', views.create_deploy, name='create_deploy'),
+    path('coding/<int:pk>/edit/', views.edit_deploy, name='edit_deploy'),
+    path('coding/<int:pk>/delete/', views.delete_deploy, name='delete_deploy'),
+    path('coding/<str:username>/<str:filename>', views.view_deployed_page, name='view_deployed_page'),
+    
+    # Admin: Deploys
+    path('dashboard/deploys/', views.admin_deploys, name='admin_deploys'),
+    path('dashboard/deploys/<int:pk>/toggle/', views.admin_deploy_toggle, name='admin_deploy_toggle'),
+    path('dashboard/deploys/<int:pk>/delete/', views.admin_deploy_delete, name='admin_deploy_delete'),
+    
     # Admin: Qurilmalar
     path('dashboard/users/<int:pk>/devices/', views.admin_user_devices, name='admin_user_devices'),
     path('dashboard/users/<int:user_pk>/devices/<int:device_pk>/logout/', views.admin_logout_user_device, name='admin_logout_user_device'),

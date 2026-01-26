@@ -2235,6 +2235,188 @@ def admin_discount_delete(request, pk):
     return render(request, 'accounts/admin/discount_delete.html', {'discount': discount})
 
 
+# ==================== CODING / HTML DEPLOY ====================
+
+@login_required
+def my_deploys(request):
+    """O'quvchining deploy qilgan sahifalari"""
+    deploys = HTMLDeploy.objects.filter(user=request.user)
+    return render(request, 'accounts/coding/my_deploys.html', {'deploys': deploys})
+
+
+@login_required
+def create_deploy(request):
+    """Yangi HTML deploy qilish"""
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        file_name = request.POST.get('file_name', '').strip()
+        description = request.POST.get('description', '').strip()
+        profession_id = request.POST.get('profession')
+        
+        # Fayl yuklash yoki matn kiritish
+        html_file = request.FILES.get('html_file')
+        html_content = request.POST.get('html_content', '').strip()
+        
+        if html_file:
+            html_content = html_file.read().decode('utf-8', errors='ignore')
+        
+        if not title or not file_name or not html_content:
+            messages.error(request, "Barcha maydonlarni to'ldiring!")
+            return redirect('create_deploy')
+        
+        # Fayl nomini tozalash
+        file_name = file_name.lower().replace(' ', '_')
+        if not file_name.endswith('.html'):
+            file_name += '.html'
+        
+        # Mavjudligini tekshirish
+        if HTMLDeploy.objects.filter(user=request.user, file_name=file_name).exists():
+            messages.error(request, f"'{file_name}' nomli fayl allaqachon mavjud!")
+            return redirect('create_deploy')
+        
+        deploy = HTMLDeploy.objects.create(
+            user=request.user,
+            profession_id=profession_id if profession_id else None,
+            title=title,
+            file_name=file_name,
+            html_content=html_content,
+            description=description,
+        )
+        
+        messages.success(request, f"Sahifa muvaffaqiyatli deploy qilindi! URL: {deploy.get_url()}")
+        return redirect('my_deploys')
+    
+    professions = Profession.objects.all()
+    return render(request, 'accounts/coding/create_deploy.html', {'professions': professions})
+
+
+@login_required
+def edit_deploy(request, pk):
+    """Deploy qilingan sahifani tahrirlash"""
+    deploy = get_object_or_404(HTMLDeploy, pk=pk, user=request.user)
+    
+    if request.method == 'POST':
+        deploy.title = request.POST.get('title', '').strip()
+        deploy.description = request.POST.get('description', '').strip()
+        profession_id = request.POST.get('profession')
+        deploy.profession_id = profession_id if profession_id else None
+        
+        # Fayl yuklash yoki matn kiritish
+        html_file = request.FILES.get('html_file')
+        html_content = request.POST.get('html_content', '').strip()
+        
+        if html_file:
+            deploy.html_content = html_file.read().decode('utf-8', errors='ignore')
+        elif html_content:
+            deploy.html_content = html_content
+        
+        deploy.is_active = 'is_active' in request.POST
+        deploy.save()
+        
+        messages.success(request, "Sahifa yangilandi!")
+        return redirect('my_deploys')
+    
+    professions = Profession.objects.all()
+    return render(request, 'accounts/coding/edit_deploy.html', {
+        'deploy': deploy,
+        'professions': professions,
+    })
+
+
+@login_required
+def delete_deploy(request, pk):
+    """Deploy qilingan sahifani o'chirish"""
+    deploy = get_object_or_404(HTMLDeploy, pk=pk, user=request.user)
+    
+    if request.method == 'POST':
+        deploy.delete()
+        messages.success(request, "Sahifa o'chirildi!")
+        return redirect('my_deploys')
+    
+    return render(request, 'accounts/coding/delete_deploy.html', {'deploy': deploy})
+
+
+def view_deployed_page(request, username, filename):
+    """Deploy qilingan sahifani ko'rsatish (login talab qilinmaydi)"""
+    user = get_object_or_404(CustomUser, username=username)
+    deploy = get_object_or_404(HTMLDeploy, user=user, file_name=filename, is_active=True)
+    
+    # Ko'rishlar sonini oshirish
+    deploy.views_count += 1
+    deploy.save(update_fields=['views_count'])
+    
+    return HttpResponse(deploy.html_content, content_type='text/html')
+
+
+# ==================== ADMIN: HTML DEPLOYS ====================
+
+@login_required
+def admin_deploys(request):
+    """Admin: Barcha deploylar"""
+    if not request.user.is_admin:
+        messages.error(request, "Sizda bu sahifaga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    deploys = HTMLDeploy.objects.select_related('user', 'profession').all()
+    
+    # Filterlar
+    user_id = request.GET.get('user')
+    if user_id:
+        deploys = deploys.filter(user_id=user_id)
+    
+    status = request.GET.get('status')
+    if status == 'active':
+        deploys = deploys.filter(is_active=True)
+    elif status == 'inactive':
+        deploys = deploys.filter(is_active=False)
+    
+    q = request.GET.get('q')
+    if q:
+        deploys = deploys.filter(title__icontains=q)
+    
+    users = CustomUser.objects.filter(deploys__isnull=False).distinct()
+    
+    context = {
+        'deploys': deploys,
+        'users': users,
+        'total_deploys': HTMLDeploy.objects.count(),
+        'active_deploys': HTMLDeploy.objects.filter(is_active=True).count(),
+        'total_views': HTMLDeploy.objects.aggregate(total=Sum('views_count'))['total'] or 0,
+    }
+    return render(request, 'accounts/admin/deploys.html', context)
+
+
+@login_required
+def admin_deploy_toggle(request, pk):
+    """Admin: Deploy faolligini o'zgartirish"""
+    if not request.user.is_admin:
+        return redirect('home')
+    
+    deploy = get_object_or_404(HTMLDeploy, pk=pk)
+    deploy.is_active = not deploy.is_active
+    deploy.save()
+    
+    status = "faollashtirildi" if deploy.is_active else "o'chirildi"
+    messages.success(request, f"'{deploy.title}' {status}!")
+    return redirect('admin_deploys')
+
+
+@login_required
+def admin_deploy_delete(request, pk):
+    """Admin: Deployni o'chirish"""
+    if not request.user.is_admin:
+        return redirect('home')
+    
+    deploy = get_object_or_404(HTMLDeploy, pk=pk)
+    
+    if request.method == 'POST':
+        deploy.delete()
+        messages.success(request, "Deploy o'chirildi!")
+        return redirect('admin_deploys')
+    
+    return render(request, 'accounts/admin/deploy_delete.html', {'deploy': deploy})
+
+
 # ==================== ADMIN: DARSLAR STATISTIKASI ====================
 
 @login_required

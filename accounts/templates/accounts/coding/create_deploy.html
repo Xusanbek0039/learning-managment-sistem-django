@@ -1,0 +1,164 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Yangi sahifa yaratish | IT Creative{% endblock %}
+
+{% block extra_css %}
+<style>
+.code-editor {
+    font-family: 'Fira Code', 'Consolas', monospace;
+    font-size: 14px;
+    background: #1e1e1e;
+    color: #d4d4d4;
+    border-radius: 12px;
+    padding: 16px;
+    min-height: 400px;
+    resize: vertical;
+}
+.form-card {
+    background: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+}
+.upload-zone {
+    border: 2px dashed var(--bs-border-color);
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+.upload-zone:hover {
+    border-color: #0d6efd;
+    background: rgba(13, 110, 253, 0.05);
+}
+.upload-zone.dragover {
+    border-color: #0d6efd;
+    background: rgba(13, 110, 253, 0.1);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            
+            <a href="{% url 'my_deploys' %}" class="btn btn-outline-secondary rounded-pill mb-4">
+                <i class="bi bi-arrow-left me-1"></i>Orqaga
+            </a>
+            
+            <div class="form-card p-4">
+                <h3 class="mb-4">
+                    <i class="bi bi-code-slash me-2"></i>Yangi sahifa yaratish
+                </h3>
+                
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Loyiha nomi *</label>
+                            <input type="text" name="title" class="form-control form-control-lg" 
+                                   placeholder="Masalan: Mening portfoliom" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fayl nomi *</label>
+                            <div class="input-group">
+                                <input type="text" name="file_name" class="form-control form-control-lg" 
+                                       placeholder="index" required>
+                                <span class="input-group-text">.html</span>
+                            </div>
+                            <small class="text-muted">URL: /coding/{{ user.username }}/fayl_nomi.html</small>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-4 mt-2">
+                        <div class="col-md-6">
+                            <label class="form-label">Kurs (ixtiyoriy)</label>
+                            <select name="profession" class="form-select">
+                                <option value="">Tanlanmagan</option>
+                                {% for p in professions %}
+                                <option value="{{ p.pk }}">{{ p.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tavsif (ixtiyoriy)</label>
+                            <input type="text" name="description" class="form-control" 
+                                   placeholder="Qisqacha tavsif...">
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <label class="form-label">HTML fayl yuklash</label>
+                        <div class="upload-zone" onclick="document.getElementById('htmlFile').click()">
+                            <i class="bi bi-cloud-upload fs-1 text-muted"></i>
+                            <p class="mb-0 mt-2">HTML faylni bu yerga tashlang yoki bosing</p>
+                            <small class="text-muted">Faqat .html fayllar</small>
+                        </div>
+                        <input type="file" id="htmlFile" name="html_file" accept=".html,.htm" 
+                               style="display:none" onchange="handleFileSelect(this)">
+                        <div id="fileName" class="mt-2 text-success" style="display:none;"></div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <label class="form-label">Yoki HTML kodni yozing</label>
+                        <textarea name="html_content" class="code-editor form-control" rows="15" 
+                                  placeholder="<!DOCTYPE html>
+<html>
+<head>
+    <title>Mening sahifam</title>
+</head>
+<body>
+    <h1>Salom dunyo!</h1>
+</body>
+</html>"></textarea>
+                    </div>
+                    
+                    <div class="d-flex gap-3 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill">
+                            <i class="bi bi-rocket me-2"></i>Deploy qilish
+                        </button>
+                        <a href="{% url 'my_deploys' %}" class="btn btn-outline-secondary btn-lg rounded-pill">
+                            Bekor qilish
+                        </a>
+                    </div>
+                </form>
+            </div>
+            
+        </div>
+    </div>
+    
+</div>
+
+<script>
+function handleFileSelect(input) {
+    if (input.files && input.files[0]) {
+        document.getElementById('fileName').style.display = 'block';
+        document.getElementById('fileName').innerHTML = '<i class="bi bi-file-earmark-code me-1"></i>' + input.files[0].name;
+    }
+}
+
+// Drag and drop
+const uploadZone = document.querySelector('.upload-zone');
+uploadZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadZone.classList.add('dragover');
+});
+uploadZone.addEventListener('dragleave', () => {
+    uploadZone.classList.remove('dragover');
+});
+uploadZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadZone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file && file.name.endsWith('.html')) {
+        document.getElementById('htmlFile').files = e.dataTransfer.files;
+        handleFileSelect(document.getElementById('htmlFile'));
+    }
+});
+</script>
+{% endblock %}
