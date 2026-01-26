@@ -17,7 +17,7 @@ from .models import (
     Profession, Section, CustomUser, CourseEnrollment, Lesson, VideoLesson, VideoProgress,
     Homework, HomeworkSubmission, Test, TestQuestion, TestAnswer, TestResult,
     TestUserAnswer, Certificate, Message, PaymentStatus, HelpRequest, Discount,
-    UserDevice, UserSession
+    UserDevice, UserSession, HTMLDeploy
 )
 from coin.models import ActivityLog, CoinTransaction
 

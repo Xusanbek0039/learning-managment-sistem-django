@@ -555,6 +555,35 @@ class UserSession(models.Model):
         return timezone.now() > self.expires_at
 
 
+class HTMLDeploy(models.Model):
+    user = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='deploys')
+    profession = models.ForeignKey('Profession', on_delete=models.CASCADE, related_name='deploys', null=True, blank=True)
+    title = models.CharField(max_length=200, verbose_name="Loyiha nomi")
+    file_name = models.CharField(max_length=100, verbose_name="Fayl nomi")
+    html_content = models.TextField(verbose_name="HTML kodi")
+    description = models.TextField(blank=True, null=True, verbose_name="Tavsif")
+    is_active = models.BooleanField(default=True, verbose_name="Faol")
+    views_count = models.IntegerField(default=0, verbose_name="Ko'rishlar soni")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['user', 'file_name']
+        ordering = ['-created_at']
+        verbose_name = "HTML Deploy"
+        verbose_name_plural = "HTML Deploylar"
+    
+    def __str__(self):
+        return f"{self.user.username}/{self.file_name}"
+    
+    def get_url(self):
+        return f"/coding/{self.user.username}/{self.file_name}"
+    
+    @property
+    def full_url(self):
+        return self.get_url()
+
+
 class Discount(models.Model):
     DISCOUNT_TYPES = (
         ('percentage', 'Foiz'),
