@@ -157,6 +157,54 @@
     </div>
 </div>
 
+<!-- Deploy statistikasi -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon cyan me-3"><i class="bi bi-code-slash"></i></div>
+                <div>
+                    <div class="stat-number">{{ total_deploys }}</div>
+                    <div class="stat-label">Jami loyihalar</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon green me-3"><i class="bi bi-check-circle"></i></div>
+                <div>
+                    <div class="stat-number">{{ active_deploys }}</div>
+                    <div class="stat-label">Faol</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon red me-3"><i class="bi bi-x-circle"></i></div>
+                <div>
+                    <div class="stat-number">{{ inactive_deploys }}</div>
+                    <div class="stat-label">Nofaol</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon blue me-3"><i class="bi bi-eye"></i></div>
+                <div>
+                    <div class="stat-number">{{ total_deploy_views }}</div>
+                    <div class="stat-label">Ko'rishlar</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Test va Vazifalar -->
 <div class="row g-4 mb-4">
     <div class="col-md-6">
@@ -284,6 +332,72 @@
                 </div>
                 {% else %}
                 <p class="text-muted text-center py-3">Ma'lumot yo'q</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Oxirgi harakatlar -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-activity me-2"></i>Oxirgi harakatlar</span>
+                <a href="{% url 'coin:admin_activities' %}" class="btn btn-sm btn-outline-primary">Barchasi</a>
+            </div>
+            <div class="card-body">
+                {% if recent_activities %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Foydalanuvchi</th>
+                                <th>Amal</th>
+                                <th>Tavsif</th>
+                                <th>Vaqt</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activity in recent_activities %}
+                            <tr>
+                                <td>
+                                    <strong>{{ activity.user.full_name }}</strong>
+                                </td>
+                                <td>
+                                    {% if activity.action_type == 'login' %}
+                                    <span class="badge bg-info"><i class="bi bi-box-arrow-in-right me-1"></i>Kirish</span>
+                                    {% elif activity.action_type == 'logout' %}
+                                    <span class="badge bg-secondary"><i class="bi bi-box-arrow-right me-1"></i>Chiqish</span>
+                                    {% elif activity.action_type == 'deploy_create' %}
+                                    <span class="badge bg-success"><i class="bi bi-rocket me-1"></i>Deploy</span>
+                                    {% elif activity.action_type == 'deploy_edit' %}
+                                    <span class="badge bg-primary"><i class="bi bi-pencil me-1"></i>Tahrirlash</span>
+                                    {% elif activity.action_type == 'deploy_delete' %}
+                                    <span class="badge bg-danger"><i class="bi bi-trash me-1"></i>O'chirish</span>
+                                    {% elif activity.action_type == 'submit_homework' %}
+                                    <span class="badge bg-primary"><i class="bi bi-file-earmark-check me-1"></i>Vazifa</span>
+                                    {% elif activity.action_type == 'submit_test' %}
+                                    <span class="badge bg-warning text-dark"><i class="bi bi-check2-square me-1"></i>Test</span>
+                                    {% elif activity.action_type == 'watch_video' %}
+                                    <span class="badge bg-info"><i class="bi bi-play-circle me-1"></i>Video</span>
+                                    {% elif activity.action_type == 'enroll_course' %}
+                                    <span class="badge bg-success"><i class="bi bi-person-plus me-1"></i>Yozildi</span>
+                                    {% elif activity.action_type == 'earn_coins' %}
+                                    <span class="badge bg-warning text-dark"><i class="bi bi-coin me-1"></i>Coin</span>
+                                    {% else %}
+                                    <span class="badge bg-light text-dark">{{ activity.get_action_type_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-muted small">{{ activity.description|truncatewords:10 }}</td>
+                                <td><small class="text-muted">{{ activity.created_at|timesince }}</small></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-3">Harakatlar mavjud emas</p>
                 {% endif %}
             </div>
         </div>

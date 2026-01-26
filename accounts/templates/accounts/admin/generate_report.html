@@ -1,0 +1,124 @@
+{% extends 'accounts/admin/base_admin.html' %}
+
+{% block title %}Hisobot Yaratish - Admin Panel{% endblock %}
+
+{% block admin_content %}
+<div class="top-bar">
+    <h1 class="page-title"><i class="bi bi-file-earmark-plus me-2"></i>Yangi Hisobot Yaratish</h1>
+    <a href="{% url 'admin_reports' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Orqaga
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-gear me-2"></i>Hisobot sozlamalari
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Hisobot turi</label>
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="report_type" 
+                                           id="typeDaily" value="daily">
+                                    <label class="form-check-label" for="typeDaily">
+                                        <i class="bi bi-calendar-day me-1"></i>Kunlik
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="report_type" 
+                                           id="typeWeekly" value="weekly">
+                                    <label class="form-check-label" for="typeWeekly">
+                                        <i class="bi bi-calendar-week me-1"></i>Haftalik
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="report_type" 
+                                           id="typeMonthly" value="monthly" checked>
+                                    <label class="form-check-label" for="typeMonthly">
+                                        <i class="bi bi-calendar-month me-1"></i>Oylik
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="report_type" 
+                                           id="typeCustom" value="custom">
+                                    <label class="form-check-label" for="typeCustom">
+                                        <i class="bi bi-calendar-range me-1"></i>Maxsus
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4" id="customDates">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Boshlanish sanasi</label>
+                            <input type="date" name="date_from" class="form-control">
+                            <small class="text-muted">Bo'sh qoldirsangiz avtomatik hisoblanadi</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Tugash sanasi</label>
+                            <input type="date" name="date_to" class="form-control">
+                            <small class="text-muted">Bo'sh qoldirsangiz bugungi sana olinadi</small>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Hisobot quyidagilarni o'z ichiga oladi:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Foydalanuvchilar statistikasi (jami, yangi)</li>
+                            <li>Kurslar va darslar soni</li>
+                            <li>Test va vazifa topshiruvlar</li>
+                            <li>Video ko'rishlar</li>
+                            <li>Deploy qilingan loyihalar</li>
+                            <li>Coin statistikasi</li>
+                            <li>Sertifikatlar</li>
+                            <li>Barcha harakatlar</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'admin_reports' %}" class="btn btn-outline-secondary">Bekor qilish</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-file-earmark-plus me-1"></i>Hisobot yaratish
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const radioButtons = document.querySelectorAll('input[name="report_type"]');
+    const customDates = document.getElementById('customDates');
+    
+    radioButtons.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === 'custom') {
+                customDates.style.display = 'flex';
+            } else {
+                customDates.style.display = 'none';
+            }
+        });
+    });
+    
+    // Initial state
+    customDates.style.display = 'none';
+});
+</script>
+{% endblock %}

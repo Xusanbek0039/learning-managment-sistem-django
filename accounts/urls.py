@@ -126,4 +126,11 @@ urlpatterns = [
     path('dashboard/users/<int:pk>/devices/', views.admin_user_devices, name='admin_user_devices'),
     path('dashboard/users/<int:user_pk>/devices/<int:device_pk>/logout/', views.admin_logout_user_device, name='admin_logout_user_device'),
     path('dashboard/users/<int:pk>/devices/logout-all/', views.admin_logout_all_user_devices, name='admin_logout_all_user_devices'),
+    
+    # Admin: Hisobotlar
+    path('dashboard/reports/', views.admin_reports, name='admin_reports'),
+    path('dashboard/reports/generate/', views.generate_report, name='generate_report'),
+    path('dashboard/reports/<int:pk>/', views.view_report, name='view_report'),
+    path('dashboard/reports/<int:pk>/download/', views.download_report, name='download_report'),
+    path('dashboard/reports/<int:pk>/delete/', views.delete_report, name='delete_report'),
 ]

@@ -1,0 +1,116 @@
+{% extends 'accounts/admin/base_admin.html' %}
+
+{% block title %}Oylik Hisobotlar - Admin Panel{% endblock %}
+
+{% block admin_content %}
+<div class="top-bar">
+    <h1 class="page-title"><i class="bi bi-file-earmark-bar-graph me-2"></i>Oylik Hisobotlar</h1>
+    <a href="{% url 'generate_report' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-2"></i>Yangi hisobot
+    </a>
+</div>
+
+<!-- Filter -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small fw-semibold">Hisobot turi</label>
+                <select name="type" class="form-select">
+                    <option value="">Barchasi</option>
+                    <option value="daily" {% if request.GET.type == 'daily' %}selected{% endif %}>Kunlik</option>
+                    <option value="weekly" {% if request.GET.type == 'weekly' %}selected{% endif %}>Haftalik</option>
+                    <option value="monthly" {% if request.GET.type == 'monthly' %}selected{% endif %}>Oylik</option>
+                    <option value="custom" {% if request.GET.type == 'custom' %}selected{% endif %}>Maxsus</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100">
+                    <i class="bi bi-funnel me-1"></i>Filter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Reports Table -->
+<div class="card">
+    <div class="card-body">
+        {% if reports %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Hisobot nomi</th>
+                        <th>Turi</th>
+                        <th>Davr</th>
+                        <th class="text-center">Yangi foydalanuvchilar</th>
+                        <th class="text-center">Harakatlar</th>
+                        <th>Yaratilgan</th>
+                        <th class="text-end">Amallar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in reports %}
+                    <tr>
+                        <td>
+                            <strong>{{ report.title }}</strong>
+                        </td>
+                        <td>
+                            {% if report.report_type == 'daily' %}
+                            <span class="badge bg-info">Kunlik</span>
+                            {% elif report.report_type == 'weekly' %}
+                            <span class="badge bg-primary">Haftalik</span>
+                            {% elif report.report_type == 'monthly' %}
+                            <span class="badge bg-success">Oylik</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Maxsus</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <small>{{ report.date_from|date:"d.m.Y" }} - {{ report.date_to|date:"d.m.Y" }}</small>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-primary">{{ report.new_users }}</span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-secondary">{{ report.total_activities }}</span>
+                        </td>
+                        <td>
+                            <small class="text-muted">{{ report.created_at|date:"d.m.Y H:i" }}</small>
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'view_report' report.pk %}" class="btn btn-outline-primary" title="Ko'rish">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{% url 'download_report' report.pk %}" class="btn btn-outline-success" title="PDF yuklab olish">
+                                    <i class="bi bi-file-pdf"></i>
+                                </a>
+                                <form action="{% url 'delete_report' report.pk %}" method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger" 
+                                            onclick="return confirm('Hisobotni o\'chirishni tasdiqlaysizmi?')" title="O'chirish">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-file-earmark-bar-graph display-4"></i>
+            <h5 class="mt-3">Hisobotlar mavjud emas</h5>
+            <p>Yangi hisobot yaratish uchun "Yangi hisobot" tugmasini bosing</p>
+            <a href="{% url 'generate_report' %}" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i>Yangi hisobot yaratish
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

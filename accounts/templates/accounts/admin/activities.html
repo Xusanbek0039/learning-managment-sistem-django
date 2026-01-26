@@ -125,6 +125,9 @@
             <option value="coin_spent" {% if request.GET.action_type == 'coin_spent' %}selected{% endif %}>Coin sarflash</option>
             <option value="lesson_complete" {% if request.GET.action_type == 'lesson_complete' %}selected{% endif %}>Dars</option>
             <option value="homework_submit" {% if request.GET.action_type == 'homework_submit' %}selected{% endif %}>Vazifa</option>
+            <option value="deploy_create" {% if request.GET.action_type == 'deploy_create' %}selected{% endif %}>Deploy</option>
+            <option value="deploy_edit" {% if request.GET.action_type == 'deploy_edit' %}selected{% endif %}>Deploy tahrirlash</option>
+            <option value="deploy_delete" {% if request.GET.action_type == 'deploy_delete' %}selected{% endif %}>Deploy o'chirish</option>
         </select>
     </div>
 
@@ -204,6 +207,12 @@
 <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Dars</span>
 {% elif activity.action_type == 'homework_submit' %}
 <span class="badge bg-primary"><i class="bi bi-file-earmark-check me-1"></i>Vazifa</span>
+{% elif activity.action_type == 'deploy_create' %}
+<span class="badge bg-success"><i class="bi bi-rocket me-1"></i>Deploy</span>
+{% elif activity.action_type == 'deploy_edit' %}
+<span class="badge bg-primary"><i class="bi bi-pencil me-1"></i>Tahrirlash</span>
+{% elif activity.action_type == 'deploy_delete' %}
+<span class="badge bg-danger"><i class="bi bi-trash me-1"></i>O'chirish</span>
 {% else %}
 <span class="badge bg-light text-dark">{{ activity.action_type }}</span>
 {% endif %}

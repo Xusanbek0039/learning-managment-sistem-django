@@ -635,4 +635,63 @@ class Discount(models.Model):
         return True
 
 
+class SystemReport(models.Model):
+    REPORT_TYPES = (
+        ('daily', 'Kunlik'),
+        ('weekly', 'Haftalik'),
+        ('monthly', 'Oylik'),
+        ('custom', 'Maxsus'),
+    )
+    
+    title = models.CharField(max_length=200, verbose_name="Hisobot nomi")
+    report_type = models.CharField(max_length=20, choices=REPORT_TYPES, default='monthly', verbose_name="Hisobot turi")
+    date_from = models.DateField(verbose_name="Boshlanish sanasi")
+    date_to = models.DateField(verbose_name="Tugash sanasi")
+    
+    # Statistika ma'lumotlari
+    total_users = models.IntegerField(default=0)
+    total_students = models.IntegerField(default=0)
+    total_teachers = models.IntegerField(default=0)
+    new_users = models.IntegerField(default=0, verbose_name="Yangi foydalanuvchilar")
+    
+    total_courses = models.IntegerField(default=0)
+    total_lessons = models.IntegerField(default=0)
+    total_videos = models.IntegerField(default=0)
+    total_tests = models.IntegerField(default=0)
+    total_homeworks = models.IntegerField(default=0)
+    
+    new_enrollments = models.IntegerField(default=0, verbose_name="Yangi yozilishlar")
+    test_submissions = models.IntegerField(default=0, verbose_name="Test topshiruvlar")
+    homework_submissions = models.IntegerField(default=0, verbose_name="Vazifa topshiruvlar")
+    video_views = models.IntegerField(default=0, verbose_name="Video ko'rishlar")
+    
+    total_deploys = models.IntegerField(default=0)
+    new_deploys = models.IntegerField(default=0, verbose_name="Yangi loyihalar")
+    deploy_views = models.IntegerField(default=0)
+    
+    total_coins = models.IntegerField(default=0)
+    coins_earned = models.IntegerField(default=0, verbose_name="Ishlangan coinlar")
+    coins_spent = models.IntegerField(default=0, verbose_name="Sarflangan coinlar")
+    
+    total_certificates = models.IntegerField(default=0)
+    new_certificates = models.IntegerField(default=0, verbose_name="Yangi sertifikatlar")
+    
+    total_activities = models.IntegerField(default=0, verbose_name="Jami harakatlar")
+    
+    # PDF fayl
+    pdf_file = models.FileField(upload_to='reports/', null=True, blank=True, verbose_name="PDF fayl")
+    
+    # Meta
+    created_by = models.ForeignKey('CustomUser', on_delete=models.SET_NULL, null=True, blank=True, related_name='created_reports')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-date_to', '-created_at']
+        verbose_name = "Tizim hisoboti"
+        verbose_name_plural = "Tizim hisobotlari"
+    
+    def __str__(self):
+        return f"{self.title} ({self.date_from} - {self.date_to})"
+
+
 

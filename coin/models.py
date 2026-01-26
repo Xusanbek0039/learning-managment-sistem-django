@@ -150,6 +150,9 @@ class ActivityLog(models.Model):
         ('enroll_course', 'Kursga yozildi'),
         ('purchase_product', 'Mahsulot sotib oldi'),
         ('earn_coins', 'Coin oldi'),
+        ('deploy_create', 'Loyiha deploy qildi'),
+        ('deploy_edit', 'Loyihani tahrirladi'),
+        ('deploy_delete', "Loyihani o'chirdi"),
     )
 
     user = models.ForeignKey(

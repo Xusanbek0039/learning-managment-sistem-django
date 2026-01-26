@@ -1,0 +1,220 @@
+{% extends 'accounts/admin/base_admin.html' %}
+
+{% block title %}{{ report.title }} - Admin Panel{% endblock %}
+
+{% block admin_content %}
+<div class="top-bar">
+    <h1 class="page-title"><i class="bi bi-file-earmark-bar-graph me-2"></i>{{ report.title }}</h1>
+    <div class="d-flex gap-2">
+        <a href="{% url 'download_report' report.pk %}" class="btn btn-success">
+            <i class="bi bi-file-pdf me-1"></i>PDF yuklab olish
+        </a>
+        <a href="{% url 'admin_reports' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Orqaga
+        </a>
+    </div>
+</div>
+
+<!-- Report Info -->
+<div class="alert alert-info mb-4">
+    <div class="row">
+        <div class="col-md-4">
+            <i class="bi bi-calendar-range me-1"></i>
+            <strong>Davr:</strong> {{ report.date_from|date:"d.m.Y" }} - {{ report.date_to|date:"d.m.Y" }}
+        </div>
+        <div class="col-md-4">
+            <i class="bi bi-tag me-1"></i>
+            <strong>Turi:</strong> {{ report.get_report_type_display }}
+        </div>
+        <div class="col-md-4">
+            <i class="bi bi-clock me-1"></i>
+            <strong>Yaratilgan:</strong> {{ report.created_at|date:"d.m.Y H:i" }}
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row g-4 mb-4">
+    <!-- Foydalanuvchilar -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-people me-2"></i>Foydalanuvchilar
+            </div>
+            <div class="card-body">
+                <table class="table table-sm mb-0">
+                    <tr>
+                        <td>Jami foydalanuvchilar</td>
+                        <td class="text-end fw-bold">{{ report.total_users }}</td>
+                    </tr>
+                    <tr>
+                        <td>O'quvchilar</td>
+                        <td class="text-end fw-bold">{{ report.total_students }}</td>
+                    </tr>
+                    <tr>
+                        <td>O'qituvchilar</td>
+                        <td class="text-end fw-bold">{{ report.total_teachers }}</td>
+                    </tr>
+                    <tr class="table-success">
+                        <td>Yangi (davr ichida)</td>
+                        <td class="text-end fw-bold">+{{ report.new_users }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Kurslar -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-book me-2"></i>Kurslar va Darslar
+            </div>
+            <div class="card-body">
+                <table class="table table-sm mb-0">
+                    <tr>
+                        <td>Jami kurslar</td>
+                        <td class="text-end fw-bold">{{ report.total_courses }}</td>
+                    </tr>
+                    <tr>
+                        <td>Jami darslar</td>
+                        <td class="text-end fw-bold">{{ report.total_lessons }}</td>
+                    </tr>
+                    <tr>
+                        <td>Videodarslar</td>
+                        <td class="text-end fw-bold">{{ report.total_videos }}</td>
+                    </tr>
+                    <tr>
+                        <td>Testlar</td>
+                        <td class="text-end fw-bold">{{ report.total_tests }}</td>
+                    </tr>
+                    <tr>
+                        <td>Uy vazifalari</td>
+                        <td class="text-end fw-bold">{{ report.total_homeworks }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Davr faoliyati -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <i class="bi bi-activity me-2"></i>Davr Faoliyati
+            </div>
+            <div class="card-body">
+                <table class="table table-sm mb-0">
+                    <tr>
+                        <td>Yangi yozilishlar</td>
+                        <td class="text-end fw-bold">{{ report.new_enrollments }}</td>
+                    </tr>
+                    <tr>
+                        <td>Test topshiruvlar</td>
+                        <td class="text-end fw-bold">{{ report.test_submissions }}</td>
+                    </tr>
+                    <tr>
+                        <td>Vazifa topshiruvlar</td>
+                        <td class="text-end fw-bold">{{ report.homework_submissions }}</td>
+                    </tr>
+                    <tr>
+                        <td>Video ko'rishlar</td>
+                        <td class="text-end fw-bold">{{ report.video_views }}</td>
+                    </tr>
+                    <tr class="table-primary">
+                        <td>Jami harakatlar</td>
+                        <td class="text-end fw-bold">{{ report.total_activities }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Deploy -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+                <i class="bi bi-code-slash me-2"></i>Coding / Deploy
+            </div>
+            <div class="card-body">
+                <table class="table table-sm mb-0">
+                    <tr>
+                        <td>Jami loyihalar</td>
+                        <td class="text-end fw-bold">{{ report.total_deploys }}</td>
+                    </tr>
+                    <tr class="table-success">
+                        <td>Yangi loyihalar (davr)</td>
+                        <td class="text-end fw-bold">+{{ report.new_deploys }}</td>
+                    </tr>
+                    <tr>
+                        <td>Jami ko'rishlar</td>
+                        <td class="text-end fw-bold">{{ report.deploy_views }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Coinlar -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+            <div class="card-header" style="background: linear-gradient(135deg, #f59e0b, #facc15); color: #000;">
+                <i class="bi bi-coin me-2"></i>Coin Statistikasi
+            </div>
+            <div class="card-body">
+                <table class="table table-sm mb-0">
+                    <tr>
+                        <td>Jami coinlar (hozir)</td>
+                        <td class="text-end fw-bold">{{ report.total_coins }}</td>
+                    </tr>
+                    <tr class="table-success">
+                        <td>Ishlangan (davr)</td>
+                        <td class="text-end fw-bold text-success">+{{ report.coins_earned }}</td>
+                    </tr>
+                    <tr class="table-danger">
+                        <td>Sarflangan (davr)</td>
+                        <td class="text-end fw-bold text-danger">-{{ report.coins_spent }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sertifikatlar -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+            <div class="card-header bg-secondary text-white">
+                <i class="bi bi-award me-2"></i>Sertifikatlar
+            </div>
+            <div class="card-body">
+                <table class="table table-sm mb-0">
+                    <tr>
+                        <td>Jami sertifikatlar</td>
+                        <td class="text-end fw-bold">{{ report.total_certificates }}</td>
+                    </tr>
+                    <tr class="table-success">
+                        <td>Yangi (davr ichida)</td>
+                        <td class="text-end fw-bold">+{{ report.new_certificates }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Actions -->
+<div class="card">
+    <div class="card-body text-center">
+        <a href="{% url 'download_report' report.pk %}" class="btn btn-lg btn-success me-2">
+            <i class="bi bi-file-pdf me-2"></i>PDF Yuklab olish
+        </a>
+        <form action="{% url 'delete_report' report.pk %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-lg btn-outline-danger" 
+                    onclick="return confirm('Hisobotni o\'chirishni tasdiqlaysizmi?')">
+                <i class="bi bi-trash me-1"></i>O'chirish
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

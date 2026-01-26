@@ -17,7 +17,7 @@ from .models import (
     Profession, Section, CustomUser, CourseEnrollment, Lesson, VideoLesson, VideoProgress,
     Homework, HomeworkSubmission, Test, TestQuestion, TestAnswer, TestResult,
     TestUserAnswer, Certificate, Message, PaymentStatus, HelpRequest, Discount,
-    UserDevice, UserSession, HTMLDeploy
+    UserDevice, UserSession, HTMLDeploy, SystemReport
 )
 from coin.models import ActivityLog, CoinTransaction
 
@@ -1482,6 +1482,15 @@ def admin_dashboard(request):
     total_purchases = ProductPurchase.objects.count()
     total_coins_spent = ProductPurchase.objects.aggregate(total=Sum('coins_spent'))['total'] or 0
     
+    # Deploy statistikasi
+    total_deploys = HTMLDeploy.objects.count()
+    active_deploys = HTMLDeploy.objects.filter(is_active=True).count()
+    inactive_deploys = HTMLDeploy.objects.filter(is_active=False).count()
+    total_deploy_views = HTMLDeploy.objects.aggregate(total=Sum('views_count'))['total'] or 0
+    
+    # Oxirgi harakatlar
+    recent_activities = ActivityLog.objects.select_related('user').order_by('-created_at')[:10]
+    
     profession_stats = Profession.objects.annotate(
         student_count=Count('enrollments', filter=Q(enrollments__user__role='student')),
         teacher_count=Count('students', filter=Q(students__role='teacher'))
@@ -1526,6 +1535,11 @@ def admin_dashboard(request):
         'active_products': active_products,
         'total_purchases': total_purchases,
         'total_coins_spent': total_coins_spent,
+        'total_deploys': total_deploys,
+        'active_deploys': active_deploys,
+        'inactive_deploys': inactive_deploys,
+        'total_deploy_views': total_deploy_views,
+        'recent_activities': recent_activities,
     }
     return render(request, 'accounts/admin/dashboard.html', context)
 
@@ -2371,6 +2385,14 @@ def create_deploy(request):
                 message_type='system'
             )
         
+        # Activity log
+        ActivityLog.objects.create(
+            user=request.user,
+            action_type='deploy_create',
+            description=f"'{title}' loyihasini deploy qildi",
+            ip_address=request.META.get('REMOTE_ADDR')
+        )
+        
         messages.success(request, f"Loyiha muvaffaqiyatli deploy qilindi! URL: {deploy.get_url()}")
         return redirect('my_deploys')
     
@@ -2401,6 +2423,14 @@ def edit_deploy(request, pk):
         deploy.is_active = 'is_active' in request.POST
         deploy.save()
         
+        # Activity log
+        ActivityLog.objects.create(
+            user=request.user,
+            action_type='deploy_edit',
+            description=f"'{deploy.title}' loyihasini tahrirladi",
+            ip_address=request.META.get('REMOTE_ADDR')
+        )
+        
         messages.success(request, "Sahifa yangilandi!")
         return redirect('my_deploys')
     
@@ -2420,6 +2450,8 @@ def delete_deploy(request, pk):
     deploy = get_object_or_404(HTMLDeploy, pk=pk, user=request.user)
     
     if request.method == 'POST':
+        deploy_title = deploy.title
+        
         # Agar loyiha bo'lsa, papkani o'chirish
         if deploy.deploy_type == 'project':
             folder_path = deploy.get_folder_path()
@@ -2427,6 +2459,15 @@ def delete_deploy(request, pk):
                 shutil.rmtree(folder_path)
         
         deploy.delete()
+        
+        # Activity log
+        ActivityLog.objects.create(
+            user=request.user,
+            action_type='deploy_delete',
+            description=f"'{deploy_title}' loyihasini o'chirdi",
+            ip_address=request.META.get('REMOTE_ADDR')
+        )
+        
         messages.success(request, "Loyiha o'chirildi!")
         return redirect('my_deploys')
     
@@ -2837,5 +2878,311 @@ def admin_logout_all_user_devices(request, pk):
         messages.success(request, f"{user.full_name}ning barcha qurilmalaridan chiqildi!")
     
     return redirect('admin_user_devices', pk=pk)
+
+
+# ============ SYSTEM REPORTS ============
+@login_required
+def admin_reports(request):
+    """Oylik hisobotlar ro'yxati"""
+    if not request.user.is_admin:
+        messages.error(request, "Sizda bu sahifaga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    reports = SystemReport.objects.all()
+    
+    # Filter by type
+    report_type = request.GET.get('type')
+    if report_type:
+        reports = reports.filter(report_type=report_type)
+    
+    return render(request, 'accounts/admin/reports.html', {'reports': reports})
+
+
+@login_required
+def generate_report(request):
+    """Yangi hisobot yaratish"""
+    if not request.user.is_admin:
+        messages.error(request, "Sizda bu sahifaga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    if request.method == 'POST':
+        report_type = request.POST.get('report_type', 'monthly')
+        date_from_str = request.POST.get('date_from')
+        date_to_str = request.POST.get('date_to')
+        
+        from datetime import datetime
+        
+        if date_from_str and date_to_str:
+            date_from = datetime.strptime(date_from_str, '%Y-%m-%d').date()
+            date_to = datetime.strptime(date_to_str, '%Y-%m-%d').date()
+        else:
+            # Default: oxirgi bir oy
+            date_to = timezone.now().date()
+            if report_type == 'weekly':
+                date_from = date_to - timedelta(days=7)
+            elif report_type == 'daily':
+                date_from = date_to
+            else:  # monthly
+                date_from = date_to - timedelta(days=30)
+        
+        # Hisobot nomini yaratish
+        type_names = {'daily': 'Kunlik', 'weekly': 'Haftalik', 'monthly': 'Oylik', 'custom': 'Maxsus'}
+        title = f"{type_names.get(report_type, 'Hisobot')} hisobot - {date_from.strftime('%d.%m.%Y')} - {date_to.strftime('%d.%m.%Y')}"
+        
+        # Statistikalarni yig'ish
+        # Umumiy
+        total_users = CustomUser.objects.count()
+        total_students = CustomUser.objects.filter(role='student').count()
+        total_teachers = CustomUser.objects.filter(role='teacher').count()
+        new_users = CustomUser.objects.filter(date_joined__date__gte=date_from, date_joined__date__lte=date_to).count()
+        
+        total_courses = Profession.objects.count()
+        total_lessons = Lesson.objects.count()
+        total_videos = VideoLesson.objects.count()
+        total_tests = Test.objects.count()
+        total_homeworks = Homework.objects.count()
+        
+        # Davr ichida
+        new_enrollments = CourseEnrollment.objects.filter(enrolled_at__date__gte=date_from, enrolled_at__date__lte=date_to).count()
+        test_submissions = TestResult.objects.filter(completed_at__date__gte=date_from, completed_at__date__lte=date_to).count()
+        homework_submissions = HomeworkSubmission.objects.filter(submitted_at__date__gte=date_from, submitted_at__date__lte=date_to).count()
+        video_views = VideoProgress.objects.filter(watched_at__date__gte=date_from, watched_at__date__lte=date_to, watched=True).count()
+        
+        # Deploy
+        total_deploys = HTMLDeploy.objects.count()
+        new_deploys = HTMLDeploy.objects.filter(created_at__date__gte=date_from, created_at__date__lte=date_to).count()
+        deploy_views = HTMLDeploy.objects.aggregate(total=Sum('views_count'))['total'] or 0
+        
+        # Coin
+        total_coins = CustomUser.objects.aggregate(total=Sum('coins'))['total'] or 0
+        coins_earned = CoinTransaction.objects.filter(
+            transaction_type='earn',
+            created_at__date__gte=date_from,
+            created_at__date__lte=date_to
+        ).aggregate(total=Sum('amount'))['total'] or 0
+        coins_spent = CoinTransaction.objects.filter(
+            transaction_type='spend',
+            created_at__date__gte=date_from,
+            created_at__date__lte=date_to
+        ).aggregate(total=Sum('amount'))['total'] or 0
+        
+        # Sertifikat
+        total_certificates = Certificate.objects.count()
+        new_certificates = Certificate.objects.filter(issued_at__date__gte=date_from, issued_at__date__lte=date_to).count()
+        
+        # Harakatlar
+        total_activities = ActivityLog.objects.filter(created_at__date__gte=date_from, created_at__date__lte=date_to).count()
+        
+        # Report yaratish
+        report = SystemReport.objects.create(
+            title=title,
+            report_type=report_type,
+            date_from=date_from,
+            date_to=date_to,
+            total_users=total_users,
+            total_students=total_students,
+            total_teachers=total_teachers,
+            new_users=new_users,
+            total_courses=total_courses,
+            total_lessons=total_lessons,
+            total_videos=total_videos,
+            total_tests=total_tests,
+            total_homeworks=total_homeworks,
+            new_enrollments=new_enrollments,
+            test_submissions=test_submissions,
+            homework_submissions=homework_submissions,
+            video_views=video_views,
+            total_deploys=total_deploys,
+            new_deploys=new_deploys,
+            deploy_views=deploy_views,
+            total_coins=total_coins,
+            coins_earned=coins_earned,
+            coins_spent=abs(coins_spent),
+            total_certificates=total_certificates,
+            new_certificates=new_certificates,
+            total_activities=total_activities,
+            created_by=request.user,
+        )
+        
+        # PDF yaratish
+        generate_report_pdf(report)
+        
+        messages.success(request, f"'{title}' hisoboti muvaffaqiyatli yaratildi!")
+        return redirect('admin_reports')
+    
+    return render(request, 'accounts/admin/generate_report.html')
+
+
+def generate_report_pdf(report):
+    """Hisobot uchun PDF yaratish"""
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+    from io import BytesIO
+    from django.core.files.base import ContentFile
+    
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=30, bottomMargin=30)
+    elements = []
+    styles = getSampleStyleSheet()
+    
+    heading_style = ParagraphStyle(
+        'CustomHeading',
+        parent=styles['Heading2'],
+        spaceAfter=10,
+        spaceBefore=20,
+        textColor=colors.HexColor('#0d6efd')
+    )
+    
+    def create_table(data, col_widths=None):
+        if col_widths is None:
+            col_widths = [300, 150]
+        table = Table(data, colWidths=col_widths)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0d6efd')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
+            ('PADDING', (0, 0), (-1, -1), 8),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8f9fa')]),
+        ]))
+        return table
+    
+    # Title
+    elements.append(Paragraph(report.title, styles['Title']))
+    elements.append(Paragraph(f"Davr: {report.date_from.strftime('%d.%m.%Y')} - {report.date_to.strftime('%d.%m.%Y')}", styles['Normal']))
+    elements.append(Paragraph(f"Yaratilgan: {report.created_at.strftime('%d.%m.%Y %H:%M')}", styles['Normal']))
+    elements.append(Spacer(1, 20))
+    
+    # 1. Foydalanuvchilar
+    elements.append(Paragraph("1. Foydalanuvchilar statistikasi", heading_style))
+    user_data = [
+        ["Ko'rsatkich", 'Soni'],
+        ['Jami foydalanuvchilar', str(report.total_users)],
+        ["O'quvchilar", str(report.total_students)],
+        ["O'qituvchilar", str(report.total_teachers)],
+        ['Yangi foydalanuvchilar (davr)', str(report.new_users)],
+    ]
+    elements.append(create_table(user_data))
+    elements.append(Spacer(1, 15))
+    
+    # 2. Kurslar
+    elements.append(Paragraph("2. Kurslar va darslar", heading_style))
+    course_data = [
+        ["Ko'rsatkich", 'Soni'],
+        ['Jami kurslar', str(report.total_courses)],
+        ['Jami darslar', str(report.total_lessons)],
+        ['Videodarslar', str(report.total_videos)],
+        ['Testlar', str(report.total_tests)],
+        ['Uy vazifalari', str(report.total_homeworks)],
+    ]
+    elements.append(create_table(course_data))
+    elements.append(Spacer(1, 15))
+    
+    # 3. Davr faoliyati
+    elements.append(Paragraph("3. Davr faoliyati", heading_style))
+    activity_data = [
+        ["Ko'rsatkich", 'Soni'],
+        ['Yangi yozilishlar', str(report.new_enrollments)],
+        ['Test topshiruvlar', str(report.test_submissions)],
+        ['Vazifa topshiruvlar', str(report.homework_submissions)],
+        ["Video ko'rishlar", str(report.video_views)],
+        ['Jami harakatlar', str(report.total_activities)],
+    ]
+    elements.append(create_table(activity_data))
+    elements.append(Spacer(1, 15))
+    
+    # 4. Deploy
+    elements.append(Paragraph("4. Coding / Deploy", heading_style))
+    deploy_data = [
+        ["Ko'rsatkich", 'Soni'],
+        ['Jami loyihalar', str(report.total_deploys)],
+        ['Yangi loyihalar (davr)', str(report.new_deploys)],
+        ["Jami ko'rishlar", str(report.deploy_views)],
+    ]
+    elements.append(create_table(deploy_data))
+    elements.append(Spacer(1, 15))
+    
+    # 5. Coinlar
+    elements.append(Paragraph("5. Coin statistikasi", heading_style))
+    coin_data = [
+        ["Ko'rsatkich", 'Qiymat'],
+        ['Jami coinlar (hozir)', str(report.total_coins)],
+        ['Ishlangan coinlar (davr)', str(report.coins_earned)],
+        ['Sarflangan coinlar (davr)', str(report.coins_spent)],
+    ]
+    elements.append(create_table(coin_data))
+    elements.append(Spacer(1, 15))
+    
+    # 6. Sertifikatlar
+    elements.append(Paragraph("6. Sertifikatlar", heading_style))
+    cert_data = [
+        ["Ko'rsatkich", 'Soni'],
+        ['Jami sertifikatlar', str(report.total_certificates)],
+        ['Yangi sertifikatlar (davr)', str(report.new_certificates)],
+    ]
+    elements.append(create_table(cert_data))
+    
+    doc.build(elements)
+    
+    # PDF faylni saqlash
+    pdf_content = buffer.getvalue()
+    buffer.close()
+    
+    filename = f"report_{report.report_type}_{report.date_from}_{report.date_to}.pdf"
+    report.pdf_file.save(filename, ContentFile(pdf_content))
+    report.save()
+
+
+@login_required
+def download_report(request, pk):
+    """Hisobotni PDF sifatida yuklab olish"""
+    if not request.user.is_admin:
+        messages.error(request, "Sizda bu sahifaga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    report = get_object_or_404(SystemReport, pk=pk)
+    
+    if not report.pdf_file:
+        # PDF mavjud bo'lmasa, yaratish
+        generate_report_pdf(report)
+    
+    response = HttpResponse(report.pdf_file.read(), content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{report.title}.pdf"'
+    return response
+
+
+@login_required
+def delete_report(request, pk):
+    """Hisobotni o'chirish"""
+    if not request.user.is_admin:
+        messages.error(request, "Sizda bu sahifaga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    report = get_object_or_404(SystemReport, pk=pk)
+    
+    if request.method == 'POST':
+        # PDF faylni ham o'chirish
+        if report.pdf_file:
+            report.pdf_file.delete()
+        report.delete()
+        messages.success(request, "Hisobot o'chirildi!")
+    
+    return redirect('admin_reports')
+
+
+@login_required
+def view_report(request, pk):
+    """Hisobotni ko'rish"""
+    if not request.user.is_admin:
+        messages.error(request, "Sizda bu sahifaga kirish huquqi yo'q!")
+        return redirect('home')
+    
+    report = get_object_or_404(SystemReport, pk=pk)
+    return render(request, 'accounts/admin/view_report.html', {'report': report})
 
 
