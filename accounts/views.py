@@ -505,7 +505,10 @@ def student_public_profile(request, pk):
     completed_count = certificates.count()
     
     # Deploy qilingan sahifalar
-    deploys = HTMLDeploy.objects.filter(user=student, is_active=True)
+    deploys = HTMLDeploy.objects.filter(user=student, is_active=True).order_by('-created_at')
+    
+    # Barcha kurslar (yozilgan)
+    all_enrollments = student_enrollments
     
     return render(request, 'accounts/student_public_profile.html', {
         'student': student,
@@ -513,6 +516,7 @@ def student_public_profile(request, pk):
         'certificates': certificates,
         'completed_count': completed_count,
         'deploys': deploys,
+        'all_enrollments': all_enrollments,
     })
 
 
@@ -2731,8 +2735,8 @@ def remove_device(request, pk):
         messages.error(request, "Joriy qurilmani o'chirib bo'lmaydi!")
         return redirect('my_devices')
     
-    # Deactivate all sessions for this device
-    device.sessions.update(is_active=False)
+    # Delete all sessions for this device (so user gets logged out)
+    device.sessions.all().delete()
     device.is_active = False
     device.save()
     
@@ -2752,8 +2756,8 @@ def logout_device(request, pk):
         messages.error(request, "Joriy qurilmadan chiqish uchun 'Chiqish' tugmasini ishlating!")
         return redirect('my_devices')
     
-    # Deactivate all sessions for this device
-    device.sessions.filter(is_active=True).update(is_active=False)
+    # Delete all active sessions for this device (so user gets logged out)
+    device.sessions.filter(is_active=True).delete()
     
     messages.success(request, f"'{device.device_name}' qurilmasidan chiqildi!")
     return redirect('my_devices')

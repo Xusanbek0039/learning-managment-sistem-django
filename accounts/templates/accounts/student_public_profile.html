@@ -116,13 +116,75 @@
 <!-- RIGHT INFO -->
 <div class="col-lg-8 d-flex flex-column gap-4">
 
-<!-- BIO -->
-{% if student.bio %}
+<!-- PERSONAL INFO -->
 <div class="p-card p-4">
     <h5 class="fw-bold mb-3">
-        <i class="bi bi-person-lines-fill me-2"></i>O'zi haqida
+        <i class="bi bi-person-lines-fill me-2"></i>Shaxsiy ma'lumotlar
     </h5>
-    <p class="mb-0">{{ student.bio }}</p>
+    
+    <div class="row g-3">
+        <div class="col-md-6">
+            <small class="text-muted">Telefon raqami</small>
+            <div><i class="bi bi-telephone me-2"></i>{{ student.phone }}</div>
+        </div>
+        
+        <div class="col-md-6">
+            <small class="text-muted">Email</small>
+            <div><i class="bi bi-envelope me-2"></i>{% if student.email %}{{ student.email }}{% else %}-{% endif %}</div>
+        </div>
+        
+        <div class="col-md-6">
+            <small class="text-muted">Tug'ilgan sana</small>
+            <div><i class="bi bi-calendar-event me-2"></i>{% if student.birth_date %}{{ student.birth_date|date:"d.m.Y" }}{% else %}-{% endif %}</div>
+        </div>
+        
+        <div class="col-md-6">
+            <small class="text-muted">Ro'yxatdan o'tgan</small>
+            <div><i class="bi bi-calendar-check me-2"></i>{{ student.date_joined|date:"d.m.Y" }}</div>
+        </div>
+        
+        <div class="col-md-6">
+            <small class="text-muted">Manzil</small>
+            <div><i class="bi bi-geo-alt me-2"></i>{% if student.address %}{{ student.address }}{% else %}-{% endif %}</div>
+        </div>
+        
+        <div class="col-md-6">
+            <small class="text-muted">Jami online vaqt</small>
+            <div><i class="bi bi-clock me-2"></i>{{ student.total_online_time }} daqiqa</div>
+        </div>
+        
+        {% if student.bio %}
+        <div class="col-12">
+            <small class="text-muted">O'zi haqida</small>
+            <p class="mb-0 mt-1">{{ student.bio }}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ENROLLED COURSES -->
+{% if all_enrollments %}
+<div class="p-card p-4">
+    <h5 class="fw-bold mb-3">
+        <i class="bi bi-book me-2"></i>O'qiyotgan kurslari
+        <span class="badge bg-primary ms-2">{{ all_enrollments|length }}</span>
+    </h5>
+    
+    <div class="row g-3">
+        {% for enrollment in all_enrollments %}
+        <div class="col-md-6">
+            <a href="{% url 'profession_detail' enrollment.profession.pk %}" class="text-decoration-none text-body">
+                <div class="mini-item d-flex align-items-center gap-3">
+                    <img src="{{ enrollment.profession.photo.url }}" style="width:48px;height:48px;border-radius:12px;object-fit:cover">
+                    <div>
+                        <b>{{ enrollment.profession.name }}</b><br>
+                        <small class="text-muted">{{ enrollment.enrolled_at|date:"d.m.Y" }} dan beri</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
 </div>
 {% endif %}
 

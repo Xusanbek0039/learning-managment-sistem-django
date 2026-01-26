@@ -165,7 +165,16 @@ class SessionTimeoutMiddleware:
                     user_session.save(update_fields=['last_activity', 'expires_at'])
                     
                 except UserSession.DoesNotExist:
-                    # Create new session if not exists
+                    # Session not found - user may have been logged out from another device
+                    # Check if there's an inactive session with this key
+                    inactive_session = UserSession.objects.filter(session_key=session_key).first()
+                    if inactive_session:
+                        # Session exists but inactive - logout user
+                        logout(request)
+                        messages.info(request, "Sessiyangiz boshqa qurilmadan tugatildi. Iltimos, qaytadan kiring.")
+                        return redirect('login')
+                    
+                    # Create new session if truly not exists
                     device_info = get_device_info(request)
                     ip_address = get_client_ip(request)
                     
@@ -187,13 +196,15 @@ class SessionTimeoutMiddleware:
                         device.ip_address = ip_address
                         device.save(update_fields=['last_login', 'ip_address'])
                     
-                    # Create session
-                    UserSession.objects.create(
-                        user=request.user,
-                        device=device,
+                    # Create session using get_or_create to avoid unique constraint error
+                    UserSession.objects.get_or_create(
                         session_key=session_key,
-                        ip_address=ip_address,
-                        expires_at=timezone.now() + timedelta(seconds=self.SESSION_TIMEOUT)
+                        defaults={
+                            'user': request.user,
+                            'device': device,
+                            'ip_address': ip_address,
+                            'expires_at': timezone.now() + timedelta(seconds=self.SESSION_TIMEOUT)
+                        }
                     )
         
         response = self.get_response(request)
