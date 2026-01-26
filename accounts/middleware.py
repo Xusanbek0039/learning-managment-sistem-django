@@ -3,7 +3,66 @@ from django.utils import timezone
 from django.contrib.auth import logout
 from django.shortcuts import redirect
 from django.contrib import messages
-from datetime import timedelta
+from datetime import timedelta, date
+
+
+# ==================== BIRTHDAY CHECK ====================
+
+class BirthdayCheckMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if request.user.is_authenticated and hasattr(request.user, 'birth_date'):
+            today = date.today()
+            birth = request.user.birth_date
+            if birth and birth.month == today.month and birth.day == today.day:
+                request.is_birthday = True
+            else:
+                request.is_birthday = False
+        else:
+            request.is_birthday = False
+
+        return self.get_response(request)
+
+
+# ==================== UPDATE LAST ACTIVITY ====================
+
+class UpdateLastActivityMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if request.user.is_authenticated:
+            request.user.last_activity = timezone.now()
+            request.user.save(update_fields=['last_activity'])
+        return self.get_response(request)
+
+
+# ==================== BLOCKED USER ====================
+
+class BlockedUserMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if request.user.is_authenticated:
+            if hasattr(request.user, 'is_blocked') and request.user.is_blocked:
+                logout(request)
+                messages.error(request, "Sizning akkauntingiz bloklangan 🚫")
+                return redirect('login')
+        return self.get_response(request)
+
+
+# ==================== PAYMENT CHECK ====================
+
+class PaymentCheckMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        # Payment check logic - can be customized based on your needs
+        return self.get_response(request)
 
 
 def get_client_ip(request):
