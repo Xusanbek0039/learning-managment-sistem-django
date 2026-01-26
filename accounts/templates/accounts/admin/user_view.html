@@ -215,4 +215,200 @@
 </div>
 </div>
 
+<!-- ================= STUDENT ANALYSIS ================= -->
+{% if user_obj.role == 'student' and analysis_data %}
+<div class="row mt-4">
+<div class="col-12">
+    <h4 class="fw-bold mb-4">
+        <i class="bi bi-graph-up-arrow me-2 text-primary"></i>O'quvchi Tahlili
+    </h4>
+</div>
+</div>
+
+<!-- Coin Stats Card -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card text-center p-4" style="background: linear-gradient(135deg, #facc15, #f59e0b); color: #000;">
+            <h3 class="mb-0 fw-bold">{{ user_obj.coins }}</h3>
+            <small>Joriy coinlar</small>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center p-4 bg-success text-white">
+            <h3 class="mb-0 fw-bold">+{{ coin_earned }}</h3>
+            <small>Jami ishlangan</small>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center p-4 bg-danger text-white">
+            <h3 class="mb-0 fw-bold">-{{ coin_spent }}</h3>
+            <small>Jami sarflangan</small>
+        </div>
+    </div>
+</div>
+
+<!-- Course Analysis Cards -->
+{% for data in analysis_data %}
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <i class="bi bi-book me-2"></i>
+            <strong>{{ data.profession.name }}</strong>
+            <small class="text-muted ms-2">Yozilgan: {{ data.enrollment.enrolled_at|date:"d.m.Y" }}</small>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <div class="progress" style="width: 150px; height: 10px;">
+                <div class="progress-bar bg-success" style="width: {{ data.overall_progress }}%"></div>
+            </div>
+            <span class="badge bg-primary">{{ data.overall_progress }}%</span>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row g-4">
+            <!-- Video Progress -->
+            <div class="col-md-3">
+                <div class="text-center p-3 rounded" style="background: var(--bs-tertiary-bg);">
+                    <i class="bi bi-play-circle fs-2 text-info mb-2 d-block"></i>
+                    <h4 class="mb-0">{{ data.watched_videos }}/{{ data.total_videos }}</h4>
+                    <small class="text-muted">Video ko'rilgan</small>
+                </div>
+            </div>
+            
+            <!-- Test Stats -->
+            <div class="col-md-3">
+                <div class="text-center p-3 rounded" style="background: var(--bs-tertiary-bg);">
+                    <i class="bi bi-check2-square fs-2 text-success mb-2 d-block"></i>
+                    <h4 class="mb-0">{{ data.tests_taken }} <small class="text-muted fs-6">({{ data.avg_test_score }}%)</small></h4>
+                    <small class="text-muted">Test topshirgan</small>
+                    <div class="mt-1">
+                        <span class="badge bg-success">{{ data.passed_tests }} o'tdi</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Homework Stats -->
+            <div class="col-md-3">
+                <div class="text-center p-3 rounded" style="background: var(--bs-tertiary-bg);">
+                    <i class="bi bi-file-earmark-check fs-2 text-warning mb-2 d-block"></i>
+                    <h4 class="mb-0">{{ data.submitted_homeworks }}/{{ data.total_homeworks }}</h4>
+                    <small class="text-muted">Vazifa topshirgan</small>
+                    <div class="mt-1">
+                        {% if data.pending_homeworks > 0 %}
+                        <span class="badge bg-warning text-dark">{{ data.pending_homeworks }} kutilmoqda</span>
+                        {% endif %}
+                        {% if data.graded_homeworks > 0 %}
+                        <span class="badge bg-success">{{ data.graded_homeworks }} baholangan</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Average Grade -->
+            <div class="col-md-3">
+                <div class="text-center p-3 rounded" style="background: var(--bs-tertiary-bg);">
+                    <i class="bi bi-star fs-2 text-primary mb-2 d-block"></i>
+                    <h4 class="mb-0">{{ data.avg_homework_grade }}</h4>
+                    <small class="text-muted">O'rtacha baho</small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stuck Lessons -->
+        {% if data.stuck_lessons %}
+        <div class="mt-4">
+            <h6 class="fw-bold text-danger mb-3">
+                <i class="bi bi-exclamation-triangle me-2"></i>Tugatilmagan darslar
+            </h6>
+            <div class="table-responsive">
+                <table class="table table-sm table-hover">
+                    <thead>
+                        <tr>
+                            <th>Dars</th>
+                            <th class="text-center">Video</th>
+                            <th class="text-center">Test</th>
+                            <th class="text-center">Vazifa</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stuck in data.stuck_lessons %}
+                        <tr>
+                            <td>{{ stuck.lesson.title }}</td>
+                            <td class="text-center">
+                                <span class="badge {% if '0/' in stuck.video_progress %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                                    {{ stuck.video_progress }}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                {% if stuck.test_done == None %}
+                                <span class="badge bg-secondary">-</span>
+                                {% elif stuck.test_done %}
+                                <span class="badge bg-success"><i class="bi bi-check"></i></span>
+                                {% else %}
+                                <span class="badge bg-danger"><i class="bi bi-x"></i></span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if stuck.hw_done == None %}
+                                <span class="badge bg-secondary">-</span>
+                                {% elif stuck.hw_done %}
+                                <span class="badge bg-success"><i class="bi bi-check"></i></span>
+                                {% else %}
+                                <span class="badge bg-danger"><i class="bi bi-x"></i></span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+
+<!-- Recent Activities -->
+{% if recent_activities %}
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-activity me-2"></i>Oxirgi harakatlar
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Amal</th>
+                        <th>Tavsif</th>
+                        <th>Vaqt</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for activity in recent_activities %}
+                    <tr>
+                        <td>
+                            {% if activity.action_type == 'login' %}
+                            <span class="badge bg-info"><i class="bi bi-box-arrow-in-right"></i></span>
+                            {% elif activity.action_type == 'deploy_create' %}
+                            <span class="badge bg-success"><i class="bi bi-rocket"></i></span>
+                            {% elif activity.action_type == 'submit_test' %}
+                            <span class="badge bg-warning text-dark"><i class="bi bi-check2-square"></i></span>
+                            {% elif activity.action_type == 'watch_video' %}
+                            <span class="badge bg-primary"><i class="bi bi-play-circle"></i></span>
+                            {% else %}
+                            <span class="badge bg-secondary"><i class="bi bi-activity"></i></span>
+                            {% endif %}
+                        </td>
+                        <td class="small">{{ activity.description|truncatewords:10 }}</td>
+                        <td class="small text-muted">{{ activity.created_at|timesince }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endif %}
+
 {% endblock %}

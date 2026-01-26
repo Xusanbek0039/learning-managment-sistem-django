@@ -1646,9 +1646,105 @@ def admin_user_view(request, pk):
     user = get_object_or_404(CustomUser, pk=pk)
     certificates = Certificate.objects.filter(student=user)
     
+    # O'quvchi tahlili
+    analysis_data = []
+    
+    if user.role == 'student':
+        enrollments = user.enrollments.all().select_related('profession')
+        
+        for enrollment in enrollments:
+            profession = enrollment.profession
+            
+            # Darslar
+            total_lessons = Lesson.objects.filter(profession=profession).count()
+            
+            # Video progress
+            watched_videos = VideoProgress.objects.filter(
+                user=user,
+                video__lesson__profession=profession,
+                watched=True
+            ).count()
+            total_videos = VideoLesson.objects.filter(lesson__profession=profession).count()
+            
+            # Test natijalari
+            test_results = TestResult.objects.filter(
+                student=user,
+                test__lesson__profession=profession
+            )
+            tests_taken = test_results.count()
+            avg_test_score = test_results.aggregate(avg=Avg('score'))['avg'] or 0
+            passed_tests = test_results.filter(passed=True).count()
+            
+            # Homework
+            homework_submissions = HomeworkSubmission.objects.filter(
+                student=user,
+                homework__lesson__profession=profession
+            )
+            total_homeworks = Homework.objects.filter(lesson__profession=profession).count()
+            submitted_homeworks = homework_submissions.count()
+            graded_homeworks = homework_submissions.filter(status='graded').count()
+            pending_homeworks = homework_submissions.filter(status='pending').count()
+            avg_homework_grade = homework_submissions.filter(grade__isnull=False).aggregate(avg=Avg('grade'))['avg'] or 0
+            
+            # Umumiy progress
+            completed_items = watched_videos + tests_taken + submitted_homeworks
+            total_items = total_videos + Test.objects.filter(lesson__profession=profession).count() + total_homeworks
+            overall_progress = (completed_items / total_items * 100) if total_items > 0 else 0
+            
+            # Qaysi darslarda to'xtab qolgan
+            stuck_lessons = []
+            lessons = Lesson.objects.filter(profession=profession).order_by('section__order', 'order')
+            for lesson in lessons:
+                # Video lesson uchun tekshirish (OneToOne relation)
+                has_video = hasattr(lesson, 'video') and lesson.video is not None
+                lesson_videos = 1 if has_video else 0
+                watched = VideoProgress.objects.filter(user=user, video__lesson=lesson, watched=True).count()
+                has_test = Test.objects.filter(lesson=lesson).exists()
+                test_passed = TestResult.objects.filter(student=user, test__lesson=lesson).exists()
+                has_hw = Homework.objects.filter(lesson=lesson).exists()
+                hw_submitted = HomeworkSubmission.objects.filter(student=user, homework__lesson=lesson).exists()
+                
+                # Agar video ko'rilmagan yoki test topshirilmagan bo'lsa
+                if (lesson_videos > 0 and watched < lesson_videos) or (has_test and not test_passed) or (has_hw and not hw_submitted):
+                    stuck_lessons.append({
+                        'lesson': lesson,
+                        'video_progress': f"{watched}/{lesson_videos}",
+                        'test_done': test_passed if has_test else None,
+                        'hw_done': hw_submitted if has_hw else None,
+                    })
+            
+            analysis_data.append({
+                'profession': profession,
+                'enrollment': enrollment,
+                'overall_progress': round(overall_progress, 1),
+                'total_lessons': total_lessons,
+                'watched_videos': watched_videos,
+                'total_videos': total_videos,
+                'tests_taken': tests_taken,
+                'avg_test_score': round(avg_test_score, 1),
+                'passed_tests': passed_tests,
+                'total_homeworks': total_homeworks,
+                'submitted_homeworks': submitted_homeworks,
+                'graded_homeworks': graded_homeworks,
+                'pending_homeworks': pending_homeworks,
+                'avg_homework_grade': round(avg_homework_grade, 1),
+                'stuck_lessons': stuck_lessons[:5],  # Oxirgi 5 ta
+            })
+    
+    # Coin statistikasi
+    coin_earned = CoinTransaction.objects.filter(user=user, action='add').aggregate(total=Sum('amount'))['total'] or 0
+    coin_spent = CoinTransaction.objects.filter(user=user, action__in=['remove', 'purchase']).aggregate(total=Sum('amount'))['total'] or 0
+    
+    # Oxirgi faolliklar
+    recent_activities = ActivityLog.objects.filter(user=user).order_by('-created_at')[:10]
+    
     return render(request, 'accounts/admin/user_view.html', {
         'user_obj': user,
         'certificates': certificates,
+        'analysis_data': analysis_data,
+        'coin_earned': coin_earned,
+        'coin_spent': coin_spent,
+        'recent_activities': recent_activities,
     })
 
 
@@ -2956,12 +3052,12 @@ def generate_report(request):
         # Coin
         total_coins = CustomUser.objects.aggregate(total=Sum('coins'))['total'] or 0
         coins_earned = CoinTransaction.objects.filter(
-            transaction_type='earn',
+            action='add',
             created_at__date__gte=date_from,
             created_at__date__lte=date_to
         ).aggregate(total=Sum('amount'))['total'] or 0
         coins_spent = CoinTransaction.objects.filter(
-            transaction_type='spend',
+            action__in=['remove', 'purchase'],
             created_at__date__gte=date_from,
             created_at__date__lte=date_to
         ).aggregate(total=Sum('amount'))['total'] or 0

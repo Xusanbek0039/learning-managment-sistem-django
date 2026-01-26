@@ -447,6 +447,12 @@ class Message(models.Model):
         ('personal', 'Shaxsiy'),
         ('system', 'Tizim xabari'),
         ('payment', 'To\'lov eslatmasi'),
+        ('motivation', 'Rag\'batlantirish'),
+        ('warning', 'Ogohlantirish'),
+        ('achievement', 'Yutuq'),
+        ('reminder', 'Eslatma'),
+        ('recommendation', 'Tavsiya'),
+        ('security', 'Xavfsizlik'),
     )
     
     title = models.CharField(max_length=200, verbose_name="Sarlavha")
