@@ -10,9 +10,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # First remove the old unique constraint
         migrations.AlterUniqueTogether(
             name='htmldeploy',
-            unique_together={('user', 'folder_name')},
+            unique_together=set(),
         ),
         migrations.AddField(
             model_name='htmldeploy',
@@ -37,5 +38,10 @@ class Migration(migrations.Migration):
         migrations.RemoveField(
             model_name='htmldeploy',
             name='file_name',
+        ),
+        # Now add the new unique constraint
+        migrations.AlterUniqueTogether(
+            name='htmldeploy',
+            unique_together={('user', 'folder_name')},
         ),
     ]
