@@ -565,7 +565,7 @@ class HTMLDeploy(models.Model):
     profession = models.ForeignKey('Profession', on_delete=models.CASCADE, related_name='deploys', null=True, blank=True)
     title = models.CharField(max_length=200, verbose_name="Loyiha nomi")
     deploy_type = models.CharField(max_length=20, choices=DEPLOY_TYPES, default='html', verbose_name="Turi")
-    folder_name = models.CharField(max_length=100, verbose_name="Papka nomi")
+    folder_name = models.CharField(max_length=100, verbose_name="Papka nomi", default='project')
     entry_file = models.CharField(max_length=100, default='index.html', verbose_name="Asosiy fayl")
     html_content = models.TextField(blank=True, null=True, verbose_name="HTML kodi")
     description = models.TextField(blank=True, null=True, verbose_name="Tavsif")
