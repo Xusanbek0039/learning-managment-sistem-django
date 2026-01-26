@@ -109,6 +109,10 @@
                 <i class="bi bi-percent"></i>
                 <span>Chegirmalar</span>
             </a>
+            <a href="{% url 'admin_deploys' %}" class="nav-link {% if 'deploys' in request.path %}active{% endif %}">
+                <i class="bi bi-code-slash"></i>
+                <span>Deploylar</span>
+            </a>
 
         </nav>
 
