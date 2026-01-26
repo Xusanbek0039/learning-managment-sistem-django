@@ -94,4 +94,16 @@ urlpatterns = [
     path('dashboard/discounts/add/', views.admin_discount_add, name='admin_discount_add'),
     path('dashboard/discounts/<int:pk>/edit/', views.admin_discount_edit, name='admin_discount_edit'),
     path('dashboard/discounts/<int:pk>/delete/', views.admin_discount_delete, name='admin_discount_delete'),
+    
+    # Qurilmalar boshqaruvi (User)
+    path('profile/devices/', views.my_devices, name='my_devices'),
+    path('profile/devices/<int:pk>/remove/', views.remove_device, name='remove_device'),
+    path('profile/devices/<int:pk>/logout/', views.logout_device, name='logout_device'),
+    path('profile/devices/<int:pk>/trust/', views.trust_device, name='trust_device'),
+    path('profile/devices/logout-all/', views.logout_all_devices, name='logout_all_devices'),
+    
+    # Admin: Qurilmalar
+    path('dashboard/users/<int:pk>/devices/', views.admin_user_devices, name='admin_user_devices'),
+    path('dashboard/users/<int:user_pk>/devices/<int:device_pk>/logout/', views.admin_logout_user_device, name='admin_logout_user_device'),
+    path('dashboard/users/<int:pk>/devices/logout-all/', views.admin_logout_all_user_devices, name='admin_logout_all_user_devices'),
 ]
