@@ -169,33 +169,72 @@
 </div>
 </div>
 
-<!-- COURSES -->
-{% if enrollments %}
+<!-- ACTIVE COURSES -->
+{% if active_courses %}
 <div class="p-card p-4">
 
 <h5 class="fw-bold mb-3">
-    <i class="bi bi-book me-2"></i>Mening kurslarim
+    <i class="bi bi-book me-2"></i>Faol kurslarim
 </h5>
 
 <div class="row g-3">
 
-{% for enrollment in enrollments %}
+{% for enrollment in active_courses %}
 <div class="col-md-6">
-<a href="{% url 'profession_detail' enrollment.profession.pk %}" class="text-decoration-none text-body">
-
-<div class="mini-item d-flex align-items-center gap-3">
-
-    <img src="{{ enrollment.profession.photo.url }}"
-         style="width:48px;height:48px;border-radius:12px;object-fit:cover">
-
-    <div>
-        <b>{{ enrollment.profession.name }}</b><br>
-        <small class="text-muted">{{ enrollment.enrolled_at|date:"d.m.Y" }}</small>
-    </div>
+<div class="mini-item">
+    <a href="{% url 'profession_detail' enrollment.profession.pk %}" class="text-decoration-none text-body">
+        <div class="d-flex align-items-center gap-3 mb-2">
+            <img src="{{ enrollment.profession.photo.url }}"
+                 style="width:48px;height:48px;border-radius:12px;object-fit:cover">
+            <div>
+                <b>{{ enrollment.profession.name }}</b><br>
+                <small class="text-muted">{{ enrollment.enrolled_at|date:"d.m.Y" }}</small>
+            </div>
+        </div>
+    </a>
+    <a href="{% url 'classmates' enrollment.profession.pk %}" class="btn btn-sm btn-outline-primary rounded-pill w-100">
+        <i class="bi bi-people me-1"></i>Kursdoshlar
+    </a>
+</div>
+</div>
+{% endfor %}
 
 </div>
+</div>
+{% endif %}
 
-</a>
+<!-- COMPLETED COURSES -->
+{% if completed_courses %}
+<div class="p-card p-4">
+
+<h5 class="fw-bold mb-3">
+    <i class="bi bi-check-circle text-success me-2"></i>Tugallangan kurslarim
+    <span class="badge bg-success ms-2">{{ completed_courses|length }}</span>
+</h5>
+
+<div class="row g-3">
+
+{% for item in completed_courses %}
+<div class="col-md-6">
+<div class="mini-item" style="border: 2px solid #198754;">
+    <div class="d-flex align-items-center gap-3 mb-2">
+        <img src="{{ item.enrollment.profession.photo.url }}"
+             style="width:48px;height:48px;border-radius:12px;object-fit:cover">
+        <div class="flex-grow-1">
+            <b>{{ item.enrollment.profession.name }}</b>
+            <span class="badge bg-success ms-1">Tugallandi</span><br>
+            <small class="text-muted">Berilgan: {{ item.certificate.issued_at|date:"d.m.Y" }}</small>
+        </div>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'classmates' item.enrollment.profession.pk %}" class="btn btn-sm btn-outline-primary rounded-pill flex-grow-1">
+            <i class="bi bi-people me-1"></i>Kursdoshlar
+        </a>
+        <a href="{{ item.certificate.file.url }}" target="_blank" class="btn btn-sm btn-success rounded-pill">
+            <i class="bi bi-award me-1"></i>Sertifikat
+        </a>
+    </div>
+</div>
 </div>
 {% endfor %}
 

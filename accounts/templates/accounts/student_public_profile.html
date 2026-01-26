@@ -1,0 +1,192 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}{{ student.full_name }} | IT Creative{% endblock %}
+
+{% block extra_css %}
+<style>
+.profile-wrap{--border:rgba(0,0,0,.08);--shadow:0 15px 40px rgba(0,0,0,.12)}
+[data-bs-theme="dark"] .profile-wrap{--border:rgba(255,255,255,.12);--shadow:0 30px 70px rgba(0,0,0,.7)}
+
+.p-card{
+    background:var(--bs-body-bg);
+    border:1px solid var(--border);
+    border-radius:1.5rem;
+    box-shadow:var(--shadow);
+}
+
+.avatar-xl{
+    width:140px;height:140px;border-radius:50%;object-fit:cover;
+    border:5px solid rgba(99,102,241,.4)
+}
+.avatar-fallback-xl{
+    width:140px;height:140px;border-radius:50%;
+    background:linear-gradient(135deg,#6366f1,#8b5cf6);
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-size:3rem;font-weight:700
+}
+
+.coin-box{
+    background:linear-gradient(135deg,#facc15,#f59e0b);
+    border-radius:1rem;padding:.6rem 1.2rem;font-weight:700;color:#111
+}
+
+.mini-item{
+    background:var(--bs-tertiary-bg);
+    border-radius:1rem;padding:.8rem;transition:.2s
+}
+.mini-item:hover{transform:translateY(-4px)}
+
+.stat-box {
+    background: var(--bs-tertiary-bg);
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+}
+.stat-number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--bs-body-color);
+}
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--bs-secondary-color);
+}
+
+.online-indicator {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+}
+.online-indicator.online { background: #22c55e; }
+.online-indicator.offline { background: #9ca3af; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5 profile-wrap">
+
+<div class="row g-4">
+
+<!-- LEFT PROFILE CARD -->
+<div class="col-lg-4">
+<div class="p-card p-4 text-center">
+
+    {% if student.photo %}
+        <img src="{{ student.photo.url }}" class="avatar-xl mb-3">
+    {% else %}
+        <div class="avatar-fallback-xl mb-3 mx-auto">{{ student.get_initials }}</div>
+    {% endif %}
+
+    <h4 class="fw-bold mb-1">{{ student.full_name }}</h4>
+    <p class="text-muted mb-2">@{{ student.username }}</p>
+    
+    <div class="mb-3">
+        <span class="online-indicator {% if student.is_online %}online{% else %}offline{% endif %}"></span>
+        <span>{% if student.is_online %}Online{% else %}Offline{% endif %}</span>
+    </div>
+
+    <span class="badge rounded-pill bg-primary px-3 py-2 mb-3">O'quvchi</span>
+
+    <div class="coin-box mb-3">
+        <i class="bi bi-coin me-1"></i>{{ student.coins }} coin
+    </div>
+
+    <!-- Stats -->
+    <div class="row g-2 mt-3">
+        <div class="col-6">
+            <div class="stat-box">
+                <div class="stat-number">{{ student.enrollments.count }}</div>
+                <div class="stat-label">Kurs</div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="stat-box">
+                <div class="stat-number">{{ completed_count }}</div>
+                <div class="stat-label">Tugallangan</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</div>
+
+<!-- RIGHT INFO -->
+<div class="col-lg-8 d-flex flex-column gap-4">
+
+<!-- BIO -->
+{% if student.bio %}
+<div class="p-card p-4">
+    <h5 class="fw-bold mb-3">
+        <i class="bi bi-person-lines-fill me-2"></i>O'zi haqida
+    </h5>
+    <p class="mb-0">{{ student.bio }}</p>
+</div>
+{% endif %}
+
+<!-- COMMON COURSES -->
+{% if common_courses %}
+<div class="p-card p-4">
+    <h5 class="fw-bold mb-3">
+        <i class="bi bi-book me-2"></i>Umumiy kurslarimiz
+        <span class="badge bg-primary ms-2">{{ common_courses|length }}</span>
+    </h5>
+    
+    <div class="row g-3">
+        {% for profession in common_courses %}
+        <div class="col-md-6">
+            <a href="{% url 'profession_detail' profession.pk %}" class="text-decoration-none text-body">
+                <div class="mini-item d-flex align-items-center gap-3">
+                    <img src="{{ profession.photo.url }}" style="width:48px;height:48px;border-radius:12px;object-fit:cover">
+                    <div>
+                        <b>{{ profession.name }}</b>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- CERTIFICATES -->
+{% if certificates %}
+<div class="p-card p-4">
+    <h5 class="fw-bold mb-3">
+        <i class="bi bi-award me-2"></i>Sertifikatlari
+        <span class="badge bg-success ms-2">{{ certificates|length }}</span>
+    </h5>
+    
+    <div class="row g-3">
+        {% for cert in certificates %}
+        <div class="col-md-6">
+            <div class="mini-item">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-success text-white rounded-3 p-2">
+                        <i class="bi bi-award fs-5"></i>
+                    </div>
+                    <div>
+                        <b>{{ cert.profession.name }}</b><br>
+                        <small class="text-muted">{{ cert.issued_at|date:"d.m.Y" }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- BACK BUTTON -->
+<div class="text-center">
+    <button onclick="history.back()" class="btn btn-outline-secondary rounded-pill px-4">
+        <i class="bi bi-arrow-left me-1"></i>Orqaga
+    </button>
+</div>
+
+</div>
+</div>
+</div>
+{% endblock %}
