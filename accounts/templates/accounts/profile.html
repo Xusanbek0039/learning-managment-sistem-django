@@ -242,6 +242,52 @@
 </div>
 {% endif %}
 
+<!-- DEPLOYED PROJECTS -->
+{% if deploys %}
+<div class="p-card p-4">
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold mb-0">
+        <i class="bi bi-code-slash me-2"></i>Deploy qilgan loyihalarim
+    </h5>
+    <a href="{% url 'my_deploys' %}" class="btn btn-sm btn-outline-primary rounded-pill">
+        <i class="bi bi-arrow-right me-1"></i>Barchasi
+    </a>
+</div>
+
+<div class="row g-3">
+
+{% for deploy in deploys %}
+<div class="col-md-6">
+<div class="mini-item">
+    <div class="d-flex align-items-center gap-3 mb-2">
+        <div class="bg-primary text-white rounded-3 p-2">
+            <i class="bi bi-filetype-html fs-5"></i>
+        </div>
+        <div class="flex-grow-1">
+            <b>{{ deploy.title }}</b><br>
+            <small class="text-muted">
+                <i class="bi bi-eye me-1"></i>{{ deploy.views_count }} ko'rish
+                · {{ deploy.created_at|date:"d.m.Y" }}
+            </small>
+        </div>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ deploy.get_url }}" target="_blank" class="btn btn-sm btn-primary rounded-pill flex-grow-1">
+            <i class="bi bi-box-arrow-up-right me-1"></i>Ko'rish
+        </a>
+        <a href="{% url 'edit_deploy' deploy.pk %}" class="btn btn-sm btn-outline-secondary rounded-pill">
+            <i class="bi bi-pencil"></i>
+        </a>
+    </div>
+</div>
+</div>
+{% endfor %}
+
+</div>
+</div>
+{% endif %}
+
 <!-- CERTIFICATES -->
 <div class="p-card p-4">
 

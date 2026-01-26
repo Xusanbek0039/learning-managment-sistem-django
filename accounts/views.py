@@ -444,11 +444,15 @@ def profile_view(request):
         else:
             active_courses.append(enrollment)
     
+    # Deploy qilgan loyihalar
+    deploys = HTMLDeploy.objects.filter(user=request.user, is_active=True).order_by('-created_at')[:6]
+    
     return render(request, 'accounts/profile.html', {
         'certificates': certificates,
         'enrollments': enrollments,
         'completed_courses': completed_courses,
         'active_courses': active_courses,
+        'deploys': deploys,
     })
 
 
