@@ -5,87 +5,239 @@
 {% block extra_css %}
 <style>
 :root{
-    --card-bg: rgba(255,255,255,.75);
-    --card-border: rgba(0,0,0,.08);
+    --card-bg: rgba(255,255,255,.9);
+    --card-border: rgba(0,0,0,.06);
     --text-main: #111;
-    --soft-bg: rgba(0,0,0,.05);
+    --soft-bg: rgba(0,0,0,.04);
+    --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
 }
 [data-bs-theme="dark"]{
-    --card-bg: rgba(18,18,18,.8);
+    --card-bg: rgba(30,30,35,.95);
     --card-border: rgba(255,255,255,.08);
     --text-main: #f1f1f1;
     --soft-bg: rgba(255,255,255,.06);
 }
 
-.ios-card{
-    background:var(--card-bg);
-    backdrop-filter:blur(14px);
-    border:1px solid var(--card-border);
-    border-radius:22px;
-    box-shadow:0 12px 35px rgba(0,0,0,.15);
+/* ===== HEADER STATS ===== */
+.stat-overview {
+    background: var(--gradient-1);
+    border-radius: 24px;
+    padding: 24px;
+    color: #fff;
     margin-bottom: 24px;
 }
-
-.stat-item {
+.stat-overview-item {
+    text-align: center;
     padding: 16px;
-    border-bottom: 1px solid var(--card-border);
 }
-.stat-item:last-child { border-bottom: none; }
+.stat-overview-item h2 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin: 0;
+}
+.stat-overview-item p {
+    margin: 0;
+    opacity: 0.85;
+    font-size: 0.9rem;
+}
 
-.progress-bar-custom {
-    height: 8px;
-    border-radius: 4px;
-    background: var(--soft-bg);
+/* ===== CARDS ===== */
+.glass-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.08);
+    margin-bottom: 24px;
     overflow: hidden;
 }
-.progress-bar-custom .fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.3s;
-}
-.progress-bar-custom .fill.success { background: linear-gradient(135deg, #10b981, #059669); }
-.progress-bar-custom .fill.warning { background: linear-gradient(135deg, #f59e0b, #d97706); }
-.progress-bar-custom .fill.danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
 
+.card-header-gradient {
+    padding: 20px 24px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.card-header-gradient.purple { background: var(--gradient-1); }
+.card-header-gradient.pink { background: var(--gradient-2); }
+.card-header-gradient.blue { background: var(--gradient-3); }
+.card-header-gradient.green { background: var(--gradient-4); }
+
+.card-header-gradient h5 {
+    margin: 0;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.card-header-gradient .count-badge {
+    background: rgba(255,255,255,.25);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+/* ===== STUDENT ITEM ===== */
+.student-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--card-border);
+    transition: all 0.2s;
+}
+.student-item:last-child { border-bottom: none; }
+.student-item:hover {
+    background: var(--soft-bg);
+}
+
+.student-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+.student-avatar.warning { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; }
+.student-avatar.danger { background: linear-gradient(135deg, #f87171, #ef4444); color: #fff; }
+.student-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+.student-info { flex-grow: 1; }
+.student-info h6 { margin: 0; font-weight: 600; color: var(--text-main); }
+.student-info p { margin: 0; font-size: 0.85rem; color: #888; }
+
+.student-stats {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+.mini-stat {
+    text-align: center;
+    padding: 8px 12px;
+    background: var(--soft-bg);
+    border-radius: 12px;
+}
+.mini-stat strong { display: block; font-size: 1.1rem; color: var(--text-main); }
+.mini-stat span { font-size: 0.7rem; color: #888; text-transform: uppercase; }
+
+/* ===== LESSON ITEM ===== */
+.lesson-item {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--card-border);
+    transition: all 0.2s;
+}
+.lesson-item:last-child { border-bottom: none; }
+.lesson-item:hover { background: var(--soft-bg); }
+
+.lesson-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+.lesson-title { font-weight: 600; color: var(--text-main); margin: 0; }
+.lesson-course { font-size: 0.85rem; color: #888; margin: 4px 0 0; }
+
+.completion-badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+.completion-badge.success { background: rgba(16,185,129,.15); color: #059669; }
+.completion-badge.warning { background: rgba(245,158,11,.15); color: #d97706; }
+.completion-badge.danger { background: rgba(239,68,68,.15); color: #dc2626; }
+
+.progress-wrapper {
+    height: 10px;
+    background: var(--soft-bg);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+.progress-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+.progress-fill.success { background: linear-gradient(90deg, #10b981, #34d399); }
+.progress-fill.warning { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.progress-fill.danger { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+.lesson-stats {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 12px;
+}
+.lesson-stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    color: #666;
+}
+.lesson-stat i { font-size: 1rem; }
+.lesson-stat.success i { color: #10b981; }
+.lesson-stat.danger i { color: #ef4444; }
+
+.user-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
 .user-chip {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     background: var(--soft-bg);
-    padding: 4px 10px;
+    padding: 6px 12px;
     border-radius: 20px;
     font-size: 0.8rem;
-    margin: 2px;
-}
-.user-chip img {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.section-title {
-    font-size: 1.1rem;
-    font-weight: 600;
     color: var(--text-main);
-    padding: 16px;
-    border-bottom: 1px solid var(--card-border);
+    transition: all 0.2s;
 }
-.section-title i { margin-right: 8px; }
+.user-chip:hover { background: rgba(99,102,241,.15); }
 
-.badge-stat {
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
+/* ===== EMPTY STATE ===== */
+.empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: #888;
 }
+.empty-state i { font-size: 4rem; opacity: 0.3; }
+.empty-state p { margin-top: 16px; }
 
-.student-card {
+/* ===== TAB NAVIGATION ===== */
+.stat-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+.stat-tab {
+    padding: 12px 24px;
+    border-radius: 16px;
     background: var(--soft-bg);
-    border-radius: 12px;
-    padding: 12px;
-    margin-bottom: 10px;
+    color: var(--text-main);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
+.stat-tab:hover { background: rgba(99,102,241,.15); color: #6366f1; }
+.stat-tab.active { background: var(--gradient-1); color: #fff; }
 </style>
 {% endblock %}
 
@@ -94,12 +246,12 @@
 <!-- Header -->
 <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
     <div>
-        <h3 class="mb-1"><i class="bi bi-bar-chart me-2"></i>Darslar statistikasi</h3>
-        <p class="text-muted mb-0">Eng ko'p tashlab ketilgan darslar va qiynalayotgan o'quvchilar</p>
+        <h3 class="mb-1 fw-bold"><i class="bi bi-graph-up-arrow me-2 text-primary"></i>Darslar Tahlili</h3>
+        <p class="text-muted mb-0">O'quvchilar progressi va qiynalayotgan joylarni aniqlang</p>
     </div>
     <form method="GET" class="d-flex gap-2">
-        <select name="profession" class="form-select" style="width: 200px;" onchange="this.form.submit()">
-            <option value="">Barcha kurslar</option>
+        <select name="profession" class="form-select" style="width: 220px; border-radius: 12px;" onchange="this.form.submit()">
+            <option value="">📚 Barcha kurslar</option>
             {% for p in professions %}
             <option value="{{ p.pk }}" {% if selected_profession == p.pk|stringformat:"i" %}selected{% endif %}>{{ p.name }}</option>
             {% endfor %}
@@ -107,44 +259,78 @@
     </form>
 </div>
 
+<!-- Overview Stats -->
+<div class="stat-overview">
+    <div class="row">
+        <div class="col-6 col-md-3">
+            <div class="stat-overview-item">
+                <h2>{{ passive_students|length }}</h2>
+                <p><i class="bi bi-moon-stars me-1"></i>Passiv</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-overview-item">
+                <h2>{{ struggling_students|length }}</h2>
+                <p><i class="bi bi-exclamation-triangle me-1"></i>Qiynalayotgan</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-overview-item">
+                <h2>{{ video_stats|length }}</h2>
+                <p><i class="bi bi-camera-video me-1"></i>Video</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-overview-item">
+                <h2>{{ test_stats|length }}</h2>
+                <p><i class="bi bi-clipboard-check me-1"></i>Testlar</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row">
 
 <!-- ==================== PASSIV O'QUVCHILAR ==================== -->
 <div class="col-lg-6">
-<div class="ios-card">
-    <div class="section-title">
-        <i class="bi bi-moon-stars text-warning"></i>Passiv o'quvchilar
-        <span class="badge bg-warning text-dark ms-2">{{ passive_students|length }}</span>
+<div class="glass-card">
+    <div class="card-header-gradient purple">
+        <h5><i class="bi bi-moon-stars"></i> Passiv o'quvchilar</h5>
+        <span class="count-badge">{{ passive_students|length }}</span>
     </div>
     
     {% if passive_students %}
-    <div class="p-3">
+    <div>
         {% for student in passive_students %}
-        <div class="student-card d-flex align-items-center gap-3">
-            <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width:40px;height:40px;font-size:0.9rem;">
+        <div class="student-item">
+            <div class="student-avatar warning">
+                {% if student.photo %}
+                <img src="{{ student.photo.url }}" alt="">
+                {% else %}
                 {{ student.get_initials }}
+                {% endif %}
             </div>
-            <div class="flex-grow-1">
-                <strong style="color: var(--text-main);">{{ student.full_name }}</strong>
-                <div class="small text-muted">
-                    Oxirgi faollik: 
+            <div class="student-info">
+                <h6>{{ student.full_name }}</h6>
+                <p>
+                    <i class="bi bi-clock me-1"></i>
                     {% if student.last_activity %}
-                    {{ student.last_activity|date:"d.m.Y" }}
+                    {{ student.last_activity|timesince }} oldin
                     {% else %}
-                    Hech qachon
+                    Hech qachon faol bo'lmagan
                     {% endif %}
-                </div>
+                </p>
             </div>
-            <a href="{% url 'admin_user_view' student.pk %}" class="btn btn-sm btn-outline-primary rounded-pill">
-                <i class="bi bi-eye"></i>
+            <a href="{% url 'admin_user_view' student.pk %}" class="btn btn-sm btn-primary rounded-pill">
+                <i class="bi bi-eye me-1"></i>Ko'rish
             </a>
         </div>
         {% endfor %}
     </div>
     {% else %}
-    <div class="text-center py-4 text-muted">
-        <i class="bi bi-emoji-smile fs-1"></i>
-        <p class="mt-2 mb-0">Passiv o'quvchilar yo'q!</p>
+    <div class="empty-state">
+        <i class="bi bi-emoji-smile"></i>
+        <p>Barcha o'quvchilar faol! 🎉</p>
     </div>
     {% endif %}
 </div>
@@ -152,35 +338,41 @@
 
 <!-- ==================== QIYNALAYOTGAN O'QUVCHILAR ==================== -->
 <div class="col-lg-6">
-<div class="ios-card">
-    <div class="section-title">
-        <i class="bi bi-exclamation-triangle text-danger"></i>Qiynalayotgan o'quvchilar
-        <span class="badge bg-danger ms-2">{{ struggling_students|length }}</span>
+<div class="glass-card">
+    <div class="card-header-gradient pink">
+        <h5><i class="bi bi-exclamation-triangle"></i> Qiynalayotgan o'quvchilar</h5>
+        <span class="count-badge">{{ struggling_students|length }}</span>
     </div>
     
     {% if struggling_students %}
-    <div class="p-3">
+    <div>
         {% for student in struggling_students %}
-        <div class="student-card d-flex align-items-center gap-3">
-            <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center" style="width:40px;height:40px;font-size:0.9rem;">
+        <div class="student-item">
+            <div class="student-avatar danger">
+                {% if student.photo %}
+                <img src="{{ student.photo.url }}" alt="">
+                {% else %}
                 {{ student.get_initials }}
+                {% endif %}
             </div>
-            <div class="flex-grow-1">
-                <strong style="color: var(--text-main);">{{ student.full_name }}</strong>
-                <div class="small text-muted">
-                    {{ student.low_score_count }} ta past ball • O'rtacha: {{ student.avg_score|floatformat:0 }}%
-                </div>
+            <div class="student-info">
+                <h6>{{ student.full_name }}</h6>
+                <p>
+                    <i class="bi bi-x-circle me-1"></i>{{ student.low_score_count }} ta past ball
+                    <span class="mx-2">•</span>
+                    <i class="bi bi-bar-chart me-1"></i>O'rtacha: {{ student.avg_score|floatformat:0 }}%
+                </p>
             </div>
-            <a href="{% url 'admin_user_view' student.pk %}" class="btn btn-sm btn-outline-danger rounded-pill">
-                <i class="bi bi-eye"></i>
+            <a href="{% url 'admin_user_view' student.pk %}" class="btn btn-sm btn-danger rounded-pill">
+                <i class="bi bi-eye me-1"></i>Ko'rish
             </a>
         </div>
         {% endfor %}
     </div>
     {% else %}
-    <div class="text-center py-4 text-muted">
-        <i class="bi bi-emoji-smile fs-1"></i>
-        <p class="mt-2 mb-0">Qiynalayotgan o'quvchilar yo'q!</p>
+    <div class="empty-state">
+        <i class="bi bi-emoji-smile"></i>
+        <p>Hamma yaxshi o'qiyapti! 🎉</p>
     </div>
     {% endif %}
 </div>
@@ -189,148 +381,167 @@
 </div>
 
 <!-- ==================== VIDEO DARSLAR ==================== -->
-<div class="ios-card">
-    <div class="section-title">
-        <i class="bi bi-camera-video text-primary"></i>Eng ko'p tashlab ketilgan video darslar
+<div class="glass-card">
+    <div class="card-header-gradient blue">
+        <h5><i class="bi bi-camera-video-fill"></i> Video darslar statistikasi</h5>
+        <span class="count-badge">{{ video_stats|length }} ta dars</span>
     </div>
     
     {% if video_stats %}
     {% for item in video_stats %}
-    <div class="stat-item">
-        <div class="d-flex justify-content-between align-items-start mb-2">
+    <div class="lesson-item">
+        <div class="lesson-header">
             <div>
-                <strong style="color: var(--text-main);">{{ item.lesson.title }}</strong>
-                <div class="small text-muted">{{ item.lesson.profession.name }}</div>
+                <h6 class="lesson-title">{{ item.lesson.title }}</h6>
+                <p class="lesson-course"><i class="bi bi-folder me-1"></i>{{ item.lesson.profession.name }}</p>
             </div>
-            <div class="text-end">
-                <span class="badge-stat {% if item.completion_rate >= 70 %}bg-success{% elif item.completion_rate >= 40 %}bg-warning text-dark{% else %}bg-danger{% endif %}">
-                    {{ item.completion_rate }}% ko'rgan
-                </span>
-            </div>
+            <span class="completion-badge {% if item.completion_rate >= 70 %}success{% elif item.completion_rate >= 40 %}warning{% else %}danger{% endif %}">
+                {{ item.completion_rate }}% ko'rgan
+            </span>
         </div>
         
-        <div class="progress-bar-custom mb-2">
-            <div class="fill {% if item.completion_rate >= 70 %}success{% elif item.completion_rate >= 40 %}warning{% else %}danger{% endif %}" style="width: {{ item.completion_rate }}%;"></div>
+        <div class="progress-wrapper">
+            <div class="progress-fill {% if item.completion_rate >= 70 %}success{% elif item.completion_rate >= 40 %}warning{% else %}danger{% endif %}" style="width: {{ item.completion_rate }}%;"></div>
         </div>
         
-        <div class="d-flex justify-content-between small text-muted mb-2">
-            <span><i class="bi bi-check-circle me-1"></i>{{ item.watched }} ko'rgan</span>
-            <span><i class="bi bi-x-circle me-1"></i>{{ item.not_watched }} ko'rmagan</span>
+        <div class="lesson-stats">
+            <div class="lesson-stat success">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>{{ item.watched }} ko'rgan</span>
+            </div>
+            <div class="lesson-stat danger">
+                <i class="bi bi-x-circle-fill"></i>
+                <span>{{ item.not_watched }} ko'rmagan</span>
+            </div>
         </div>
         
         {% if item.not_watched_users %}
-        <div>
-            <small class="text-muted">Ko'rmaganlar:</small>
+        <div class="user-chips">
+            <small class="text-muted me-2">Ko'rmaganlar:</small>
             {% for user in item.not_watched_users %}
             <span class="user-chip">{{ user.full_name }}</span>
             {% endfor %}
-            {% if item.not_watched > 5 %}<span class="user-chip">+{{ item.not_watched|add:"-5" }}</span>{% endif %}
+            {% if item.not_watched > 5 %}<span class="user-chip">+{{ item.not_watched|add:"-5" }} boshqa</span>{% endif %}
         </div>
         {% endif %}
     </div>
     {% endfor %}
     {% else %}
-    <div class="text-center py-4 text-muted">
-        <i class="bi bi-camera-video fs-1"></i>
-        <p class="mt-2 mb-0">Video darslar statistikasi yo'q</p>
+    <div class="empty-state">
+        <i class="bi bi-camera-video"></i>
+        <p>Video darslar statistikasi yo'q</p>
     </div>
     {% endif %}
 </div>
 
 <!-- ==================== TESTLAR ==================== -->
-<div class="ios-card">
-    <div class="section-title">
-        <i class="bi bi-clipboard-check text-info"></i>Eng ko'p tashlab ketilgan testlar
+<div class="glass-card">
+    <div class="card-header-gradient green">
+        <h5><i class="bi bi-clipboard-check-fill"></i> Testlar statistikasi</h5>
+        <span class="count-badge">{{ test_stats|length }} ta test</span>
     </div>
     
     {% if test_stats %}
     {% for item in test_stats %}
-    <div class="stat-item">
-        <div class="d-flex justify-content-between align-items-start mb-2">
+    <div class="lesson-item">
+        <div class="lesson-header">
             <div>
-                <strong style="color: var(--text-main);">{{ item.lesson.title }}</strong>
-                <div class="small text-muted">{{ item.lesson.profession.name }} • O'rtacha ball: {{ item.avg_score }}%</div>
+                <h6 class="lesson-title">{{ item.lesson.title }}</h6>
+                <p class="lesson-course">
+                    <i class="bi bi-folder me-1"></i>{{ item.lesson.profession.name }}
+                    <span class="mx-2">•</span>
+                    <i class="bi bi-bar-chart me-1"></i>O'rtacha: {{ item.avg_score }}%
+                </p>
             </div>
-            <div class="text-end">
-                <span class="badge-stat {% if item.completion_rate >= 70 %}bg-success{% elif item.completion_rate >= 40 %}bg-warning text-dark{% else %}bg-danger{% endif %}">
-                    {{ item.completion_rate }}% yechgan
-                </span>
-            </div>
+            <span class="completion-badge {% if item.completion_rate >= 70 %}success{% elif item.completion_rate >= 40 %}warning{% else %}danger{% endif %}">
+                {{ item.completion_rate }}% yechgan
+            </span>
         </div>
         
-        <div class="progress-bar-custom mb-2">
-            <div class="fill {% if item.completion_rate >= 70 %}success{% elif item.completion_rate >= 40 %}warning{% else %}danger{% endif %}" style="width: {{ item.completion_rate }}%;"></div>
+        <div class="progress-wrapper">
+            <div class="progress-fill {% if item.completion_rate >= 70 %}success{% elif item.completion_rate >= 40 %}warning{% else %}danger{% endif %}" style="width: {{ item.completion_rate }}%;"></div>
         </div>
         
-        <div class="d-flex justify-content-between small text-muted mb-2">
-            <span><i class="bi bi-check-circle me-1"></i>{{ item.completed }} yechgan</span>
-            <span><i class="bi bi-x-circle me-1"></i>{{ item.not_completed }} yechmagan</span>
+        <div class="lesson-stats">
+            <div class="lesson-stat success">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>{{ item.completed }} yechgan</span>
+            </div>
+            <div class="lesson-stat danger">
+                <i class="bi bi-x-circle-fill"></i>
+                <span>{{ item.not_completed }} yechmagan</span>
+            </div>
         </div>
         
         {% if item.not_completed_users %}
-        <div>
-            <small class="text-muted">Yechmaganlar:</small>
+        <div class="user-chips">
+            <small class="text-muted me-2">Yechmaganlar:</small>
             {% for user in item.not_completed_users %}
             <span class="user-chip">{{ user.full_name }}</span>
             {% endfor %}
-            {% if item.not_completed > 5 %}<span class="user-chip">+{{ item.not_completed|add:"-5" }}</span>{% endif %}
+            {% if item.not_completed > 5 %}<span class="user-chip">+{{ item.not_completed|add:"-5" }} boshqa</span>{% endif %}
         </div>
         {% endif %}
     </div>
     {% endfor %}
     {% else %}
-    <div class="text-center py-4 text-muted">
-        <i class="bi bi-clipboard-check fs-1"></i>
-        <p class="mt-2 mb-0">Test statistikasi yo'q</p>
+    <div class="empty-state">
+        <i class="bi bi-clipboard-check"></i>
+        <p>Test statistikasi yo'q</p>
     </div>
     {% endif %}
 </div>
 
 <!-- ==================== UYGA VAZIFALAR ==================== -->
-<div class="ios-card">
-    <div class="section-title">
-        <i class="bi bi-journal-text text-success"></i>Eng ko'p tashlab ketilgan uyga vazifalar
+<div class="glass-card">
+    <div class="card-header-gradient purple">
+        <h5><i class="bi bi-journal-text"></i> Uyga vazifalar statistikasi</h5>
+        <span class="count-badge">{{ homework_stats|length }} ta vazifa</span>
     </div>
     
     {% if homework_stats %}
     {% for item in homework_stats %}
-    <div class="stat-item">
-        <div class="d-flex justify-content-between align-items-start mb-2">
+    <div class="lesson-item">
+        <div class="lesson-header">
             <div>
-                <strong style="color: var(--text-main);">{{ item.lesson.title }}</strong>
-                <div class="small text-muted">{{ item.lesson.profession.name }}</div>
+                <h6 class="lesson-title">{{ item.lesson.title }}</h6>
+                <p class="lesson-course"><i class="bi bi-folder me-1"></i>{{ item.lesson.profession.name }}</p>
             </div>
-            <div class="text-end">
-                <span class="badge-stat {% if item.completion_rate >= 70 %}bg-success{% elif item.completion_rate >= 40 %}bg-warning text-dark{% else %}bg-danger{% endif %}">
-                    {{ item.completion_rate }}% topshirgan
-                </span>
-            </div>
+            <span class="completion-badge {% if item.completion_rate >= 70 %}success{% elif item.completion_rate >= 40 %}warning{% else %}danger{% endif %}">
+                {{ item.completion_rate }}% topshirgan
+            </span>
         </div>
         
-        <div class="progress-bar-custom mb-2">
-            <div class="fill {% if item.completion_rate >= 70 %}success{% elif item.completion_rate >= 40 %}warning{% else %}danger{% endif %}" style="width: {{ item.completion_rate }}%;"></div>
+        <div class="progress-wrapper">
+            <div class="progress-fill {% if item.completion_rate >= 70 %}success{% elif item.completion_rate >= 40 %}warning{% else %}danger{% endif %}" style="width: {{ item.completion_rate }}%;"></div>
         </div>
         
-        <div class="d-flex justify-content-between small text-muted mb-2">
-            <span><i class="bi bi-check-circle me-1"></i>{{ item.submitted }} topshirgan</span>
-            <span><i class="bi bi-x-circle me-1"></i>{{ item.not_submitted }} topshirmagan</span>
+        <div class="lesson-stats">
+            <div class="lesson-stat success">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>{{ item.submitted }} topshirgan</span>
+            </div>
+            <div class="lesson-stat danger">
+                <i class="bi bi-x-circle-fill"></i>
+                <span>{{ item.not_submitted }} topshirmagan</span>
+            </div>
         </div>
         
         {% if item.not_submitted_users %}
-        <div>
-            <small class="text-muted">Topshirmaganlar:</small>
+        <div class="user-chips">
+            <small class="text-muted me-2">Topshirmaganlar:</small>
             {% for user in item.not_submitted_users %}
             <span class="user-chip">{{ user.full_name }}</span>
             {% endfor %}
-            {% if item.not_submitted > 5 %}<span class="user-chip">+{{ item.not_submitted|add:"-5" }}</span>{% endif %}
+            {% if item.not_submitted > 5 %}<span class="user-chip">+{{ item.not_submitted|add:"-5" }} boshqa</span>{% endif %}
         </div>
         {% endif %}
     </div>
     {% endfor %}
     {% else %}
-    <div class="text-center py-4 text-muted">
-        <i class="bi bi-journal-text fs-1"></i>
-        <p class="mt-2 mb-0">Uyga vazifa statistikasi yo'q</p>
+    <div class="empty-state">
+        <i class="bi bi-journal-text"></i>
+        <p>Uyga vazifa statistikasi yo'q</p>
     </div>
     {% endif %}
 </div>
