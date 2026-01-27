@@ -1,436 +1,238 @@
 {% extends 'accounts/admin/base_admin.html' %}
+{% load static %}
 
 {% block title %}Uy Vazifalari{% endblock %}
 
 {% block extra_css %}
-<style>
-:root {
-    --bg: #f2f2f7;
-    --card: #fff;
-    --border: rgba(0,0,0,0.06);
-    --text: #1c1c1e;
-    --text2: #8e8e93;
-    --blue: #007aff;
-    --green: #34c759;
-    --orange: #ff9500;
-    --red: #ff3b30;
-    --purple: #af52de;
-    --pink: #ff2d55;
-    --teal: #5ac8fa;
-    --radius: 14px;
-}
-[data-bs-theme="dark"] {
-    --bg: #000;
-    --card: #1c1c1e;
-    --border: rgba(255,255,255,0.08);
-    --text: #fff;
-    --text2: #8e8e93;
-}
-
-/* iOS Typography */
-.ios-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--text);
-    margin: 0 0 4px;
-    letter-spacing: -0.5px;
-}
-.ios-subtitle {
-    font-size: 0.9rem;
-    color: var(--text2);
-    margin: 0;
-}
-
-/* Stats Row */
-.stats-scroll {
-    display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    padding: 4px 0 16px;
-    -webkit-overflow-scrolling: touch;
-}
-.stats-scroll::-webkit-scrollbar { display: none; }
-
-.stat-pill {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 14px 18px;
-    background: var(--card);
-    border-radius: var(--radius);
-    min-width: 140px;
-    flex-shrink: 0;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    transition: transform 0.2s, box-shadow 0.2s;
-    text-decoration: none;
-    color: var(--text);
-    border: 1px solid var(--border);
-}
-.stat-pill:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-}
-.stat-pill.active {
-    background: var(--blue);
-    color: #fff;
-    border-color: var(--blue);
-}
-.stat-pill .stat-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-}
-.stat-pill.active .stat-icon { background: rgba(255,255,255,0.2); }
-.stat-pill:not(.active) .stat-icon.orange { background: rgba(255,149,0,0.12); color: var(--orange); }
-.stat-pill:not(.active) .stat-icon.blue { background: rgba(0,122,255,0.12); color: var(--blue); }
-.stat-pill:not(.active) .stat-icon.red { background: rgba(255,59,48,0.12); color: var(--red); }
-.stat-pill:not(.active) .stat-icon.green { background: rgba(52,199,89,0.12); color: var(--green); }
-.stat-pill:not(.active) .stat-icon.purple { background: rgba(175,82,222,0.12); color: var(--purple); }
-
-.stat-pill .stat-info h4 { margin: 0; font-size: 1.3rem; font-weight: 700; }
-.stat-pill .stat-info span { font-size: 0.7rem; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.3px; }
-
-/* Filter Card */
-.filter-card {
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    margin-bottom: 16px;
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    align-items: center;
-    border: 1px solid var(--border);
-}
-.filter-card select {
-    padding: 10px 14px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: var(--bg);
-    color: var(--text);
-    font-size: 0.85rem;
-    min-width: 160px;
-}
-.filter-card select:focus { outline: none; border-color: var(--blue); }
-
-/* iOS List */
-.ios-list {
-    background: var(--card);
-    border-radius: var(--radius);
-    overflow: hidden;
-    border: 1px solid var(--border);
-}
-.ios-list-header {
-    padding: 10px 16px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text2);
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-}
-
-/* Submission Item */
-.sub-item {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border);
-    transition: background 0.15s;
-    text-decoration: none;
-    color: var(--text);
-}
-.sub-item:last-child { border-bottom: none; }
-.sub-item:hover { background: rgba(0,122,255,0.04); }
-.sub-item:active { background: rgba(0,122,255,0.08); }
-
-.sub-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: #fff;
-    flex-shrink: 0;
-    position: relative;
-}
-.sub-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 24px; }
-.sub-avatar.pending { background: linear-gradient(135deg, #ff9500, #ffcc00); }
-.sub-avatar.reviewing { background: linear-gradient(135deg, #007aff, #5ac8fa); }
-.sub-avatar.revision { background: linear-gradient(135deg, #ff3b30, #ff6b6b); }
-.sub-avatar.accepted { background: linear-gradient(135deg, #34c759, #30d158); }
-.sub-avatar.graded { background: linear-gradient(135deg, #af52de, #bf5af2); }
-
-.msg-dot {
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    width: 18px;
-    height: 18px;
-    background: var(--red);
-    border-radius: 9px;
-    font-size: 0.6rem;
-    font-weight: 700;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid var(--card);
-}
-
-.sub-content { flex: 1; min-width: 0; }
-.sub-content h6 {
-    margin: 0;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.sub-content p {
-    margin: 3px 0 0;
-    font-size: 0.8rem;
-    color: var(--text2);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-
-.late-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-    padding: 2px 6px;
-    background: rgba(255,59,48,0.12);
-    color: var(--red);
-    border-radius: 4px;
-    font-size: 0.65rem;
-    font-weight: 700;
-}
-.revision-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-    padding: 2px 6px;
-    background: rgba(255,149,0,0.12);
-    color: var(--orange);
-    border-radius: 4px;
-    font-size: 0.65rem;
-    font-weight: 600;
-}
-
-.sub-meta {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
-    flex-shrink: 0;
-}
-.status-chip {
-    padding: 5px 10px;
-    border-radius: 8px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.2px;
-}
-.status-chip.pending { background: rgba(255,149,0,0.12); color: #c77700; }
-.status-chip.reviewing { background: rgba(0,122,255,0.12); color: #0066cc; }
-.status-chip.revision { background: rgba(255,59,48,0.12); color: #cc2f26; }
-.status-chip.accepted { background: rgba(52,199,89,0.12); color: #248a3d; }
-.status-chip.graded { background: rgba(175,82,222,0.12); color: #8944ab; }
-
-.time-text {
-    font-size: 0.7rem;
-    color: var(--text2);
-}
-
-.sub-arrow {
-    color: var(--text2);
-    font-size: 1.2rem;
-    margin-left: 4px;
-}
-
-/* Empty State */
-.empty-state {
-    text-align: center;
-    padding: 60px 20px;
-}
-.empty-state .empty-icon {
-    width: 80px;
-    height: 80px;
-    background: var(--bg);
-    border-radius: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 16px;
-    font-size: 2rem;
-    color: var(--text2);
-}
-.empty-state h5 { margin: 0 0 6px; color: var(--text); font-weight: 600; }
-.empty-state p { margin: 0; color: var(--text2); font-size: 0.85rem; }
-
-/* Responsive */
-@media (max-width: 768px) {
-    .ios-title { font-size: 1.6rem; }
-    .stat-pill { min-width: 120px; padding: 12px 14px; }
-    .stat-pill .stat-icon { width: 36px; height: 36px; font-size: 1rem; }
-    .stat-pill .stat-info h4 { font-size: 1.1rem; }
-}
-</style>
+<link rel="stylesheet" href="{% static 'css/homework_scoped.css' %}">
 {% endblock %}
 
 {% block admin_content %}
-
-<!-- Header -->
-<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
-    <div>
-        <h1 class="ios-title">Uy Vazifalari</h1>
-        <p class="ios-subtitle">O'quvchilarning topshirgan vazifalarini tekshiring</p>
+<div class="vazifa-sahifa-wrapper">
+    <!-- Sarlavha -->
+    <div class="vz-sarlavha-blok">
+        <h1 class="vz-asosiy-sarlavha">Uy Vazifalari</h1>
+        <p class="vz-tavsif-pastki">O'quvchilarning topshirgan vazifalarini tekshiring va baholang</p>
     </div>
-</div>
 
-<!-- Stats -->
-<div class="stats-scroll">
-    <a href="{% url 'homework_submissions' %}" class="stat-pill {% if not status_filter %}active{% endif %}">
-        <div class="stat-icon purple"><i class="bi bi-stack"></i></div>
-        <div class="stat-info">
-            <h4>{{ stats.pending|add:stats.reviewing|add:stats.revision|add:stats.accepted }}</h4>
-            <span>Barchasi</span>
+    <!-- Statistika Karuseli -->
+    <div class="vz-statistika-idish">
+        <div class="vz-gorizantal-scroll">
+            <a href="{% url 'homework_submissions' %}" class="vz-mezon-karta {% if not status_filter %}vz-faol{% endif %}">
+                <div class="vz-belgi-idish vz-lavanda">
+                    <i class="bi bi-stack"></i>
+                </div>
+                <div class="vz-mezon-malumot">
+                    <div class="vz-raqam">{{ stats.pending|add:stats.reviewing|add:stats.revision|add:stats.accepted }}</div>
+                    <div class="vz-yorliq">Barchasi</div>
+                </div>
+            </a>
+            
+            <a href="?status=pending" class="vz-mezon-karta {% if status_filter == 'pending' %}vz-faol{% endif %}">
+                <div class="vz-belgi-idish vz-kehribar">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+                <div class="vz-mezon-malumot">
+                    <div class="vz-raqam">{{ stats.pending }}</div>
+                    <div class="vz-yorliq">Kutilmoqda</div>
+                </div>
+            </a>
+            
+            <a href="?status=reviewing" class="vz-mezon-karta {% if status_filter == 'reviewing' %}vz-faol{% endif %}">
+                <div class="vz-belgi-idish vz-okean">
+                    <i class="bi bi-eye"></i>
+                </div>
+                <div class="vz-mezon-malumot">
+                    <div class="vz-raqam">{{ stats.reviewing }}</div>
+                    <div class="vz-yorliq">Ko'rilmoqda</div>
+                </div>
+            </a>
+            
+            <a href="?status=revision" class="vz-mezon-karta {% if status_filter == 'revision' %}vz-faol{% endif %}">
+                <div class="vz-belgi-idish vz-quyosh">
+                    <i class="bi bi-arrow-repeat"></i>
+                </div>
+                <div class="vz-mezon-malumot">
+                    <div class="vz-raqam">{{ stats.revision }}</div>
+                    <div class="vz-yorliq">Qayta ishlash</div>
+                </div>
+            </a>
+            
+            <a href="?status=accepted" class="vz-mezon-karta {% if status_filter == 'accepted' %}vz-faol{% endif %}">
+                <div class="vz-belgi-idish vz-ormon">
+                    <i class="bi bi-check-lg"></i>
+                </div>
+                <div class="vz-mezon-malumot">
+                    <div class="vz-raqam">{{ stats.accepted }}</div>
+                    <div class="vz-yorliq">Qabul qilindi</div>
+                </div>
+            </a>
+            
+            <a href="?status=graded" class="vz-mezon-karta {% if status_filter == 'graded' %}vz-faol{% endif %}">
+                <div class="vz-belgi-idish vz-lavanda">
+                    <i class="bi bi-star-fill"></i>
+                </div>
+                <div class="vz-mezon-malumot">
+                    <div class="vz-raqam">{{ stats.graded }}</div>
+                    <div class="vz-yorliq">Baholangan</div>
+                </div>
+            </a>
         </div>
-    </a>
-    <a href="?status=pending" class="stat-pill {% if status_filter == 'pending' %}active{% endif %}">
-        <div class="stat-icon orange"><i class="bi bi-hourglass-split"></i></div>
-        <div class="stat-info">
-            <h4>{{ stats.pending }}</h4>
-            <span>Kutilmoqda</span>
-        </div>
-    </a>
-    <a href="?status=reviewing" class="stat-pill {% if status_filter == 'reviewing' %}active{% endif %}">
-        <div class="stat-icon blue"><i class="bi bi-eye"></i></div>
-        <div class="stat-info">
-            <h4>{{ stats.reviewing }}</h4>
-            <span>Ko'rilmoqda</span>
-        </div>
-    </a>
-    <a href="?status=revision" class="stat-pill {% if status_filter == 'revision' %}active{% endif %}">
-        <div class="stat-icon red"><i class="bi bi-arrow-repeat"></i></div>
-        <div class="stat-info">
-            <h4>{{ stats.revision }}</h4>
-            <span>Qayta ishlash</span>
-        </div>
-    </a>
-    <a href="?status=accepted" class="stat-pill {% if status_filter == 'accepted' %}active{% endif %}">
-        <div class="stat-icon green"><i class="bi bi-check-lg"></i></div>
-        <div class="stat-info">
-            <h4>{{ stats.accepted }}</h4>
-            <span>Qabul qilindi</span>
-        </div>
-    </a>
-    <a href="?status=graded" class="stat-pill {% if status_filter == 'graded' %}active{% endif %}">
-        <div class="stat-icon purple"><i class="bi bi-star-fill"></i></div>
-        <div class="stat-info">
-            <h4>{{ stats.graded }}</h4>
-            <span>Baholangan</span>
-        </div>
-    </a>
-</div>
+    </div>
 
-<!-- Filter -->
-<div class="filter-card">
-    <i class="bi bi-funnel text-muted"></i>
-    <form method="GET" class="d-flex gap-2 flex-wrap">
-        {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
-        <select name="profession" onchange="this.form.submit()">
+    <!-- Filtr -->
+    <form method="GET" class="vz-filtr-panel">
+        <i class="bi bi-funnel vz-filtr-icon"></i>
+        
+        {% if status_filter %}
+            <input type="hidden" name="status" value="{{ status_filter }}">
+        {% endif %}
+        
+        <select name="profession" class="vz-filtr-select" onchange="this.form.submit()">
             <option value="">📚 Barcha kurslar</option>
             {% for p in professions %}
-            <option value="{{ p.pk }}" {% if profession_filter == p.pk|stringformat:"i" %}selected{% endif %}>{{ p.name }}</option>
+                <option value="{{ p.pk }}" {% if profession_filter == p.pk|stringformat:"i" %}selected{% endif %}>
+                    {{ p.name }}
+                </option>
             {% endfor %}
         </select>
-    </form>
-    {% if status_filter or profession_filter %}
-    <a href="{% url 'homework_submissions' %}" class="btn btn-sm btn-outline-secondary rounded-pill ms-auto">
-        <i class="bi bi-x-lg me-1"></i>Tozalash
-    </a>
-    {% endif %}
-</div>
-
-<!-- Submissions List -->
-<div class="ios-list">
-    <div class="ios-list-header">
-        {% if status_filter %}
-        {{ status_filter|upper }} vazifalar
-        {% else %}
-        Barcha ochiq vazifalar
+        
+        {% if status_filter or profession_filter %}
+            <a href="{% url 'homework_submissions' %}" class="vz-filtr-tozalash">
+                <i class="bi bi-x-lg"></i>
+                <span>Tozalash</span>
+            </a>
         {% endif %}
-        ({{ submissions|length }})
-    </div>
-    
-    {% if submissions %}
-    {% for sub in submissions %}
-    <a href="{% url 'grade_homework' sub.pk %}" class="sub-item">
-        <div class="sub-avatar {{ sub.status }}">
-            {% if sub.student.photo %}
-            <img src="{{ sub.student.photo.url }}" alt="">
-            {% else %}
-            {{ sub.student.get_initials }}
-            {% endif %}
-            {% if sub.messages.count > 0 %}
-            <span class="msg-dot">{{ sub.messages.count }}</span>
-            {% endif %}
-        </div>
-        
-        <div class="sub-content">
-            <h6>
-                {{ sub.student.full_name }}
-                {% if sub.is_late %}
-                <span class="late-tag"><i class="bi bi-clock"></i> KECH</span>
-                {% endif %}
-            </h6>
-            <p>
-                <span><i class="bi bi-journal-text"></i> {{ sub.homework.lesson.title|truncatewords:4 }}</span>
-                <span>•</span>
-                <span>{{ sub.homework.lesson.profession.name }}</span>
-                {% if sub.revision_count > 0 %}
-                <span class="revision-tag"><i class="bi bi-arrow-repeat"></i> {{ sub.revision_count }}x</span>
-                {% endif %}
-            </p>
-        </div>
-        
-        <div class="sub-meta">
-            <span class="status-chip {{ sub.status }}">
-                {% if sub.status == 'pending' %}Kutilmoqda
-                {% elif sub.status == 'reviewing' %}Ko'rilmoqda
-                {% elif sub.status == 'revision' %}Qayta ishlash
-                {% elif sub.status == 'accepted' %}Qabul qilindi
-                {% elif sub.status == 'graded' %}{{ sub.grade }}%
+    </form>
+
+    <!-- Topshiriqlar Kolleksiyasi -->
+    <div class="vz-kolleksiya">
+        <div class="vz-kolleksiya-sarlavha">
+            <span>
+                {% if status_filter %}
+                    {% if status_filter == 'pending' %}Kutilayotgan
+                    {% elif status_filter == 'reviewing' %}Ko'rilayotgan
+                    {% elif status_filter == 'revision' %}Qayta ishlanayotgan
+                    {% elif status_filter == 'accepted' %}Qabul qilingan
+                    {% elif status_filter == 'graded' %}Baholangan
+                    {% endif %}
+                    vazifalar
+                {% else %}
+                    Barcha ochiq vazifalar
                 {% endif %}
             </span>
-            <span class="time-text">{{ sub.submitted_at|timesince }} oldin</span>
+            <span class="vz-kolleksiya-son">{{ submissions|length }}</span>
         </div>
         
-        <i class="bi bi-chevron-right sub-arrow"></i>
-    </a>
-    {% endfor %}
-    {% else %}
-    <div class="empty-state">
-        <div class="empty-icon"><i class="bi bi-inbox"></i></div>
-        <h5>Vazifalar yo'q</h5>
-        <p>Bu filterda hech qanday vazifa topilmadi</p>
+        {% if submissions %}
+            {% for sub in submissions %}
+                <a href="{% url 'grade_homework' sub.pk %}" class="vz-topshiriq">
+                    <div class="vz-talaba-avatar vz-{% if sub.status == 'pending' %}kutilmoqda{% elif sub.status == 'reviewing' %}korilmoqda{% elif sub.status == 'revision' %}tuzatish{% elif sub.status == 'accepted' %}tasdiqlangan{% elif sub.status == 'graded' %}baholangan{% endif %}">
+                        {% if sub.student.photo %}
+                            <img src="{{ sub.student.photo.url }}" alt="{{ sub.student.full_name }}">
+                        {% else %}
+                            {{ sub.student.get_initials }}
+                        {% endif %}
+                        
+                        {% if sub.messages.count > 0 %}
+                            <span class="vz-xabar-belgi">{{ sub.messages.count }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="vz-mazmun">
+                        <h6 class="vz-talaba-ism">
+                            {{ sub.student.full_name }}
+                            
+                            {% if sub.is_late %}
+                                <span class="vz-tag vz-kechikkan">
+                                    <i class="bi bi-clock"></i>
+                                    Kech
+                                </span>
+                            {% endif %}
+                            
+                            {% if sub.revision_count > 0 %}
+                                <span class="vz-tag vz-qayta">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                    {{ sub.revision_count }}x
+                                </span>
+                            {% endif %}
+                        </h6>
+                        
+                        <p class="vz-metadata">
+                            <span>
+                                <i class="bi bi-journal-text"></i>
+                                {{ sub.homework.lesson.title|truncatewords:4 }}
+                            </span>
+                            <span class="vz-nuqta">•</span>
+                            <span>{{ sub.homework.lesson.profession.name }}</span>
+                        </p>
+                    </div>
+                    
+                    <div class="vz-holat-panel">
+                        <span class="vz-holat-belgi vz-h-{% if sub.status == 'pending' %}kutilmoqda{% elif sub.status == 'reviewing' %}korilmoqda{% elif sub.status == 'revision' %}tuzatish{% elif sub.status == 'accepted' %}tasdiqlangan{% elif sub.status == 'graded' %}baholangan{% endif %}">
+                            {% if sub.status == 'pending' %}
+                                Kutilmoqda
+                            {% elif sub.status == 'reviewing' %}
+                                Ko'rilmoqda
+                            {% elif sub.status == 'revision' %}
+                                Qayta ishlash
+                            {% elif sub.status == 'accepted' %}
+                                Qabul qilindi
+                            {% elif sub.status == 'graded' %}
+                                {{ sub.grade }}%
+                            {% endif %}
+                        </span>
+                        <span class="vz-vaqt">{{ sub.submitted_at|timesince }} oldin</span>
+                    </div>
+                    
+                    <i class="bi bi-chevron-right vz-strelka"></i>
+                </a>
+            {% endfor %}
+        {% else %}
+            <div class="vz-bosh">
+                <div class="vz-bosh-icon">
+                    <i class="bi bi-inbox"></i>
+                </div>
+                <h5 class="vz-bosh-sarlavha">Vazifalar topilmadi</h5>
+                <p class="vz-bosh-matn">
+                    {% if status_filter or profession_filter %}
+                        Bu filtrda hech qanday vazifa yo'q. Boshqa filtrlarni sinab ko'ring.
+                    {% else %}
+                        Hozircha hech qanday vazifa topshirilmagan.
+                    {% endif %}
+                </p>
+            </div>
+        {% endif %}
     </div>
-    {% endif %}
 </div>
 
+<script>
+// Gorizontal scroll aniqlash
+document.addEventListener('DOMContentLoaded', function() {
+    const statistikaIdish = document.querySelector('.vz-statistika-idish');
+    const scroll = document.querySelector('.vz-gorizantal-scroll');
+    
+    if (scroll && statistikaIdish) {
+        function toshishniTekshir() {
+            const toshishBor = scroll.scrollWidth > scroll.clientWidth;
+            if (toshishBor) {
+                statistikaIdish.classList.add('vz-toshib-ketgan');
+            } else {
+                statistikaIdish.classList.remove('vz-toshib-ketgan');
+            }
+        }
+        
+        toshishniTekshir();
+        window.addEventListener('resize', toshishniTekshir);
+        
+        // Sichqoncha g'ildiragida silliq scroll
+        scroll.addEventListener('wheel', function(e) {
+            if (e.deltaY !== 0) {
+                e.preventDefault();
+                scroll.scrollLeft += e.deltaY;
+            }
+        }, { passive: false });
+    }
+});
+</script>
 {% endblock %}

@@ -1,0 +1,826 @@
+
+/* ==================== O'ZGARUVCHILAR ==================== */
+:root {
+    --okean-kok: #007aff;
+    --okean-ochiq: #5ac8fa;
+    --ormon-yashil: #34c759;
+    --quyosh-qizil: #ff3b30;
+    --kehribar-sarg: #ff9500;
+    --lavanda-binafsha: #af52de;
+    --atirgul-pushti: #ff2d55;
+    --dengiz-moviy: #5ac8fa;
+    
+    --yuzasi-kanvas: #f2f2f7;
+    --yuzasi-korinuvchan: #ffffff;
+    --yuzasi-chuqur: #e5e5ea;
+    --siyoh-asosiy: #1c1c1e;
+    --siyoh-ikkilamchi: #8e8e93;
+    --siyoh-uchinchi: #c7c7cc;
+    --chegara-ajratuvchi: rgba(0, 0, 0, 0.06);
+    
+    --nurlanish-nozik: 0 1px 3px rgba(0, 0, 0, 0.04);
+    --nurlanish-orta: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --nurlanish-yorqin: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --nurlanish-dramatik: 0 8px 24px rgba(0, 0, 0, 0.12);
+    
+    --egri-yumshoq: 14px;
+    --egri-muloyim: 10px;
+    --egri-dadil: 18px;
+    --egri-doira: 9999px;
+    
+    --harakat-silliq: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --harakat-tez: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-bs-theme="dark"] {
+    --yuzasi-kanvas: #000000;
+    --yuzasi-korinuvchan: #1c1c1e;
+    --yuzasi-chuqur: #2c2c2e;
+    --siyoh-asosiy: #ffffff;
+    --siyoh-ikkilamchi: #8e8e93;
+    --siyoh-uchinchi: #636366;
+    --chegara-ajratuvchi: rgba(255, 255, 255, 0.08);
+    --nurlanish-nozik: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --nurlanish-orta: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --nurlanish-yorqin: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ==================== TARTIB ==================== */
+.vazifa-boshqaruv-qoplama {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+@media (min-width: 768px) {
+    .vazifa-boshqaruv-qoplama {
+        padding: 1.5rem;
+    }
+}
+
+/* ==================== ANIMATSIYALAR ==================== */
+@keyframes pastdan-suzib-kirish {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes yumshoq-paydo-bolish {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes ongdan-sirpanish {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes sakrab-kattalashtirish {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes yurak-urishi {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes chaqnash-tolqin {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+/* ==================== SARLAVHA QISMI ==================== */
+.qahramon-sarlavha-blok {
+    margin-bottom: 1.5rem;
+    animation: pastdan-suzib-kirish 0.5s ease;
+}
+
+.qahramon-asosiy-sarlavha {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--siyoh-asosiy);
+    margin: 0 0 0.25rem;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+}
+
+.qahramon-tavsif-pastki {
+    font-size: 0.9375rem;
+    color: var(--siyoh-ikkilamchi);
+    margin: 0;
+    font-weight: 400;
+}
+
+@media (max-width: 767px) {
+    .qahramon-asosiy-sarlavha {
+        font-size: 1.625rem;
+    }
+    
+    .qahramon-tavsif-pastki {
+        font-size: 0.875rem;
+    }
+}
+
+/* ==================== STATISTIKA KARUSELI ==================== */
+.statistika-karusel-idish {
+    margin-bottom: 1.5rem;
+    animation: pastdan-suzib-kirish 0.6s ease 0.1s backwards;
+    position: relative;
+}
+
+.statistika-gorizantal-aylanish {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.25rem 0 1rem;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+}
+
+.statistika-gorizantal-aylanish::-webkit-scrollbar {
+    display: none;
+}
+
+.statistika-karusel-idish::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 1rem;
+    width: 40px;
+    background: linear-gradient(to left, var(--yuzasi-kanvas), transparent);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.statistika-karusel-idish.gorizantal-toshib-ketgan::after {
+    opacity: 1;
+}
+
+.mezon-korsatish-kartasi {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 1rem 1.125rem;
+    background: var(--yuzasi-korinuvchan);
+    border-radius: var(--egri-yumshoq);
+    min-width: 150px;
+    flex-shrink: 0;
+    box-shadow: var(--nurlanish-nozik);
+    transition: var(--harakat-silliq);
+    text-decoration: none;
+    color: var(--siyoh-asosiy);
+    border: 1px solid var(--chegara-ajratuvchi);
+    position: relative;
+    overflow: hidden;
+}
+
+.mezon-korsatish-kartasi::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.mezon-korsatish-kartasi:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--nurlanish-yorqin);
+}
+
+.mezon-korsatish-kartasi:hover::before {
+    opacity: 1;
+}
+
+.mezon-korsatish-kartasi:active {
+    transform: translateY(-1px);
+    box-shadow: var(--nurlanish-orta);
+}
+
+.mezon-korsatish-kartasi.hozir-faol {
+    background: var(--okean-kok);
+    color: #ffffff;
+    border-color: var(--okean-kok);
+    box-shadow: var(--nurlanish-yorqin);
+    transform: scale(1.02);
+}
+
+.mezon-belgi-idish {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--egri-muloyim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    transition: var(--harakat-silliq);
+}
+
+.mezon-korsatish-kartasi.hozir-faol .mezon-belgi-idish {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    animation: yurak-urishi 2s ease infinite;
+}
+
+.mezon-korsatish-kartasi:not(.hozir-faol) .mezon-belgi-idish.mavzu-lavanda {
+    background: rgba(175, 82, 222, 0.12);
+    color: var(--lavanda-binafsha);
+}
+
+.mezon-korsatish-kartasi:not(.hozir-faol) .mezon-belgi-idish.mavzu-kehribar {
+    background: rgba(255, 149, 0, 0.12);
+    color: var(--kehribar-sarg);
+}
+
+.mezon-korsatish-kartasi:not(.hozir-faol) .mezon-belgi-idish.mavzu-okean {
+    background: rgba(0, 122, 255, 0.12);
+    color: var(--okean-kok);
+}
+
+.mezon-korsatish-kartasi:not(.hozir-faol) .mezon-belgi-idish.mavzu-quyosh {
+    background: rgba(255, 59, 48, 0.12);
+    color: var(--quyosh-qizil);
+}
+
+.mezon-korsatish-kartasi:not(.hozir-faol) .mezon-belgi-idish.mavzu-ormon {
+    background: rgba(52, 199, 89, 0.12);
+    color: var(--ormon-yashil);
+}
+
+.mezon-malumot-korsatish {
+    flex: 1;
+}
+
+.mezon-raqamli-qiymat {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.mezon-tavsif-belgi {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+@media (max-width: 767px) {
+    .mezon-korsatish-kartasi {
+        min-width: 130px;
+        padding: 0.875rem 1rem;
+        gap: 0.75rem;
+    }
+    
+    .mezon-belgi-idish {
+        width: 38px;
+        height: 38px;
+        font-size: 1.125rem;
+    }
+    
+    .mezon-raqamli-qiymat {
+        font-size: 1.25rem;
+    }
+    
+    .mezon-tavsif-belgi {
+        font-size: 0.6875rem;
+    }
+}
+
+/* ==================== FILTR BOSHQARUV ==================== */
+.filtr-boshqaruv-paneli {
+    background: var(--yuzasi-korinuvchan);
+    border-radius: var(--egri-yumshoq);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: center;
+    border: 1px solid var(--chegara-ajratuvchi);
+    box-shadow: var(--nurlanish-nozik);
+    animation: pastdan-suzib-kirish 0.6s ease 0.2s backwards;
+}
+
+.filtr-voronka-belgi {
+    color: var(--siyoh-ikkilamchi);
+    font-size: 1.125rem;
+}
+
+.filtr-ochiluvchi-tanlash {
+    padding: 0.625rem 1rem;
+    border: 1px solid var(--chegara-ajratuvchi);
+    border-radius: var(--egri-muloyim);
+    background: var(--yuzasi-kanvas);
+    color: var(--siyoh-asosiy);
+    font-size: 0.875rem;
+    min-width: 180px;
+    cursor: pointer;
+    transition: var(--harakat-tez);
+    font-weight: 500;
+}
+
+.filtr-ochiluvchi-tanlash:focus {
+    outline: none;
+    border-color: var(--okean-kok);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.filtr-ochiluvchi-tanlash:hover {
+    border-color: var(--okean-kok);
+}
+
+.filtr-qayta-boshlash-tugma {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.625rem 1rem;
+    background: var(--yuzasi-kanvas);
+    color: var(--siyoh-ikkilamchi);
+    border: 1px solid var(--chegara-ajratuvchi);
+    border-radius: var(--egri-doira);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--harakat-tez);
+    text-decoration: none;
+    margin-left: auto;
+}
+
+.filtr-qayta-boshlash-tugma:hover {
+    background: var(--quyosh-qizil);
+    color: #ffffff;
+    border-color: var(--quyosh-qizil);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 767px) {
+    .filtr-boshqaruv-paneli {
+        padding: 0.875rem 1rem;
+    }
+    
+    .filtr-ochiluvchi-tanlash {
+        width: 100%;
+        min-width: unset;
+    }
+    
+    .filtr-qayta-boshlash-tugma {
+        width: 100%;
+        justify-content: center;
+        margin-left: 0;
+    }
+}
+
+/* ==================== TOPSHIRIQLAR KOLLEKSIYASI ==================== */
+.topshiriqlar-kolleksiya-korinish {
+    background: var(--yuzasi-korinuvchan);
+    border-radius: var(--egri-yumshoq);
+    overflow: hidden;
+    border: 1px solid var(--chegara-ajratuvchi);
+    box-shadow: var(--nurlanish-nozik);
+    animation: pastdan-suzib-kirish 0.6s ease 0.3s backwards;
+}
+
+.kolleksiya-sarlavha-chiziq {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--siyoh-ikkilamchi);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--yuzasi-kanvas);
+    border-bottom: 1px solid var(--chegara-ajratuvchi);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.kolleksiya-element-son-nishon {
+    background: var(--yuzasi-chuqur);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--egri-muloyim);
+    font-weight: 800;
+    color: var(--siyoh-asosiy);
+}
+
+/* ==================== UY VAZIFA TOPSHIRIQ YOZUVI ==================== */
+.uyVazifa-topshiriq-yozuv {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--chegara-ajratuvchi);
+    transition: var(--harakat-tez);
+    text-decoration: none;
+    color: var(--siyoh-asosiy);
+    position: relative;
+    overflow: hidden;
+}
+
+.uyVazifa-topshiriq-yozuv::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--okean-kok);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+}
+
+.uyVazifa-topshiriq-yozuv:last-child {
+    border-bottom: none;
+}
+
+.uyVazifa-topshiriq-yozuv:hover {
+    background: rgba(0, 122, 255, 0.04);
+}
+
+.uyVazifa-topshiriq-yozuv:hover::before {
+    transform: scaleY(1);
+}
+
+.uyVazifa-topshiriq-yozuv:active {
+    background: rgba(0, 122, 255, 0.08);
+    transform: scale(0.99);
+}
+
+/* Stagger animatsiya */
+.uyVazifa-topshiriq-yozuv {
+    opacity: 0;
+    animation: pastdan-suzib-kirish 0.4s ease forwards;
+}
+
+.uyVazifa-topshiriq-yozuv:nth-child(2) { animation-delay: 0.05s; }
+.uyVazifa-topshiriq-yozuv:nth-child(3) { animation-delay: 0.1s; }
+.uyVazifa-topshiriq-yozuv:nth-child(4) { animation-delay: 0.15s; }
+.uyVazifa-topshiriq-yozuv:nth-child(5) { animation-delay: 0.2s; }
+.uyVazifa-topshiriq-yozuv:nth-child(6) { animation-delay: 0.25s; }
+.uyVazifa-topshiriq-yozuv:nth-child(n+7) { animation-delay: 0.3s; }
+
+.talaba-avatar-doira {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #ffffff;
+    flex-shrink: 0;
+    position: relative;
+    box-shadow: var(--nurlanish-orta);
+    transition: var(--harakat-silliq);
+}
+
+.uyVazifa-topshiriq-yozuv:hover .talaba-avatar-doira {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: var(--nurlanish-yorqin);
+}
+
+.talaba-avatar-doira img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.talaba-avatar-doira.holat-kutilmoqda {
+    background: linear-gradient(135deg, #ff9500, #ffcc00);
+}
+
+.talaba-avatar-doira.holat-korilmoqda {
+    background: linear-gradient(135deg, #007aff, #5ac8fa);
+}
+
+.talaba-avatar-doira.holat-tuzatish-kerak {
+    background: linear-gradient(135deg, #ff3b30, #ff6b6b);
+}
+
+.talaba-avatar-doira.holat-tasdiqlangan {
+    background: linear-gradient(135deg, #34c759, #30d158);
+}
+
+.talaba-avatar-doira.holat-baholangan {
+    background: linear-gradient(135deg, #af52de, #bf5af2);
+}
+
+.oqilmagan-xabarlar-korsatkichi {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 20px;
+    height: 20px;
+    background: var(--quyosh-qizil);
+    border-radius: 10px;
+    font-size: 0.625rem;
+    font-weight: 800;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--yuzasi-korinuvchan);
+    animation: yurak-urishi 2s ease infinite;
+    padding: 0 0.25rem;
+}
+
+.topshiriq-matn-tarkib {
+    flex: 1;
+    min-width: 0;
+}
+
+.talaba-ism-sarlavha {
+    margin: 0 0 0.375rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--siyoh-asosiy);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.axborot-yorliq {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.axborot-yorliq.variant-kechikkan {
+    background: rgba(255, 59, 48, 0.12);
+    color: var(--quyosh-qizil);
+}
+
+.axborot-yorliq.variant-qayta-soni {
+    background: rgba(255, 149, 0, 0.12);
+    color: var(--kehribar-sarg);
+}
+
+.vazifa-metadata-matn {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--siyoh-ikkilamchi);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.vazifa-metadata-matn i {
+    font-size: 0.75rem;
+}
+
+.metadata-ajratuvchi-nuqta {
+    color: var(--siyoh-uchinchi);
+}
+
+.topshiriq-holat-yon-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.375rem;
+    flex-shrink: 0;
+}
+
+.ish-jarayoni-holat-yorliq {
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--egri-muloyim);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    transition: var(--harakat-tez);
+}
+
+.uyVazifa-topshiriq-yozuv:hover .ish-jarayoni-holat-yorliq {
+    transform: scale(1.05);
+}
+
+.ish-jarayoni-holat-yorliq.ahvol-kutilmoqda {
+    background: rgba(255, 149, 0, 0.15);
+    color: #c77700;
+}
+
+.ish-jarayoni-holat-yorliq.ahvol-korilmoqda {
+    background: rgba(0, 122, 255, 0.15);
+    color: #0066cc;
+}
+
+.ish-jarayoni-holat-yorliq.ahvol-tuzatish-kerak {
+    background: rgba(255, 59, 48, 0.15);
+    color: #cc2f26;
+}
+
+.ish-jarayoni-holat-yorliq.ahvol-tasdiqlangan {
+    background: rgba(52, 199, 89, 0.15);
+    color: #248a3d;
+}
+
+.ish-jarayoni-holat-yorliq.ahvol-baholangan {
+    background: rgba(175, 82, 222, 0.15);
+    color: #8944ab;
+}
+
+.nisbiy-vaqt-matn {
+    font-size: 0.6875rem;
+    color: var(--siyoh-ikkilamchi);
+    white-space: nowrap;
+}
+
+.chevron-navigatsiya-strelka {
+    color: var(--siyoh-uchinchi);
+    font-size: 1.25rem;
+    margin-left: 0.5rem;
+    flex-shrink: 0;
+    transition: var(--harakat-tez);
+}
+
+.uyVazifa-topshiriq-yozuv:hover .chevron-navigatsiya-strelka {
+    color: var(--okean-kok);
+    transform: translateX(4px);
+}
+
+@media (max-width: 767px) {
+    .uyVazifa-topshiriq-yozuv {
+        gap: 0.875rem;
+        padding: 1rem;
+    }
+    
+    .talaba-avatar-doira {
+        width: 44px;
+        height: 44px;
+        font-size: 0.875rem;
+    }
+    
+    .oqilmagan-xabarlar-korsatkichi {
+        min-width: 18px;
+        height: 18px;
+        font-size: 0.5625rem;
+    }
+    
+    .talaba-ism-sarlavha {
+        font-size: 0.9375rem;
+    }
+    
+    .vazifa-metadata-matn {
+        font-size: 0.75rem;
+    }
+    
+    .topshiriq-holat-yon-panel {
+        align-items: flex-end;
+    }
+    
+    .ish-jarayoni-holat-yorliq {
+        font-size: 0.625rem;
+        padding: 0.3125rem 0.625rem;
+    }
+    
+    .chevron-navigatsiya-strelka {
+        display: none;
+    }
+}
+
+/* ==================== BO'SH NATIJALAR KO'RINISHI ==================== */
+.bosh-natijalar-joylashtirgich {
+    text-align: center;
+    padding: 4rem 1.5rem;
+    animation: sakrab-kattalashtirish 0.5s ease;
+}
+
+.bosh-belgi-doira {
+    width: 80px;
+    height: 80px;
+    background: var(--yuzasi-kanvas);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+    font-size: 2rem;
+    color: var(--siyoh-ikkilamchi);
+    box-shadow: var(--nurlanish-nozik);
+    animation: yurak-urishi 3s ease infinite;
+}
+
+.bosh-asosiy-xabar {
+    margin: 0 0 0.5rem;
+    color: var(--siyoh-asosiy);
+    font-weight: 600;
+    font-size: 1.125rem;
+}
+
+.bosh-ikkilamchi-xabar {
+    margin: 0;
+    color: var(--siyoh-ikkilamchi);
+    font-size: 0.9375rem;
+}
+
+/* ==================== YUKLASH SKELETON ==================== */
+.yuklash-skeleton-blok {
+    background: linear-gradient(90deg, var(--yuzasi-chuqur) 25%, var(--chegara-ajratuvchi) 50%, var(--yuzasi-chuqur) 75%);
+    background-size: 200% 100%;
+    animation: chaqnash-tolqin 1.5s infinite;
+    border-radius: var(--egri-muloyim);
+}
+
+.skeleton-matn-chiziq {
+    height: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.skeleton-matn-chiziq.kenglik-ixcham {
+    width: 60%;
+}
+
+/* ==================== YORDAMCHI SINFLAR ==================== */
+.matn-nuqtalar-qisqartirish {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ==================== MAXSUS SCROLLBAR ==================== */
+@media (min-width: 768px) {
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: var(--yuzasi-kanvas);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: var(--siyoh-uchinchi);
+        border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--siyoh-ikkilamchi);
+    }
+}

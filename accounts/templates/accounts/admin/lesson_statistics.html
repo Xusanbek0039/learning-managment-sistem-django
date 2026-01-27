@@ -5,1400 +5,661 @@
 
 {% block extra_css %}
 <style>
-/* ==================== CSS VARIABLES ==================== */
-:root {
-    --primary: #6366f1;
-    --primary-light: #818cf8;
-    --primary-dark: #4f46e5;
-    --success: #10b981;
-    --danger: #ef4444;
-    --warning: #f59e0b;
-    --info: #3b82f6;
-    --purple: #8b5cf6;
-    --pink: #ec4899;
-    
-    --bg-primary: #ffffff;
-    --bg-secondary: #f8fafc;
-    --bg-tertiary: #f1f5f9;
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
-    --text-muted: #94a3b8;
-    --border-color: #e2e8f0;
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    
-    --radius: 12px;
-    --radius-sm: 8px;
-    --radius-lg: 16px;
-    --spacing: 1rem;
-}
+/* ===== SCOPED STYLES - ls prefix ===== */
+.ls-wrap { color: var(--text-color, #1f2937); }
 
-[data-bs-theme="dark"] {
-    --primary: #818cf8;
-    --bg-primary: #1e293b;
-    --bg-secondary: #0f172a;
-    --bg-tertiary: #334155;
-    --text-primary: #f1f5f9;
-    --text-secondary: #cbd5e1;
-    --text-muted: #94a3b8;
-    --border-color: #334155;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-/* ==================== LAYOUT ==================== */
-.page-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 1rem;
-}
-
-@media (min-width: 768px) {
-    .page-container {
-        padding: 1.5rem;
-    }
-}
-
-/* ==================== HEADER ==================== */
-.page-header {
+.ls-wrap .ls-head {
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-@media (min-width: 768px) {
-    .page-header {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-    }
-}
-
-.page-title {
-    display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 0.75rem;
-    font-size: 1.5rem;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+.ls-wrap .ls-head h4 {
+    margin: 0;
     font-weight: 700;
-    color: var(--text-primary);
-    margin: 0;
-}
-
-.page-title i {
-    color: var(--primary);
-    font-size: 1.75rem;
-}
-
-.header-actions {
     display: flex;
-    gap: 0.5rem;
+    align-items: center;
+    gap: 10px;
 }
 
-.btn {
-    display: inline-flex;
+/* Alerts */
+.ls-alerts {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 16px;
+}
+.ls-alert {
+    display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 10px;
+    white-space: nowrap;
+    font-size: 0.8rem;
     font-weight: 500;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border-color);
-    background: var(--bg-primary);
-    color: var(--text-primary);
+    flex-shrink: 0;
+}
+.ls-alert.warn { border-left: 3px solid #f59e0b; }
+.ls-alert.warn i { color: #f59e0b; }
+.ls-alert.danger { border-left: 3px solid #ef4444; }
+.ls-alert.danger i { color: #ef4444; }
+.ls-alert.info { border-left: 3px solid #3b82f6; }
+.ls-alert.info i { color: #3b82f6; }
+.ls-alert.primary { border-left: 3px solid #8b5cf6; }
+.ls-alert.primary i { color: #8b5cf6; }
+
+/* Filter */
+.ls-filter {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+.ls-filter input,
+.ls-filter select {
+    padding: 8px 12px !important;
+    border: 1px solid var(--border-color, #e5e7eb) !important;
+    border-radius: 10px !important;
+    background: var(--card-bg, #fff) !important;
+    color: var(--text-color, #1f2937) !important;
+    font-size: 0.85rem !important;
+}
+.ls-filter .ls-btn-search {
+    padding: 8px 16px;
+    background: #8b5cf6;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
+}
+.ls-filter .ls-btn-clear {
+    padding: 8px 12px;
+    background: var(--bg-color, #f8fafc);
+    color: var(--text-color, #6b7280);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 10px;
+    cursor: pointer;
     text-decoration: none;
 }
 
-.btn:hover {
-    background: var(--bg-secondary);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-sm);
-}
-
-.btn-primary {
-    background: var(--primary);
-    color: white;
-    border-color: var(--primary);
-}
-
-.btn-primary:hover {
-    background: var(--primary-dark);
-    border-color: var(--primary-dark);
-}
-
-/* ==================== ALERTS ==================== */
-.alerts-container {
-    display: flex;
-    gap: 0.75rem;
-    overflow-x: auto;
-    padding-bottom: 0.5rem;
-    margin-bottom: 1.5rem;
-    scrollbar-width: thin;
-}
-
-.alerts-container::-webkit-scrollbar {
-    height: 4px;
-}
-
-.alerts-container::-webkit-scrollbar-track {
-    background: var(--bg-secondary);
-    border-radius: 2px;
-}
-
-.alerts-container::-webkit-scrollbar-thumb {
-    background: var(--border-color);
-    border-radius: 2px;
-}
-
-.alert-chip {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.625rem 1rem;
-    background: var(--bg-primary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius);
-    white-space: nowrap;
-    font-size: 0.8125rem;
-    font-weight: 500;
-    color: var(--text-primary);
-    flex-shrink: 0;
-}
-
-.alert-chip.warn {
-    border-left: 3px solid var(--warning);
-    background: rgba(245, 158, 11, 0.05);
-}
-
-.alert-chip.warn i {
-    color: var(--warning);
-}
-
-.alert-chip.danger {
-    border-left: 3px solid var(--danger);
-    background: rgba(239, 68, 68, 0.05);
-}
-
-.alert-chip.danger i {
-    color: var(--danger);
-}
-
-.alert-chip.info {
-    border-left: 3px solid var(--info);
-    background: rgba(59, 130, 246, 0.05);
-}
-
-.alert-chip.info i {
-    color: var(--info);
-}
-
-/* ==================== FILTER BAR ==================== */
-.filter-bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    padding: 1rem;
-    background: var(--bg-primary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    margin-bottom: 1.5rem;
-}
-
-.filter-bar input,
-.filter-bar select {
-    padding: 0.625rem 0.875rem;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    font-size: 0.875rem;
-    flex: 1;
-    min-width: 120px;
-    transition: all 0.2s;
-}
-
-.filter-bar input:focus,
-.filter-bar select:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-}
-
-.filter-search {
-    flex: 1;
-    min-width: 200px;
-}
-
-.btn-search,
-.btn-clear {
-    padding: 0.625rem 1.25rem;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-}
-
-.btn-search {
-    background: var(--primary);
-    color: white;
-}
-
-.btn-search:hover {
-    background: var(--primary-dark);
-}
-
-.btn-clear {
-    background: var(--bg-secondary);
-    color: var(--text-secondary);
-}
-
-.btn-clear:hover {
-    background: var(--border-color);
-}
-
-/* ==================== STATS GRID ==================== */
-.stats-grid {
+/* Stats Grid */
+.ls-stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    gap: 12px;
+    margin-bottom: 20px;
 }
-
-@media (min-width: 640px) {
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (min-width: 768px) {
-    .stats-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-@media (min-width: 1024px) {
-    .stats-grid {
-        grid-template-columns: repeat(6, 1fr);
-    }
-}
-
-.stat-card {
-    background: var(--bg-primary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    padding: 1.25rem;
+.ls-stat {
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 16px;
+    padding: 16px;
     text-align: center;
     position: relative;
     overflow: hidden;
-    transition: all 0.2s;
 }
-
-.stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-}
-
-.stat-card::before {
+.ls-stat::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
+    top: 0; left: 0; right: 0;
+    height: 3px;
 }
+.ls-stat.purple::before { background: #8b5cf6; }
+.ls-stat.blue::before { background: #3b82f6; }
+.ls-stat.green::before { background: #10b981; }
+.ls-stat.orange::before { background: #f59e0b; }
+.ls-stat.pink::before { background: #ec4899; }
+.ls-stat.red::before { background: #ef4444; }
+.ls-stat i { font-size: 1.4rem; margin-bottom: 8px; display: block; }
+.ls-stat.purple i { color: #8b5cf6; }
+.ls-stat.blue i { color: #3b82f6; }
+.ls-stat.green i { color: #10b981; }
+.ls-stat.orange i { color: #f59e0b; }
+.ls-stat.pink i { color: #ec4899; }
+.ls-stat.red i { color: #ef4444; }
+.ls-stat h3 { margin: 0; font-size: 1.5rem; font-weight: 800; }
+.ls-stat span { font-size: 0.7rem; color: var(--text-muted, #6b7280); text-transform: uppercase; }
 
-.stat-card.purple::before { background: var(--purple); }
-.stat-card.blue::before { background: var(--info); }
-.stat-card.green::before { background: var(--success); }
-.stat-card.orange::before { background: var(--warning); }
-.stat-card.pink::before { background: var(--pink); }
-.stat-card.red::before { background: var(--danger); }
-
-.stat-icon {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-    opacity: 0.9;
+/* Chart */
+.ls-chart {
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 20px;
 }
+.ls-chart h6 { margin: 0 0 12px; font-weight: 600; font-size: 0.9rem; }
 
-.stat-card.purple .stat-icon { color: var(--purple); }
-.stat-card.blue .stat-icon { color: var(--info); }
-.stat-card.green .stat-icon { color: var(--success); }
-.stat-card.orange .stat-icon { color: var(--warning); }
-.stat-card.pink .stat-icon { color: var(--pink); }
-.stat-card.red .stat-icon { color: var(--danger); }
-
-.stat-value {
-    font-size: 1.75rem;
-    font-weight: 800;
-    color: var(--text-primary);
-    margin: 0.25rem 0;
-    line-height: 1;
-}
-
-.stat-label {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-weight: 600;
-}
-
-/* ==================== CHART CARD ==================== */
-.chart-card {
-    background: var(--bg-primary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.chart-title {
+/* Tabs */
+.ls-tabs {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.chart-title i {
-    color: var(--primary);
-}
-
-/* ==================== TABS ==================== */
-.tabs {
-    margin-bottom: 1.5rem;
-}
-
-.tabs-nav {
-    display: flex;
-    gap: 0.25rem;
-    background: var(--bg-secondary);
-    padding: 0.25rem;
-    border-radius: var(--radius);
+    gap: 4px;
+    background: var(--bg-color, #f8fafc);
+    padding: 4px;
+    border-radius: 10px;
+    margin-bottom: 16px;
     overflow-x: auto;
-    scrollbar-width: none;
 }
-
-.tabs-nav::-webkit-scrollbar {
-    display: none;
-}
-
-.tab-button {
+.ls-tab {
     flex: 1;
-    min-width: 100px;
-    padding: 0.75rem 1rem;
+    min-width: 80px;
+    padding: 10px 12px;
     background: transparent;
     border: none;
-    border-radius: var(--radius-sm);
-    font-size: 0.875rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
     font-weight: 600;
-    color: var(--text-secondary);
+    color: var(--text-muted, #6b7280);
     cursor: pointer;
     white-space: nowrap;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
 }
-
-.tab-button:hover {
-    color: var(--text-primary);
-    background: rgba(99, 102, 241, 0.05);
+.ls-tab:hover { color: var(--text-color, #1f2937); }
+.ls-tab.active {
+    background: var(--card-bg, #fff);
+    color: #8b5cf6;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
+.ls-tab i { margin-right: 4px; }
 
-.tab-button.active {
-    background: var(--bg-primary);
-    color: var(--primary);
-    box-shadow: var(--shadow-sm);
-}
+.ls-panel { display: none; }
+.ls-panel.active { display: block; animation: lsFadeIn 0.2s ease; }
+@keyframes lsFadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-.tab-panel {
-    display: none;
-    animation: fadeIn 0.3s ease;
-}
-
-.tab-panel.active {
-    display: block;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* ==================== CARD ==================== */
-.card {
-    background: var(--bg-primary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    margin-bottom: 1.5rem;
+/* Card */
+.ls-card {
+    background: var(--card-bg, #fff) !important;
+    border: 1px solid var(--border-color, #e5e7eb) !important;
+    border-radius: 16px !important;
+    margin-bottom: 16px;
     overflow: hidden;
 }
-
-.card-header {
+.ls-card-head {
+    padding: 12px 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid var(--border-color);
-    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
 }
-
-.card-title {
+.ls-card-head h6 {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0;
+    gap: 8px;
 }
-
-.badge {
-    background: var(--bg-tertiary);
-    padding: 0.25rem 0.625rem;
+.ls-badge {
+    background: var(--bg-color, #f8fafc);
+    padding: 4px 10px;
     border-radius: 20px;
     font-size: 0.75rem;
     font-weight: 700;
-    color: var(--text-secondary);
+    color: var(--text-muted, #6b7280);
 }
 
-/* ==================== LIST ITEMS ==================== */
-.list-item {
+/* List Item */
+.ls-item {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid var(--border-color);
-    transition: background 0.2s;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+    transition: background 0.15s;
 }
+.ls-item:last-child { border-bottom: none; }
+.ls-item:hover { background: var(--bg-color, #f8fafc); }
 
-.list-item:last-child {
-    border-bottom: none;
-}
-
-.list-item:hover {
-    background: var(--bg-secondary);
-}
-
-.item-avatar {
-    width: 42px;
-    height: 42px;
-    border-radius: var(--radius);
+.ls-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 0.875rem;
-    color: white;
+    font-size: 0.8rem;
+    color: #fff;
     flex-shrink: 0;
 }
+.ls-avatar.purple { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
+.ls-avatar.blue { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
+.ls-avatar.green { background: linear-gradient(135deg, #10b981, #34d399); }
+.ls-avatar.orange { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+.ls-avatar.red { background: linear-gradient(135deg, #ef4444, #f87171); }
+.ls-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
 
-.item-avatar.purple { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
-.item-avatar.blue { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
-.item-avatar.green { background: linear-gradient(135deg, #10b981, #34d399); }
-.item-avatar.orange { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
-.item-avatar.pink { background: linear-gradient(135deg, #ec4899, #f472b6); }
-.item-avatar.red { background: linear-gradient(135deg, #ef4444, #f87171); }
+.ls-info { flex: 1; min-width: 0; }
+.ls-info h6 { margin: 0; font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ls-info p { margin: 2px 0 0; font-size: 0.75rem; color: var(--text-muted, #6b7280); }
 
-.item-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: var(--radius);
+.ls-mini {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: var(--bg-color, #f8fafc);
+    color: var(--text-muted, #6b7280);
 }
+.ls-mini.success { background: rgba(16,185,129,0.1); color: #059669; }
+.ls-mini.danger { background: rgba(239,68,68,0.1); color: #dc2626; }
 
-.item-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.item-title {
-    font-size: 0.9375rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0 0 0.25rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.item-subtitle {
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
-    margin: 0;
-}
-
-.item-meta {
-    display: flex;
-    gap: 0.5rem;
-    flex-shrink: 0;
-    flex-wrap: wrap;
-}
-
-.mini-badge {
-    padding: 0.375rem 0.75rem;
-    border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-    font-weight: 600;
-    background: var(--bg-secondary);
-    color: var(--text-secondary);
-    white-space: nowrap;
-}
-
-.mini-badge.success {
-    background: rgba(16, 185, 129, 0.1);
-    color: var(--success);
-}
-
-.mini-badge.danger {
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--danger);
-}
-
-.mini-badge.warning {
-    background: rgba(245, 158, 11, 0.1);
-    color: var(--warning);
-}
-
-.item-action .btn-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: var(--radius-sm);
+.ls-btn-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     border: none;
-    background: var(--bg-secondary);
-    color: var(--text-secondary);
+    background: var(--bg-color, #f8fafc);
+    color: var(--text-muted, #6b7280);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    text-decoration: none;
 }
+.ls-btn-icon:hover { background: #8b5cf6; color: #fff; }
 
-.item-action .btn-icon:hover {
-    background: var(--primary);
-    color: white;
+/* Lesson */
+.ls-lesson {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
 }
+.ls-lesson:last-child { border-bottom: none; }
+.ls-lesson:hover { background: var(--bg-color, #f8fafc); }
 
-/* ==================== LESSON CARD ==================== */
-.lesson-item {
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.lesson-item:last-child {
-    border-bottom: none;
-}
-
-.lesson-item:hover {
-    background: var(--bg-secondary);
-}
-
-.lesson-header {
+.ls-lesson-top {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 1rem;
-    margin-bottom: 0.75rem;
+    gap: 10px;
+    margin-bottom: 10px;
 }
+.ls-lesson-title { font-size: 0.85rem; font-weight: 600; margin: 0; }
+.ls-lesson-sub { font-size: 0.7rem; color: var(--text-muted, #6b7280); margin: 2px 0 0; }
 
-.lesson-title-wrap {
-    flex: 1;
-    min-width: 0;
-}
-
-.lesson-title {
-    font-size: 0.9375rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0 0 0.25rem;
-}
-
-.lesson-subtitle {
+.ls-rate {
+    padding: 4px 10px;
+    border-radius: 6px;
     font-size: 0.75rem;
-    color: var(--text-muted);
-    margin: 0;
-}
-
-.rate-badge {
-    padding: 0.375rem 0.75rem;
-    border-radius: var(--radius-sm);
-    font-size: 0.8125rem;
     font-weight: 700;
     flex-shrink: 0;
 }
+.ls-rate.high { background: rgba(16,185,129,0.1); color: #059669; }
+.ls-rate.mid { background: rgba(245,158,11,0.1); color: #d97706; }
+.ls-rate.low { background: rgba(239,68,68,0.1); color: #dc2626; }
 
-.rate-badge.high {
-    background: rgba(16, 185, 129, 0.1);
-    color: var(--success);
-}
-
-.rate-badge.mid {
-    background: rgba(245, 158, 11, 0.1);
-    color: var(--warning);
-}
-
-.rate-badge.low {
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--danger);
-}
-
-.progress-bar {
+.ls-progress {
     height: 6px;
-    background: var(--bg-secondary);
+    background: var(--bg-color, #f8fafc);
     border-radius: 6px;
     overflow: hidden;
-    margin-bottom: 0.75rem;
+    margin-bottom: 10px;
 }
-
-.progress-fill {
+.ls-progress-fill {
     height: 100%;
     border-radius: 6px;
-    transition: width 0.4s ease;
 }
+.ls-progress-fill.high { background: linear-gradient(90deg, #10b981, #34d399); }
+.ls-progress-fill.mid { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.ls-progress-fill.low { background: linear-gradient(90deg, #ef4444, #f87171); }
 
-.progress-fill.high {
-    background: linear-gradient(90deg, var(--success), #34d399);
-}
-
-.progress-fill.mid {
-    background: linear-gradient(90deg, var(--warning), #fbbf24);
-}
-
-.progress-fill.low {
-    background: linear-gradient(90deg, var(--danger), #f87171);
-}
-
-.lesson-meta {
+.ls-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
-}
-
-.lesson-meta-item {
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-}
-
-.lesson-meta-item i {
-    font-size: 0.875rem;
-}
-
-.lesson-meta-item.success {
-    color: var(--success);
-}
-
-.lesson-meta-item.danger {
-    color: var(--danger);
-}
-
-.lesson-meta-item.warning {
-    color: var(--warning);
-}
-
-/* ==================== QUESTION ITEM ==================== */
-.question-item {
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.question-item:last-child {
-    border-bottom: none;
-}
-
-.question-text {
-    font-size: 0.9375rem;
-    color: var(--text-primary);
-    margin: 0 0 0.5rem;
-    line-height: 1.5;
-}
-
-.question-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
+    gap: 12px;
     font-size: 0.75rem;
-    color: var(--text-muted);
+    color: var(--text-muted, #6b7280);
 }
+.ls-meta span { display: flex; align-items: center; gap: 4px; }
+.ls-meta .success { color: #10b981; }
+.ls-meta .danger { color: #ef4444; }
+.ls-meta .warning { color: #f59e0b; }
 
-.error-rate {
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--danger);
-    padding: 0.25rem 0.5rem;
+/* Grid */
+.ls-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+@media (max-width: 768px) { .ls-grid { grid-template-columns: 1fr; } }
+
+/* Empty */
+.ls-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted, #6b7280);
+}
+.ls-empty i { font-size: 2.5rem; opacity: 0.3; margin-bottom: 10px; display: block; }
+
+/* Question */
+.ls-q {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+.ls-q:last-child { border-bottom: none; }
+.ls-q-text { font-size: 0.85rem; margin: 0 0 6px; line-height: 1.4; }
+.ls-q-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 0.7rem;
+    color: var(--text-muted, #6b7280);
+}
+.ls-q-err {
+    background: rgba(239,68,68,0.1);
+    color: #dc2626;
+    padding: 2px 6px;
     border-radius: 4px;
     font-weight: 700;
-}
-
-/* ==================== GRID LAYOUTS ==================== */
-.grid-2 {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-}
-
-@media (min-width: 768px) {
-    .grid-2 {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-/* ==================== EMPTY STATE ==================== */
-.empty-state {
-    text-align: center;
-    padding: 3rem 1rem;
-    color: var(--text-muted);
-}
-
-.empty-state i {
-    font-size: 3rem;
-    opacity: 0.3;
-    margin-bottom: 1rem;
-    display: block;
-}
-
-.empty-state p {
-    margin: 0;
-    font-size: 0.9375rem;
-}
-
-/* ==================== RESPONSIVE UTILITIES ==================== */
-@media (max-width: 767px) {
-    .page-title {
-        font-size: 1.25rem;
-    }
-    
-    .stat-value {
-        font-size: 1.5rem;
-    }
-    
-    .filter-bar {
-        flex-direction: column;
-    }
-    
-    .filter-bar input,
-    .filter-bar select {
-        width: 100%;
-    }
 }
 </style>
 {% endblock %}
 
 {% block admin_content %}
-<div class="page-container">
-    <!-- Header -->
-    <div class="page-header">
-        <h1 class="page-title">
-            <i class="bi bi-bar-chart-line-fill"></i>
-            Darslar Tahlili
-        </h1>
-        <div class="header-actions">
-            <a href="{% url 'admin_reports' %}" class="btn btn-primary">
-                <i class="bi bi-file-pdf"></i>
-                PDF Yuklab olish
-            </a>
-        </div>
-    </div>
+<div class="ls-wrap">
 
-    <!-- Alerts -->
-    {% if alerts %}
-    <div class="alerts-container">
-        {% for a in alerts %}
-        <div class="alert-chip {{ a.type }}">
-            <i class="bi {{ a.icon }}"></i>
-            <span>{{ a.title }}</span>
-        </div>
+<!-- Header -->
+<div class="ls-head">
+    <h4><i class="bi bi-bar-chart-line-fill" style="color:#8b5cf6"></i> Darslar Tahlili</h4>
+    <a href="{% url 'admin_reports' %}" class="btn btn-sm btn-outline-primary rounded-pill">
+        <i class="bi bi-file-pdf me-1"></i>PDF
+    </a>
+</div>
+
+<!-- Alerts -->
+{% if alerts %}
+<div class="ls-alerts">
+    {% for a in alerts %}
+    <div class="ls-alert {{ a.type }}">
+        <i class="bi {{ a.icon }}"></i>
+        <span>{{ a.title }}</span>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Filter -->
+<form method="GET" class="ls-filter">
+    <input type="text" name="q" placeholder="🔍 Qidirish..." value="{{ search_query }}" style="flex:1; max-width:180px;">
+    <select name="profession" style="max-width:160px;">
+        <option value="">Barcha kurslar</option>
+        {% for p in professions %}
+        <option value="{{ p.pk }}" {% if selected_profession == p.pk|stringformat:"i" %}selected{% endif %}>{{ p.name }}</option>
         {% endfor %}
-    </div>
-    {% endif %}
+    </select>
+    <input type="date" name="date_from" value="{% if date_from %}{{ date_from|date:'Y-m-d' }}{% endif %}" style="max-width:130px;">
+    <input type="date" name="date_to" value="{% if date_to %}{{ date_to|date:'Y-m-d' }}{% endif %}" style="max-width:130px;">
+    <button type="submit" class="ls-btn-search"><i class="bi bi-search"></i></button>
+    <a href="{% url 'admin_lesson_statistics' %}" class="ls-btn-clear"><i class="bi bi-x-lg"></i></a>
+</form>
 
-    <!-- Filter Bar -->
-    <form method="GET" class="filter-bar">
-        <input 
-            type="text" 
-            name="q" 
-            class="filter-search"
-            placeholder="🔍 Qidirish..." 
-            value="{{ search_query }}"
-        >
-        <select name="profession">
-            <option value="">Barcha kurslar</option>
-            {% for p in professions %}
-            <option value="{{ p.pk }}" {% if selected_profession == p.pk|stringformat:"i" %}selected{% endif %}>
-                {{ p.name }}
-            </option>
+<!-- Stats -->
+<div class="ls-stats">
+    <div class="ls-stat purple">
+        <i class="bi bi-journal-bookmark-fill"></i>
+        <h3>{{ total_lessons }}</h3>
+        <span>Darslar</span>
+    </div>
+    <div class="ls-stat blue">
+        <i class="bi bi-people-fill"></i>
+        <h3>{{ active_students }}<small style="font-size:0.7rem;opacity:0.7">/{{ total_students }}</small></h3>
+        <span>Faol</span>
+    </div>
+    <div class="ls-stat green">
+        <i class="bi bi-play-circle-fill"></i>
+        <h3>{{ total_video_views }}</h3>
+        <span>Ko'rilgan</span>
+    </div>
+    <div class="ls-stat orange">
+        <i class="bi bi-clipboard-check-fill"></i>
+        <h3>{{ total_test_attempts }}</h3>
+        <span>Test</span>
+    </div>
+    <div class="ls-stat pink">
+        <i class="bi bi-percent"></i>
+        <h3>{{ avg_test_score }}%</h3>
+        <span>O'rtacha</span>
+    </div>
+    <div class="ls-stat red">
+        <i class="bi bi-check2-circle"></i>
+        <h3>{{ completion_percent }}%</h3>
+        <span>Tugallangan</span>
+    </div>
+</div>
+
+<!-- Chart -->
+<div class="ls-chart">
+    <h6><i class="bi bi-graph-up me-2" style="color:#8b5cf6"></i>Kunlik faollik (30 kun)</h6>
+    <canvas id="lsActivityChart" height="80"></canvas>
+</div>
+
+<!-- Tabs -->
+<div class="ls-tabs">
+    <button class="ls-tab active" onclick="lsOpenTab(event,'lsTab1')"><i class="bi bi-grid"></i>Umumiy</button>
+    <button class="ls-tab" onclick="lsOpenTab(event,'lsTab2')"><i class="bi bi-camera-video"></i>Video</button>
+    <button class="ls-tab" onclick="lsOpenTab(event,'lsTab3')"><i class="bi bi-clipboard"></i>Test</button>
+    <button class="ls-tab" onclick="lsOpenTab(event,'lsTab4')"><i class="bi bi-journal"></i>Vazifa</button>
+    <button class="ls-tab" onclick="lsOpenTab(event,'lsTab5')"><i class="bi bi-people"></i>O'quvchi</button>
+</div>
+
+<!-- TAB 1 -->
+<div class="ls-panel active" id="lsTab1">
+    <div class="ls-grid">
+        <div class="ls-card">
+            <div class="ls-card-head">
+                <h6><i class="bi bi-award-fill" style="color:#10b981"></i>Sertifikatga yaqin</h6>
+                <span class="ls-badge">{{ near_certificate_students|length }}</span>
+            </div>
+            {% if near_certificate_students %}
+            {% for s in near_certificate_students %}
+            <div class="ls-item">
+                <div class="ls-avatar green">{% if s.student.photo %}<img src="{{ s.student.photo.url }}">{% else %}{{ s.student.get_initials }}{% endif %}</div>
+                <div class="ls-info"><h6>{{ s.student.full_name }}</h6><p>{{ s.profession.name }} • {{ s.remaining }} dars qoldi</p></div>
+                <span class="ls-mini success">{{ s.progress }}%</span>
+            </div>
             {% endfor %}
-        </select>
-        <input 
-            type="date" 
-            name="date_from" 
-            value="{% if date_from %}{{ date_from|date:'Y-m-d' }}{% endif %}"
-        >
-        <input 
-            type="date" 
-            name="date_to" 
-            value="{% if date_to %}{{ date_to|date:'Y-m-d' }}{% endif %}"
-        >
-        <button type="submit" class="btn-search">
-            <i class="bi bi-search"></i>
-            Qidirish
-        </button>
-        <a href="{% url 'admin_lesson_statistics' %}" class="btn-clear">
-            <i class="bi bi-x-lg"></i>
-            Tozalash
-        </a>
-    </form>
-
-    <!-- Statistics Grid -->
-    <div class="stats-grid">
-        <div class="stat-card purple">
-            <i class="bi bi-journal-bookmark-fill stat-icon"></i>
-            <div class="stat-value">{{ total_lessons }}</div>
-            <div class="stat-label">Darslar</div>
+            {% else %}
+            <div class="ls-empty"><i class="bi bi-award"></i><p>Hozircha yo'q</p></div>
+            {% endif %}
         </div>
-        <div class="stat-card blue">
-            <i class="bi bi-people-fill stat-icon"></i>
-            <div class="stat-value">
-                {{ active_students }}<small style="font-size:0.75rem;opacity:0.7">/{{ total_students }}</small>
+        
+        <div class="ls-card">
+            <div class="ls-card-head">
+                <h6><i class="bi bi-trophy-fill" style="color:#f59e0b"></i>TOP Videolar</h6>
             </div>
-            <div class="stat-label">Faol O'quvchilar</div>
-        </div>
-        <div class="stat-card green">
-            <i class="bi bi-play-circle-fill stat-icon"></i>
-            <div class="stat-value">{{ total_video_views }}</div>
-            <div class="stat-label">Ko'rilgan</div>
-        </div>
-        <div class="stat-card orange">
-            <i class="bi bi-clipboard-check-fill stat-icon"></i>
-            <div class="stat-value">{{ total_test_attempts }}</div>
-            <div class="stat-label">Test Urinishlari</div>
-        </div>
-        <div class="stat-card pink">
-            <i class="bi bi-percent stat-icon"></i>
-            <div class="stat-value">{{ avg_test_score }}%</div>
-            <div class="stat-label">O'rtacha Ball</div>
-        </div>
-        <div class="stat-card red">
-            <i class="bi bi-check2-circle stat-icon"></i>
-            <div class="stat-value">{{ completion_percent }}%</div>
-            <div class="stat-label">Tugallangan</div>
-        </div>
-    </div>
-
-    <!-- Activity Chart -->
-    <div class="chart-card">
-        <h6 class="chart-title">
-            <i class="bi bi-graph-up"></i>
-            Kunlik faollik (30 kun)
-        </h6>
-        <canvas id="activityChart" height="80"></canvas>
-    </div>
-
-    <!-- Tabs -->
-    <div class="tabs">
-        <div class="tabs-nav">
-            <button type="button" class="tab-button active" onclick="openTab(event, 'tab1')">
-                <i class="bi bi-grid"></i>
-                Umumiy
-            </button>
-            <button type="button" class="tab-button" onclick="openTab(event, 'tab2')">
-                <i class="bi bi-camera-video"></i>
-                Video
-            </button>
-            <button type="button" class="tab-button" onclick="openTab(event, 'tab3')">
-                <i class="bi bi-clipboard"></i>
-                Test
-            </button>
-            <button type="button" class="tab-button" onclick="openTab(event, 'tab4')">
-                <i class="bi bi-journal"></i>
-                Vazifa
-            </button>
-            <button type="button" class="tab-button" onclick="openTab(event, 'tab5')">
-                <i class="bi bi-people"></i>
-                O'quvchilar
-            </button>
-        </div>
-
-        <!-- Tab 1: Umumiy -->
-        <div class="tab-panel active" id="tab1">
-            <div class="grid-2">
-                <!-- Near Certificate Students -->
-                <div class="card">
-                    <div class="card-header">
-                        <h6 class="card-title">
-                            <i class="bi bi-award-fill" style="color:var(--success)"></i>
-                            Sertifikatga yaqin
-                        </h6>
-                        <span class="badge">{{ near_certificate_students|length }}</span>
-                    </div>
-                    {% if near_certificate_students %}
-                        {% for s in near_certificate_students %}
-                        <div class="list-item">
-                            <div class="item-avatar green">
-                                {% if s.student.photo %}
-                                    <img src="{{ s.student.photo.url }}" alt="">
-                                {% else %}
-                                    {{ s.student.get_initials }}
-                                {% endif %}
-                            </div>
-                            <div class="item-info">
-                                <h6 class="item-title">{{ s.student.full_name }}</h6>
-                                <p class="item-subtitle">{{ s.profession.name }} • {{ s.remaining }} dars qoldi</p>
-                            </div>
-                            <div class="item-meta">
-                                <span class="mini-badge success">{{ s.progress }}%</span>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="empty-state">
-                            <i class="bi bi-award"></i>
-                            <p>Hozircha ma'lumot yo'q</p>
-                        </div>
-                    {% endif %}
-                </div>
-
-                <!-- Top Videos -->
-                <div class="card">
-                    <div class="card-header">
-                        <h6 class="card-title">
-                            <i class="bi bi-trophy-fill" style="color:var(--warning)"></i>
-                            TOP Videolar
-                        </h6>
-                    </div>
-                    {% if top_video_lessons %}
-                        {% for v in top_video_lessons|slice:":5" %}
-                        <div class="list-item">
-                            <div class="item-avatar blue">{{ forloop.counter }}</div>
-                            <div class="item-info">
-                                <h6 class="item-title">{{ v.lesson.title }}</h6>
-                                <p class="item-subtitle">{{ v.lesson.profession.name }}</p>
-                            </div>
-                            <span class="mini-badge">{{ v.watched }} ko'rilgan</span>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="empty-state">
-                            <i class="bi bi-camera-video"></i>
-                            <p>Ma'lumot yo'q</p>
-                        </div>
-                    {% endif %}
-                </div>
+            {% if top_video_lessons %}
+            {% for v in top_video_lessons|slice:":5" %}
+            <div class="ls-item">
+                <div class="ls-avatar blue">{{ forloop.counter }}</div>
+                <div class="ls-info"><h6>{{ v.lesson.title }}</h6><p>{{ v.lesson.profession.name }}</p></div>
+                <span class="ls-mini">{{ v.watched }} ko'rilgan</span>
             </div>
-        </div>
-
-        <!-- Tab 2: Video -->
-        <div class="tab-panel" id="tab2">
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="card-title">
-                        <i class="bi bi-camera-video-fill" style="color:var(--info)"></i>
-                        Video darslar
-                    </h6>
-                    <span class="badge">{{ video_stats|length }}</span>
-                </div>
-                {% if video_stats %}
-                    {% for v in video_stats %}
-                    <div class="lesson-item">
-                        <div class="lesson-header">
-                            <div class="lesson-title-wrap">
-                                <h6 class="lesson-title">{{ v.lesson.title }}</h6>
-                                <p class="lesson-subtitle">{{ v.lesson.profession.name }}</p>
-                            </div>
-                            <span class="rate-badge {% if v.completion_rate >= 70 %}high{% elif v.completion_rate >= 40 %}mid{% else %}low{% endif %}">
-                                {{ v.completion_rate }}%
-                            </span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill {% if v.completion_rate >= 70 %}high{% elif v.completion_rate >= 40 %}mid{% else %}low{% endif %}" 
-                                 style="width:{{ v.completion_rate }}%"></div>
-                        </div>
-                        <div class="lesson-meta">
-                            <span class="lesson-meta-item success">
-                                <i class="bi bi-eye"></i> {{ v.total_views }} ochilgan
-                            </span>
-                            <span class="lesson-meta-item success">
-                                <i class="bi bi-check-circle"></i> {{ v.watched }} ko'rgan
-                            </span>
-                            <span class="lesson-meta-item danger">
-                                <i class="bi bi-x-circle"></i> {{ v.not_watched }} ko'rmagan
-                            </span>
-                        </div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="empty-state">
-                        <i class="bi bi-camera-video"></i>
-                        <p>Video darslar yo'q</p>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- Tab 3: Test -->
-        <div class="tab-panel" id="tab3">
-            <div class="grid-2">
-                <!-- Test Stats -->
-                <div class="card">
-                    <div class="card-header">
-                        <h6 class="card-title">
-                            <i class="bi bi-clipboard-check-fill" style="color:var(--success)"></i>
-                            Testlar
-                        </h6>
-                        <span class="badge">{{ test_stats|length }}</span>
-                    </div>
-                    {% if test_stats %}
-                        {% for t in test_stats %}
-                        <div class="lesson-item">
-                            <div class="lesson-header">
-                                <div class="lesson-title-wrap">
-                                    <h6 class="lesson-title">{{ t.lesson.title }}</h6>
-                                    <p class="lesson-subtitle">{{ t.lesson.profession.name }}</p>
-                                </div>
-                                <span class="rate-badge {% if t.avg_score >= 70 %}high{% elif t.avg_score >= 50 %}mid{% else %}low{% endif %}">
-                                    {{ t.avg_score }}%
-                                </span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill {% if t.pass_rate >= 70 %}high{% elif t.pass_rate >= 50 %}mid{% else %}low{% endif %}" 
-                                     style="width:{{ t.pass_rate }}%"></div>
-                            </div>
-                            <div class="lesson-meta">
-                                <span class="lesson-meta-item">
-                                    <i class="bi bi-people"></i> {{ t.total_attempts }} urinish
-                                </span>
-                                <span class="lesson-meta-item success">
-                                    <i class="bi bi-check-circle"></i> {{ t.passed_count }} o'tdi
-                                </span>
-                                <span class="lesson-meta-item danger">
-                                    <i class="bi bi-x-circle"></i> {{ t.failed_count }} yiqildi
-                                </span>
-                                <span class="lesson-meta-item warning">
-                                    <i class="bi bi-arrow-repeat"></i> {{ t.retry_students }} qayta
-                                </span>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="empty-state">
-                            <i class="bi bi-clipboard"></i>
-                            <p>Testlar yo'q</p>
-                        </div>
-                    {% endif %}
-                </div>
-
-                <!-- Hardest Questions -->
-                <div class="card">
-                    <div class="card-header">
-                        <h6 class="card-title">
-                            <i class="bi bi-exclamation-diamond-fill" style="color:var(--danger)"></i>
-                            Qiyin savollar
-                        </h6>
-                        <span class="badge">{{ hardest_questions|length }}</span>
-                    </div>
-                    {% if hardest_questions %}
-                        {% for q in hardest_questions %}
-                        <div class="question-item">
-                            <p class="question-text">{{ q.question.question_text|truncatewords:15 }}</p>
-                            <div class="question-meta">
-                                <span>{{ q.test.lesson.title }}</span>
-                                <span>{{ q.total_answered }} javob</span>
-                                <span class="error-rate">{{ q.error_rate }}% xato</span>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="empty-state">
-                            <i class="bi bi-question-circle"></i>
-                            <p>Qiyin savol yo'q</p>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Tab 4: Vazifa -->
-        <div class="tab-panel" id="tab4">
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="card-title">
-                        <i class="bi bi-journal-text" style="color:var(--warning)"></i>
-                        Uy vazifalari
-                    </h6>
-                    <span class="badge">{{ homework_stats|length }}</span>
-                </div>
-                {% if homework_stats %}
-                    {% for h in homework_stats %}
-                    <div class="lesson-item">
-                        <div class="lesson-header">
-                            <div class="lesson-title-wrap">
-                                <h6 class="lesson-title">{{ h.lesson.title }}</h6>
-                                <p class="lesson-subtitle">{{ h.lesson.profession.name }}</p>
-                            </div>
-                            <span class="rate-badge {% if h.completion_rate >= 70 %}high{% elif h.completion_rate >= 40 %}mid{% else %}low{% endif %}">
-                                {{ h.completion_rate }}%
-                            </span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill {% if h.completion_rate >= 70 %}high{% elif h.completion_rate >= 40 %}mid{% else %}low{% endif %}" 
-                                 style="width:{{ h.completion_rate }}%"></div>
-                        </div>
-                        <div class="lesson-meta">
-                            <span class="lesson-meta-item success">
-                                <i class="bi bi-check-circle"></i> {{ h.submitted }} topshirgan
-                            </span>
-                            <span class="lesson-meta-item danger">
-                                <i class="bi bi-x-circle"></i> {{ h.not_submitted }} topshirmagan
-                            </span>
-                            <span class="lesson-meta-item warning">
-                                <i class="bi bi-hourglass"></i> {{ h.pending_count }} kutilmoqda
-                            </span>
-                            <span class="lesson-meta-item">
-                                <i class="bi bi-star-fill" style="color:var(--warning)"></i> {{ h.avg_grade }}%
-                            </span>
-                        </div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="empty-state">
-                        <i class="bi bi-journal"></i>
-                        <p>Vazifalar yo'q</p>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- Tab 5: O'quvchilar -->
-        <div class="tab-panel" id="tab5">
-            <div class="grid-2">
-                <!-- Passive Students -->
-                <div class="card">
-                    <div class="card-header">
-                        <h6 class="card-title">
-                            <i class="bi bi-moon-stars-fill" style="color:var(--purple)"></i>
-                            Passiv o'quvchilar (7+ kun)
-                        </h6>
-                        <span class="badge">{{ passive_students|length }}</span>
-                    </div>
-                    {% if passive_students %}
-                        {% for s in passive_students %}
-                        <div class="list-item">
-                            <div class="item-avatar purple">
-                                {% if s.photo %}
-                                    <img src="{{ s.photo.url }}" alt="">
-                                {% else %}
-                                    {{ s.get_initials }}
-                                {% endif %}
-                            </div>
-                            <div class="item-info">
-                                <h6 class="item-title">{{ s.full_name }}</h6>
-                                <p class="item-subtitle">
-                                    {% if s.last_activity %}
-                                        {{ s.last_activity|timesince }} oldin
-                                    {% else %}
-                                        Hech qachon faollik ko'rsatmagan
-                                    {% endif %}
-                                </p>
-                            </div>
-                            <div class="item-action">
-                                <a href="{% url 'admin_user_view' s.pk %}" class="btn-icon">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="empty-state">
-                            <i class="bi bi-emoji-smile"></i>
-                            <p>Hammasi faol!</p>
-                        </div>
-                    {% endif %}
-                </div>
-
-                <!-- Struggling Students -->
-                <div class="card">
-                    <div class="card-header">
-                        <h6 class="card-title">
-                            <i class="bi bi-exclamation-triangle-fill" style="color:var(--danger)"></i>
-                            Qiynalayotgan o'quvchilar
-                        </h6>
-                        <span class="badge">{{ struggling_students|length }}</span>
-                    </div>
-                    {% if struggling_students %}
-                        {% for s in struggling_students %}
-                        <div class="list-item">
-                            <div class="item-avatar red">
-                                {% if s.photo %}
-                                    <img src="{{ s.photo.url }}" alt="">
-                                {% else %}
-                                    {{ s.get_initials }}
-                                {% endif %}
-                            </div>
-                            <div class="item-info">
-                                <h6 class="item-title">{{ s.full_name }}</h6>
-                                <p class="item-subtitle">
-                                    {{ s.low_score_count }} past ball • O'rtacha: {{ s.avg_score|floatformat:0 }}%
-                                </p>
-                            </div>
-                            <div class="item-action">
-                                <a href="{% url 'admin_user_view' s.pk %}" class="btn-icon">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="empty-state">
-                            <i class="bi bi-emoji-smile"></i>
-                            <p>Hammasi yaxshi!</p>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
+            {% endfor %}
+            {% else %}
+            <div class="ls-empty"><i class="bi bi-camera-video"></i><p>Ma'lumot yo'q</p></div>
+            {% endif %}
         </div>
     </div>
 </div>
 
+<!-- TAB 2 -->
+<div class="ls-panel" id="lsTab2">
+    <div class="ls-card">
+        <div class="ls-card-head">
+            <h6><i class="bi bi-camera-video-fill" style="color:#3b82f6"></i>Video darslar</h6>
+            <span class="ls-badge">{{ video_stats|length }}</span>
+        </div>
+        {% if video_stats %}
+        {% for v in video_stats %}
+        <div class="ls-lesson">
+            <div class="ls-lesson-top">
+                <div><h6 class="ls-lesson-title">{{ v.lesson.title }}</h6><p class="ls-lesson-sub">{{ v.lesson.profession.name }}</p></div>
+                <span class="ls-rate {% if v.completion_rate >= 70 %}high{% elif v.completion_rate >= 40 %}mid{% else %}low{% endif %}">{{ v.completion_rate }}%</span>
+            </div>
+            <div class="ls-progress"><div class="ls-progress-fill {% if v.completion_rate >= 70 %}high{% elif v.completion_rate >= 40 %}mid{% else %}low{% endif %}" style="width:{{ v.completion_rate }}%"></div></div>
+            <div class="ls-meta">
+                <span><i class="bi bi-eye success"></i> {{ v.total_views }} ochilgan</span>
+                <span><i class="bi bi-check-circle success"></i> {{ v.watched }} ko'rgan</span>
+                <span><i class="bi bi-x-circle danger"></i> {{ v.not_watched }} ko'rmagan</span>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="ls-empty"><i class="bi bi-camera-video"></i><p>Video darslar yo'q</p></div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- TAB 3 -->
+<div class="ls-panel" id="lsTab3">
+    <div class="ls-grid">
+        <div class="ls-card">
+            <div class="ls-card-head">
+                <h6><i class="bi bi-clipboard-check-fill" style="color:#10b981"></i>Testlar</h6>
+                <span class="ls-badge">{{ test_stats|length }}</span>
+            </div>
+            {% if test_stats %}
+            {% for t in test_stats %}
+            <div class="ls-lesson">
+                <div class="ls-lesson-top">
+                    <div><h6 class="ls-lesson-title">{{ t.lesson.title }}</h6><p class="ls-lesson-sub">{{ t.lesson.profession.name }}</p></div>
+                    <span class="ls-rate {% if t.avg_score >= 70 %}high{% elif t.avg_score >= 50 %}mid{% else %}low{% endif %}">{{ t.avg_score }}%</span>
+                </div>
+                <div class="ls-progress"><div class="ls-progress-fill {% if t.pass_rate >= 70 %}high{% elif t.pass_rate >= 50 %}mid{% else %}low{% endif %}" style="width:{{ t.pass_rate }}%"></div></div>
+                <div class="ls-meta">
+                    <span><i class="bi bi-people"></i> {{ t.total_attempts }} urinish</span>
+                    <span><i class="bi bi-check-circle success"></i> {{ t.passed_count }} o'tdi</span>
+                    <span><i class="bi bi-x-circle danger"></i> {{ t.failed_count }} yiqildi</span>
+                    <span><i class="bi bi-arrow-repeat warning"></i> {{ t.retry_students }} qayta</span>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="ls-empty"><i class="bi bi-clipboard"></i><p>Testlar yo'q</p></div>
+            {% endif %}
+        </div>
+        
+        <div class="ls-card">
+            <div class="ls-card-head">
+                <h6><i class="bi bi-exclamation-diamond-fill" style="color:#ef4444"></i>Qiyin savollar</h6>
+                <span class="ls-badge">{{ hardest_questions|length }}</span>
+            </div>
+            {% if hardest_questions %}
+            {% for q in hardest_questions %}
+            <div class="ls-q">
+                <p class="ls-q-text">{{ q.question.question_text|truncatewords:15 }}</p>
+                <div class="ls-q-meta">
+                    <span>{{ q.test.lesson.title }}</span>
+                    <span>{{ q.total_answered }} javob</span>
+                    <span class="ls-q-err">{{ q.error_rate }}% xato</span>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="ls-empty"><i class="bi bi-question-circle"></i><p>Qiyin savol yo'q</p></div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- TAB 4 -->
+<div class="ls-panel" id="lsTab4">
+    <div class="ls-card">
+        <div class="ls-card-head">
+            <h6><i class="bi bi-journal-text" style="color:#f59e0b"></i>Uy vazifalari</h6>
+            <span class="ls-badge">{{ homework_stats|length }}</span>
+        </div>
+        {% if homework_stats %}
+        {% for h in homework_stats %}
+        <div class="ls-lesson">
+            <div class="ls-lesson-top">
+                <div><h6 class="ls-lesson-title">{{ h.lesson.title }}</h6><p class="ls-lesson-sub">{{ h.lesson.profession.name }}</p></div>
+                <span class="ls-rate {% if h.completion_rate >= 70 %}high{% elif h.completion_rate >= 40 %}mid{% else %}low{% endif %}">{{ h.completion_rate }}%</span>
+            </div>
+            <div class="ls-progress"><div class="ls-progress-fill {% if h.completion_rate >= 70 %}high{% elif h.completion_rate >= 40 %}mid{% else %}low{% endif %}" style="width:{{ h.completion_rate }}%"></div></div>
+            <div class="ls-meta">
+                <span><i class="bi bi-check-circle success"></i> {{ h.submitted }} topshirgan</span>
+                <span><i class="bi bi-x-circle danger"></i> {{ h.not_submitted }} topshirmagan</span>
+                <span><i class="bi bi-hourglass warning"></i> {{ h.pending_count }} kutilmoqda</span>
+                <span><i class="bi bi-star-fill" style="color:#f59e0b"></i> {{ h.avg_grade }}%</span>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="ls-empty"><i class="bi bi-journal"></i><p>Vazifalar yo'q</p></div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- TAB 5 -->
+<div class="ls-panel" id="lsTab5">
+    <div class="ls-grid">
+        <div class="ls-card">
+            <div class="ls-card-head">
+                <h6><i class="bi bi-moon-stars-fill" style="color:#8b5cf6"></i>Passiv (7+ kun)</h6>
+                <span class="ls-badge">{{ passive_students|length }}</span>
+            </div>
+            {% if passive_students %}
+            {% for s in passive_students %}
+            <div class="ls-item">
+                <div class="ls-avatar purple">{% if s.photo %}<img src="{{ s.photo.url }}">{% else %}{{ s.get_initials }}{% endif %}</div>
+                <div class="ls-info"><h6>{{ s.full_name }}</h6><p>{% if s.last_activity %}{{ s.last_activity|timesince }} oldin{% else %}Hech qachon{% endif %}</p></div>
+                <a href="{% url 'admin_user_view' s.pk %}" class="ls-btn-icon"><i class="bi bi-eye"></i></a>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="ls-empty"><i class="bi bi-emoji-smile"></i><p>Hammasi faol!</p></div>
+            {% endif %}
+        </div>
+        
+        <div class="ls-card">
+            <div class="ls-card-head">
+                <h6><i class="bi bi-exclamation-triangle-fill" style="color:#ef4444"></i>Qiynalayotgan</h6>
+                <span class="ls-badge">{{ struggling_students|length }}</span>
+            </div>
+            {% if struggling_students %}
+            {% for s in struggling_students %}
+            <div class="ls-item">
+                <div class="ls-avatar red">{% if s.photo %}<img src="{{ s.photo.url }}">{% else %}{{ s.get_initials }}{% endif %}</div>
+                <div class="ls-info"><h6>{{ s.full_name }}</h6><p>{{ s.low_score_count }} past ball • O'rtacha: {{ s.avg_score|floatformat:0 }}%</p></div>
+                <a href="{% url 'admin_user_view' s.pk %}" class="ls-btn-icon"><i class="bi bi-eye"></i></a>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="ls-empty"><i class="bi bi-emoji-smile"></i><p>Hammasi yaxshi!</p></div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// Tab switching function
-function openTab(event, tabId) {
-    // Hide all tab panels
-    document.querySelectorAll('.tab-panel').forEach(panel => {
-        panel.classList.remove('active');
-    });
-    
-    // Remove active class from all buttons
-    document.querySelectorAll('.tab-button').forEach(button => {
-        button.classList.remove('active');
-    });
-    
-    // Show selected tab panel
-    document.getElementById(tabId).classList.add('active');
-    
-    // Add active class to clicked button
-    event.currentTarget.classList.add('active');
+function lsOpenTab(e, id) {
+    document.querySelectorAll('.ls-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.ls-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    e.currentTarget.classList.add('active');
 }
 
-// Activity Chart
-const activityData = {{ daily_activity|safe }};
-const ctx = document.getElementById('activityChart');
-
-new Chart(ctx, {
+const lsData = {{ daily_activity|safe }};
+new Chart(document.getElementById('lsActivityChart'), {
     type: 'line',
     data: {
-        labels: activityData.map(d => d.date),
+        labels: lsData.map(d => d.date),
         datasets: [
-            {
-                label: 'Video',
-                data: activityData.map(d => d.videos),
-                borderColor: '#3b82f6',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                fill: true,
-                tension: 0.4,
-                borderWidth: 2
-            },
-            {
-                label: 'Test',
-                data: activityData.map(d => d.tests),
-                borderColor: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                fill: true,
-                tension: 0.4,
-                borderWidth: 2
-            },
-            {
-                label: 'Vazifa',
-                data: activityData.map(d => d.homeworks),
-                borderColor: '#f59e0b',
-                backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                fill: true,
-                tension: 0.4,
-                borderWidth: 2
-            }
+            { label: 'Video', data: lsData.map(d => d.videos), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true, tension: 0.4, borderWidth: 2 },
+            { label: 'Test', data: lsData.map(d => d.tests), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.4, borderWidth: 2 },
+            { label: 'Vazifa', data: lsData.map(d => d.homeworks), borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', fill: true, tension: 0.4, borderWidth: 2 }
         ]
     },
     options: {
         responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-            legend: {
-                position: 'top',
-                labels: {
-                    boxWidth: 12,
-                    padding: 15,
-                    font: {
-                        size: 11,
-                        weight: '600'
-                    }
-                }
-            },
-            tooltip: {
-                mode: 'index',
-                intersect: false,
-                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                padding: 12,
-                cornerRadius: 8
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                grid: {
-                    color: 'rgba(0, 0, 0, 0.05)'
-                },
-                ticks: {
-                    font: {
-                        size: 11
-                    }
-                }
-            },
-            x: {
-                grid: {
-                    display: false
-                },
-                ticks: {
-                    font: {
-                        size: 11
-                    },
-                    maxRotation: 45,
-                    minRotation: 0
-                }
-            }
-        },
-        elements: {
-            point: {
-                radius: 0,
-                hitRadius: 10,
-                hoverRadius: 4
-            }
-        },
-        interaction: {
-            mode: 'nearest',
-            axis: 'x',
-            intersect: false
-        }
+        plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 15, font: { size: 11 } } } },
+        scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' } }, x: { grid: { display: false } } },
+        elements: { point: { radius: 0 } }
     }
 });
 </script>
