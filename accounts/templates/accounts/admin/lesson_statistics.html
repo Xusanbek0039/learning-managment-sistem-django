@@ -1,840 +1,812 @@
 {% extends 'accounts/admin/base_admin.html' %}
+{% load static %}
 
-{% block title %}Darslar statistikasi - Admin Panel{% endblock %}
+{% block title %}Darslar Tahlili{% endblock %}
 
 {% block extra_css %}
 <style>
-:root{
-    --card-bg: rgba(255,255,255,.95);
-    --card-border: rgba(0,0,0,.06);
-    --text-main: #111;
+:root {
+    --bg-card: #fff;
+    --bg-soft: #f8fafc;
+    --border: #e5e7eb;
+    --text-dark: #1f2937;
     --text-muted: #6b7280;
-    --soft-bg: rgba(0,0,0,.03);
-    --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-    --gradient-5: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-lg: 0 10px 40px rgba(0,0,0,0.08);
+    --purple: #8b5cf6;
+    --blue: #3b82f6;
+    --green: #10b981;
+    --orange: #f59e0b;
+    --pink: #ec4899;
+    --red: #ef4444;
 }
-[data-bs-theme="dark"]{
-    --card-bg: rgba(30,30,40,.95);
-    --card-border: rgba(255,255,255,.08);
-    --text-main: #f1f1f1;
+[data-bs-theme="dark"] {
+    --bg-card: #1e1e2d;
+    --bg-soft: #151521;
+    --border: #2d2d3a;
+    --text-dark: #e5e7eb;
     --text-muted: #9ca3af;
-    --soft-bg: rgba(255,255,255,.05);
 }
 
-/* ===== PAGE HEADER ===== */
-.page-header {
-    background: var(--gradient-1);
-    border-radius: 24px;
-    padding: 32px;
-    color: #fff;
-    margin-bottom: 24px;
-    position: relative;
-    overflow: hidden;
-}
-.page-header::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -20%;
-    width: 400px;
-    height: 400px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 50%;
-}
-.page-header::after {
-    content: '';
-    position: absolute;
-    bottom: -60%;
-    left: 10%;
-    width: 300px;
-    height: 300px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 50%;
-}
-.page-header h3 {
-    position: relative;
-    z-index: 1;
-    font-weight: 800;
-    margin: 0 0 8px;
-}
-.page-header p {
-    position: relative;
-    z-index: 1;
-    opacity: 0.9;
-    margin: 0;
-}
+* { box-sizing: border-box; }
 
-/* ===== FILTER BAR ===== */
-.filter-bar {
-    background: var(--card-bg);
-    border-radius: 16px;
-    padding: 16px 20px;
-    margin-bottom: 24px;
+/* ===== HEADER ===== */
+.page-head {
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
     flex-wrap: wrap;
-    gap: 12px;
-    border: 1px solid var(--card-border);
-}
-.filter-bar select {
-    background: var(--soft-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    padding: 10px 16px;
-    font-weight: 500;
-    min-width: 220px;
-    color: var(--text-main);
-}
-
-/* ===== STAT CARDS ROW ===== */
-.stat-cards-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
     gap: 16px;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
-@media (max-width: 992px) {
-    .stat-cards-row { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 576px) {
-    .stat-cards-row { grid-template-columns: 1fr; }
-}
-
-.stat-mini-card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 20px;
-    padding: 24px;
-    text-align: center;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-}
-.stat-mini-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0,0,0,0.12);
-}
-.stat-mini-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-}
-.stat-mini-card.purple::before { background: var(--gradient-1); }
-.stat-mini-card.pink::before { background: var(--gradient-2); }
-.stat-mini-card.blue::before { background: var(--gradient-3); }
-.stat-mini-card.green::before { background: var(--gradient-4); }
-
-.stat-mini-card .stat-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 12px;
-    font-size: 1.5rem;
-}
-.stat-mini-card.purple .stat-icon { background: linear-gradient(135deg, rgba(102,126,234,0.15), rgba(118,75,162,0.15)); color: #764ba2; }
-.stat-mini-card.pink .stat-icon { background: linear-gradient(135deg, rgba(240,147,251,0.15), rgba(245,87,108,0.15)); color: #f5576c; }
-.stat-mini-card.blue .stat-icon { background: linear-gradient(135deg, rgba(79,172,254,0.15), rgba(0,242,254,0.15)); color: #00c6fb; }
-.stat-mini-card.green .stat-icon { background: linear-gradient(135deg, rgba(67,233,123,0.15), rgba(56,249,215,0.15)); color: #10b981; }
-
-.stat-mini-card h2 {
-    font-size: 2.5rem;
-    font-weight: 800;
-    margin: 0;
-    color: var(--text-main);
-}
-.stat-mini-card p {
-    margin: 4px 0 0;
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    font-weight: 500;
-}
-
-/* ===== TAB NAVIGATION ===== */
-.section-tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 24px;
-    flex-wrap: wrap;
-    background: var(--card-bg);
-    padding: 8px;
-    border-radius: 16px;
-    border: 1px solid var(--card-border);
-}
-.section-tab {
-    flex: 1;
-    min-width: 150px;
-    padding: 14px 20px;
-    border-radius: 12px;
-    background: transparent;
-    color: var(--text-muted);
-    text-decoration: none;
-    font-weight: 600;
-    text-align: center;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    border: none;
-    cursor: pointer;
-}
-.section-tab:hover { 
-    background: var(--soft-bg); 
-    color: var(--text-main);
-}
-.section-tab.active {
-    color: #fff;
-}
-.section-tab.active.purple { background: var(--gradient-1); }
-.section-tab.active.pink { background: var(--gradient-2); }
-.section-tab.active.blue { background: var(--gradient-3); }
-.section-tab.active.green { background: var(--gradient-4); }
-
-.section-tab .tab-badge {
-    background: rgba(255,255,255,0.25);
-    padding: 2px 10px;
-    border-radius: 12px;
-    font-size: 0.8rem;
-}
-.section-tab:not(.active) .tab-badge {
-    background: var(--soft-bg);
-}
-
-/* ===== CONTENT SECTIONS ===== */
-.content-section {
-    display: none;
-    animation: fadeIn 0.4s ease;
-}
-.content-section.active {
-    display: block;
-}
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* ===== GLASS CARD ===== */
-.glass-card {
-    background: var(--card-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--card-border);
-    border-radius: 20px;
-    box-shadow: 0 4px 24px rgba(0,0,0,.06);
-    margin-bottom: 24px;
-    overflow: hidden;
-}
-
-.card-header-gradient {
-    padding: 20px 24px;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-.card-header-gradient.purple { background: var(--gradient-1); }
-.card-header-gradient.pink { background: var(--gradient-2); }
-.card-header-gradient.blue { background: var(--gradient-3); }
-.card-header-gradient.green { background: var(--gradient-4); }
-
-.card-header-gradient h5 {
+.page-head h4 {
     margin: 0;
     font-weight: 700;
+    color: var(--text-dark);
     display: flex;
     align-items: center;
     gap: 10px;
 }
-.card-header-gradient .count-badge {
-    background: rgba(255,255,255,.25);
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-weight: 700;
+.page-head h4 i {
+    color: var(--purple);
+}
+
+/* ===== ALERTS ROW ===== */
+.alerts-row {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 16px;
+}
+.alert-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-dark);
+    flex-shrink: 0;
+}
+.alert-chip i { font-size: 1rem; }
+.alert-chip.warn { border-left: 3px solid var(--orange); }
+.alert-chip.warn i { color: var(--orange); }
+.alert-chip.danger { border-left: 3px solid var(--red); }
+.alert-chip.danger i { color: var(--red); }
+.alert-chip.info { border-left: 3px solid var(--blue); }
+.alert-chip.info i { color: var(--blue); }
+.alert-chip.primary { border-left: 3px solid var(--purple); }
+.alert-chip.primary i { color: var(--purple); }
+
+/* ===== FILTER BAR ===== */
+.filter-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+.filter-bar input,
+.filter-bar select {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    color: var(--text-dark);
+    font-size: 0.85rem;
+    min-width: 0;
+}
+.filter-bar input:focus,
+.filter-bar select:focus {
+    outline: none;
+    border-color: var(--purple);
+}
+.filter-bar .btn-search {
+    padding: 8px 16px;
+    background: var(--purple);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    cursor: pointer;
+}
+.filter-bar .btn-clear {
+    padding: 8px 12px;
+    background: var(--bg-soft);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+}
+
+/* ===== STAT GRID ===== */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.stat-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.stat-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+}
+.stat-box.purple::before { background: var(--purple); }
+.stat-box.blue::before { background: var(--blue); }
+.stat-box.green::before { background: var(--green); }
+.stat-box.orange::before { background: var(--orange); }
+.stat-box.pink::before { background: var(--pink); }
+.stat-box.red::before { background: var(--red); }
+
+.stat-box i {
+    font-size: 1.4rem;
+    margin-bottom: 8px;
+    display: block;
+}
+.stat-box.purple i { color: var(--purple); }
+.stat-box.blue i { color: var(--blue); }
+.stat-box.green i { color: var(--green); }
+.stat-box.orange i { color: var(--orange); }
+.stat-box.pink i { color: var(--pink); }
+.stat-box.red i { color: var(--red); }
+
+.stat-box h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-dark);
+}
+.stat-box span {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* ===== CHART CARD ===== */
+.chart-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 20px;
+}
+.chart-card h6 {
+    margin: 0 0 12px;
+    font-weight: 600;
+    color: var(--text-dark);
     font-size: 0.9rem;
 }
 
-/* ===== STUDENT ITEM ===== */
-.student-item {
+/* ===== TABS ===== */
+.tabs-nav {
     display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 16px 24px;
-    border-bottom: 1px solid var(--card-border);
+    gap: 4px;
+    background: var(--bg-soft);
+    padding: 4px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 16px;
+    overflow-x: auto;
+}
+.tab-btn {
+    flex: 1;
+    min-width: 80px;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    white-space: nowrap;
     transition: all 0.2s;
 }
-.student-item:last-child { border-bottom: none; }
-.student-item:hover {
-    background: var(--soft-bg);
+.tab-btn:hover {
+    color: var(--text-dark);
+}
+.tab-btn.active {
+    background: var(--bg-card);
+    color: var(--purple);
+    box-shadow: var(--shadow);
+}
+.tab-btn i { margin-right: 4px; }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ===== CARD ===== */
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+.card-head {
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+}
+.card-head h6 {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.card-head .badge {
+    background: var(--bg-soft);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
 }
 
-.student-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 14px;
+/* ===== LIST ITEM ===== */
+.item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+}
+.item:last-child { border-bottom: none; }
+.item:hover { background: var(--bg-soft); }
+
+.item-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 0.8rem;
+    color: #fff;
     flex-shrink: 0;
 }
-.student-avatar.warning { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; }
-.student-avatar.danger { background: linear-gradient(135deg, #f87171, #ef4444); color: #fff; }
-.student-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 14px; }
+.item-avatar.purple { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
+.item-avatar.blue { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
+.item-avatar.green { background: linear-gradient(135deg, #10b981, #34d399); }
+.item-avatar.orange { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+.item-avatar.pink { background: linear-gradient(135deg, #ec4899, #f472b6); }
+.item-avatar.red { background: linear-gradient(135deg, #ef4444, #f87171); }
+.item-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
 
-.student-info { flex-grow: 1; }
-.student-info h6 { margin: 0; font-weight: 600; color: var(--text-main); }
-.student-info p { margin: 4px 0 0; font-size: 0.85rem; color: var(--text-muted); }
-
-.student-action .btn {
-    border-radius: 12px;
+.item-info { flex: 1; min-width: 0; }
+.item-info h6 {
+    margin: 0;
+    font-size: 0.85rem;
     font-weight: 600;
-    padding: 8px 16px;
+    color: var(--text-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.item-info p {
+    margin: 2px 0 0;
+    font-size: 0.75rem;
+    color: var(--text-muted);
 }
 
-/* ===== LESSON ITEM ===== */
-.lesson-item {
-    padding: 24px;
-    border-bottom: 1px solid var(--card-border);
-    transition: all 0.2s;
+.item-stats {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
 }
-.lesson-item:last-child { border-bottom: none; }
-.lesson-item:hover { background: var(--soft-bg); }
+.mini-badge {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: var(--bg-soft);
+    color: var(--text-muted);
+}
+.mini-badge.success { background: rgba(16,185,129,0.1); color: #059669; }
+.mini-badge.danger { background: rgba(239,68,68,0.1); color: #dc2626; }
+.mini-badge.warning { background: rgba(245,158,11,0.1); color: #d97706; }
 
-.lesson-header {
+.item-action .btn-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    background: var(--bg-soft);
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+}
+.item-action .btn-icon:hover {
+    background: var(--purple);
+    color: #fff;
+}
+
+/* ===== LESSON CARD ===== */
+.lesson-card {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+}
+.lesson-card:last-child { border-bottom: none; }
+.lesson-card:hover { background: var(--bg-soft); }
+
+.lesson-top {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 16px;
-    gap: 12px;
+    gap: 10px;
+    margin-bottom: 10px;
 }
-.lesson-title { 
-    font-weight: 700; 
-    color: var(--text-main); 
-    margin: 0;
-    font-size: 1.05rem;
-}
-.lesson-course { 
-    font-size: 0.85rem; 
-    color: var(--text-muted); 
-    margin: 6px 0 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.completion-badge {
-    padding: 8px 16px;
-    border-radius: 12px;
-    font-weight: 700;
+.lesson-title {
     font-size: 0.85rem;
-    white-space: nowrap;
-}
-.completion-badge.success { background: rgba(16,185,129,.12); color: #059669; }
-.completion-badge.warning { background: rgba(245,158,11,.12); color: #d97706; }
-.completion-badge.danger { background: rgba(239,68,68,.12); color: #dc2626; }
-
-.progress-wrapper {
-    height: 10px;
-    background: var(--soft-bg);
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 16px;
-}
-.progress-fill {
-    height: 100%;
-    border-radius: 10px;
-    transition: width 0.6s ease;
-}
-.progress-fill.success { background: linear-gradient(90deg, #10b981, #34d399); }
-.progress-fill.warning { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
-.progress-fill.danger { background: linear-gradient(90deg, #ef4444, #f87171); }
-
-.lesson-stats {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-}
-.lesson-stat {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    background: var(--soft-bg);
-    padding: 8px 14px;
-    border-radius: 10px;
-}
-.lesson-stat i { font-size: 1.1rem; }
-.lesson-stat.success i { color: #10b981; }
-.lesson-stat.danger i { color: #ef4444; }
-
-.user-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: center;
-}
-.user-chips-label {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    margin-right: 4px;
-}
-.user-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--soft-bg);
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    color: var(--text-main);
-    transition: all 0.2s;
-    font-weight: 500;
-}
-.user-chip:hover { 
-    background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(168,85,247,0.12));
-    color: #6366f1;
-}
-
-/* ===== EMPTY STATE ===== */
-.empty-state {
-    text-align: center;
-    padding: 60px 24px;
-    color: var(--text-muted);
-}
-.empty-state i { 
-    font-size: 4rem; 
-    opacity: 0.2;
-    margin-bottom: 16px;
-    display: block;
-}
-.empty-state p { 
+    font-weight: 600;
+    color: var(--text-dark);
     margin: 0;
-    font-size: 1rem;
 }
+.lesson-sub {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin: 2px 0 0;
+}
+.rate-badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+.rate-badge.high { background: rgba(16,185,129,0.1); color: #059669; }
+.rate-badge.mid { background: rgba(245,158,11,0.1); color: #d97706; }
+.rate-badge.low { background: rgba(239,68,68,0.1); color: #dc2626; }
 
-/* ===== DUAL GRID ===== */
-.dual-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 24px;
+.progress-bar {
+    height: 6px;
+    background: var(--bg-soft);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 10px;
 }
-@media (max-width: 992px) {
-    .dual-grid { grid-template-columns: 1fr; }
+.progress-bar .fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.4s ease;
 }
+.progress-bar .fill.high { background: linear-gradient(90deg, #10b981, #34d399); }
+.progress-bar .fill.mid { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.progress-bar .fill.low { background: linear-gradient(90deg, #ef4444, #f87171); }
 
-/* ===== SCROLL ANIMATIONS ===== */
-.fade-up {
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeUp 0.5s ease forwards;
+.lesson-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
 }
-@keyframes fadeUp {
-    to { opacity: 1; transform: translateY(0); }
+.lesson-meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
-.fade-up:nth-child(1) { animation-delay: 0.1s; }
-.fade-up:nth-child(2) { animation-delay: 0.2s; }
-.fade-up:nth-child(3) { animation-delay: 0.3s; }
-.fade-up:nth-child(4) { animation-delay: 0.4s; }
+.lesson-meta i { font-size: 0.85rem; }
+.lesson-meta .success { color: var(--green); }
+.lesson-meta .danger { color: var(--red); }
+.lesson-meta .warning { color: var(--orange); }
+
+/* ===== GRID LAYOUTS ===== */
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+@media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+
+/* ===== EMPTY ===== */
+.empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+}
+.empty i { font-size: 2.5rem; opacity: 0.3; margin-bottom: 10px; display: block; }
+.empty p { margin: 0; font-size: 0.85rem; }
+
+/* ===== QUESTION ITEM ===== */
+.q-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+}
+.q-item:last-child { border-bottom: none; }
+.q-text {
+    font-size: 0.85rem;
+    color: var(--text-dark);
+    margin: 0 0 6px;
+    line-height: 1.4;
+}
+.q-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+.q-meta .err {
+    background: rgba(239,68,68,0.1);
+    color: #dc2626;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+}
 </style>
 {% endblock %}
 
 {% block admin_content %}
 
-<!-- Page Header -->
-<div class="page-header fade-up">
-    <h3><i class="bi bi-graph-up-arrow me-2"></i>Darslar Tahlili</h3>
-    <p>O'quvchilar progressi va qiynalayotgan joylarni aniqlang</p>
-</div>
-
-<!-- Filter Bar -->
-<div class="filter-bar fade-up">
-    <div class="d-flex align-items-center gap-2">
-        <i class="bi bi-funnel text-muted"></i>
-        <span class="fw-semibold">Filter:</span>
-    </div>
-    <form method="GET">
-        <select name="profession" class="form-select" onchange="this.form.submit()">
-            <option value="">📚 Barcha kurslar</option>
-            {% for p in professions %}
-            <option value="{{ p.pk }}" {% if selected_profession == p.pk|stringformat:"i" %}selected{% endif %}>{{ p.name }}</option>
-            {% endfor %}
-        </select>
-    </form>
-</div>
-
-<!-- Stat Cards Row -->
-<div class="stat-cards-row">
-    <div class="stat-mini-card purple fade-up" onclick="switchTab('passive')">
-        <div class="stat-icon"><i class="bi bi-moon-stars-fill"></i></div>
-        <h2>{{ passive_students|length }}</h2>
-        <p>Passiv o'quvchilar</p>
-    </div>
-    <div class="stat-mini-card pink fade-up" onclick="switchTab('struggling')">
-        <div class="stat-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
-        <h2>{{ struggling_students|length }}</h2>
-        <p>Qiynalayotgan</p>
-    </div>
-    <div class="stat-mini-card blue fade-up" onclick="switchTab('video')">
-        <div class="stat-icon"><i class="bi bi-camera-video-fill"></i></div>
-        <h2>{{ video_stats|length }}</h2>
-        <p>Video darslar</p>
-    </div>
-    <div class="stat-mini-card green fade-up" onclick="switchTab('test')">
-        <div class="stat-icon"><i class="bi bi-clipboard-check-fill"></i></div>
-        <h2>{{ test_stats|length }}</h2>
-        <p>Testlar</p>
+<!-- Header -->
+<div class="page-head">
+    <h4><i class="bi bi-bar-chart-line-fill"></i> Darslar Tahlili</h4>
+    <div class="d-flex gap-2">
+        <a href="{% url 'admin_reports' %}" class="btn btn-sm btn-outline-primary rounded-pill">
+            <i class="bi bi-file-pdf me-1"></i>PDF
+        </a>
     </div>
 </div>
 
-<!-- Tab Navigation -->
-<div class="section-tabs">
-    <button class="section-tab purple active" data-tab="students" onclick="switchTab('students')">
+<!-- Alerts -->
+{% if alerts %}
+<div class="alerts-row">
+    {% for a in alerts %}
+    <div class="alert-chip {{ a.type }}">
+        <i class="bi {{ a.icon }}"></i>
+        <span>{{ a.title }}</span>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Filter -->
+<form method="GET" class="filter-bar">
+    <input type="text" name="q" placeholder="🔍 Qidirish..." value="{{ search_query }}" style="flex:1; max-width:180px;">
+    <select name="profession" style="max-width:160px;">
+        <option value="">Barcha kurslar</option>
+        {% for p in professions %}
+        <option value="{{ p.pk }}" {% if selected_profession == p.pk|stringformat:"i" %}selected{% endif %}>{{ p.name }}</option>
+        {% endfor %}
+    </select>
+    <input type="date" name="date_from" value="{% if date_from %}{{ date_from|date:'Y-m-d' }}{% endif %}" style="max-width:130px;">
+    <input type="date" name="date_to" value="{% if date_to %}{{ date_to|date:'Y-m-d' }}{% endif %}" style="max-width:130px;">
+    <button type="submit" class="btn-search"><i class="bi bi-search"></i></button>
+    <a href="{% url 'admin_lesson_statistics' %}" class="btn-clear"><i class="bi bi-x-lg"></i></a>
+</form>
+
+<!-- Stats -->
+<div class="stat-grid">
+    <div class="stat-box purple">
+        <i class="bi bi-journal-bookmark-fill"></i>
+        <h3>{{ total_lessons }}</h3>
+        <span>Darslar</span>
+    </div>
+    <div class="stat-box blue">
         <i class="bi bi-people-fill"></i>
-        O'quvchilar
-        <span class="tab-badge">{{ passive_students|length|add:struggling_students|length }}</span>
-    </button>
-    <button class="section-tab blue" data-tab="video" onclick="switchTab('video')">
-        <i class="bi bi-camera-video-fill"></i>
-        Video darslar
-        <span class="tab-badge">{{ video_stats|length }}</span>
-    </button>
-    <button class="section-tab green" data-tab="test" onclick="switchTab('test')">
+        <h3>{{ active_students }}<small style="font-size:0.7rem;opacity:0.7">/{{ total_students }}</small></h3>
+        <span>Faol</span>
+    </div>
+    <div class="stat-box green">
+        <i class="bi bi-play-circle-fill"></i>
+        <h3>{{ total_video_views }}</h3>
+        <span>Ko'rilgan</span>
+    </div>
+    <div class="stat-box orange">
         <i class="bi bi-clipboard-check-fill"></i>
-        Testlar
-        <span class="tab-badge">{{ test_stats|length }}</span>
-    </button>
-    <button class="section-tab pink" data-tab="homework" onclick="switchTab('homework')">
-        <i class="bi bi-journal-text"></i>
-        Uy vazifalari
-        <span class="tab-badge">{{ homework_stats|length }}</span>
-    </button>
+        <h3>{{ total_test_attempts }}</h3>
+        <span>Test</span>
+    </div>
+    <div class="stat-box pink">
+        <i class="bi bi-percent"></i>
+        <h3>{{ avg_test_score }}%</h3>
+        <span>O'rtacha</span>
+    </div>
+    <div class="stat-box red">
+        <i class="bi bi-check2-circle"></i>
+        <h3>{{ completion_percent }}%</h3>
+        <span>Tugallangan</span>
+    </div>
 </div>
 
-<!-- ==================== O'QUVCHILAR TAB ==================== -->
-<div class="content-section active" id="section-students">
-    <div class="dual-grid">
-        <!-- Passiv o'quvchilar -->
-        <div class="glass-card">
-            <div class="card-header-gradient purple">
-                <h5><i class="bi bi-moon-stars"></i> Passiv o'quvchilar</h5>
-                <span class="count-badge">{{ passive_students|length }}</span>
+<!-- Chart -->
+<div class="chart-card">
+    <h6><i class="bi bi-graph-up me-2" style="color:var(--purple)"></i>Kunlik faollik (30 kun)</h6>
+    <canvas id="activityChart" height="80"></canvas>
+</div>
+
+<!-- Tabs -->
+<div class="tabs-nav">
+    <button class="tab-btn active" onclick="openTab(event,'tab1')"><i class="bi bi-grid"></i>Umumiy</button>
+    <button class="tab-btn" onclick="openTab(event,'tab2')"><i class="bi bi-camera-video"></i>Video</button>
+    <button class="tab-btn" onclick="openTab(event,'tab3')"><i class="bi bi-clipboard"></i>Test</button>
+    <button class="tab-btn" onclick="openTab(event,'tab4')"><i class="bi bi-journal"></i>Vazifa</button>
+    <button class="tab-btn" onclick="openTab(event,'tab5')"><i class="bi bi-people"></i>O'quvchi</button>
+</div>
+
+<!-- TAB 1: Umumiy -->
+<div class="tab-panel active" id="tab1">
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-head">
+                <h6><i class="bi bi-award-fill" style="color:var(--green)"></i>Sertifikatga yaqin</h6>
+                <span class="badge">{{ near_certificate_students|length }}</span>
             </div>
-            
-            {% if passive_students %}
-            <div>
-                {% for student in passive_students %}
-                <div class="student-item">
-                    <div class="student-avatar warning">
-                        {% if student.photo %}
-                        <img src="{{ student.photo.url }}" alt="">
-                        {% else %}
-                        {{ student.get_initials }}
-                        {% endif %}
-                    </div>
-                    <div class="student-info">
-                        <h6>{{ student.full_name }}</h6>
-                        <p>
-                            <i class="bi bi-clock me-1"></i>
-                            {% if student.last_activity %}
-                            {{ student.last_activity|timesince }} oldin
-                            {% else %}
-                            Hech qachon faol bo'lmagan
-                            {% endif %}
-                        </p>
-                    </div>
-                    <div class="student-action">
-                        <a href="{% url 'admin_user_view' student.pk %}" class="btn btn-sm btn-primary">
-                            <i class="bi bi-eye me-1"></i>Ko'rish
-                        </a>
-                    </div>
+            {% if near_certificate_students %}
+            {% for s in near_certificate_students %}
+            <div class="item">
+                <div class="item-avatar green">
+                    {% if s.student.photo %}<img src="{{ s.student.photo.url }}">{% else %}{{ s.student.get_initials }}{% endif %}
                 </div>
-                {% endfor %}
+                <div class="item-info">
+                    <h6>{{ s.student.full_name }}</h6>
+                    <p>{{ s.profession.name }} • {{ s.remaining }} dars qoldi</p>
+                </div>
+                <div class="item-stats">
+                    <span class="mini-badge success">{{ s.progress }}%</span>
+                </div>
             </div>
+            {% endfor %}
             {% else %}
-            <div class="empty-state">
-                <i class="bi bi-emoji-smile"></i>
-                <p>Barcha o'quvchilar faol! 🎉</p>
-            </div>
+            <div class="empty"><i class="bi bi-award"></i><p>Hozircha yo'q</p></div>
             {% endif %}
         </div>
-
-        <!-- Qiynalayotgan o'quvchilar -->
-        <div class="glass-card">
-            <div class="card-header-gradient pink">
-                <h5><i class="bi bi-exclamation-triangle"></i> Qiynalayotgan o'quvchilar</h5>
-                <span class="count-badge">{{ struggling_students|length }}</span>
+        
+        <div class="card">
+            <div class="card-head">
+                <h6><i class="bi bi-trophy-fill" style="color:var(--orange)"></i>TOP Videolar</h6>
             </div>
-            
-            {% if struggling_students %}
-            <div>
-                {% for student in struggling_students %}
-                <div class="student-item">
-                    <div class="student-avatar danger">
-                        {% if student.photo %}
-                        <img src="{{ student.photo.url }}" alt="">
-                        {% else %}
-                        {{ student.get_initials }}
-                        {% endif %}
-                    </div>
-                    <div class="student-info">
-                        <h6>{{ student.full_name }}</h6>
-                        <p>
-                            <i class="bi bi-x-circle me-1"></i>{{ student.low_score_count }} ta past ball
-                            <span class="mx-2">•</span>
-                            <i class="bi bi-bar-chart me-1"></i>O'rtacha: {{ student.avg_score|floatformat:0 }}%
-                        </p>
-                    </div>
-                    <div class="student-action">
-                        <a href="{% url 'admin_user_view' student.pk %}" class="btn btn-sm btn-danger">
-                            <i class="bi bi-eye me-1"></i>Ko'rish
-                        </a>
-                    </div>
+            {% if top_video_lessons %}
+            {% for v in top_video_lessons|slice:":5" %}
+            <div class="item">
+                <div class="item-avatar blue">{{ forloop.counter }}</div>
+                <div class="item-info">
+                    <h6>{{ v.lesson.title }}</h6>
+                    <p>{{ v.lesson.profession.name }}</p>
                 </div>
-                {% endfor %}
+                <span class="mini-badge">{{ v.watched }} ko'rilgan</span>
             </div>
+            {% endfor %}
             {% else %}
-            <div class="empty-state">
-                <i class="bi bi-emoji-smile"></i>
-                <p>Hamma yaxshi o'qiyapti! 🎉</p>
-            </div>
+            <div class="empty"><i class="bi bi-camera-video"></i><p>Ma'lumot yo'q</p></div>
             {% endif %}
         </div>
     </div>
 </div>
 
-<!-- ==================== VIDEO DARSLAR TAB ==================== -->
-<div class="content-section" id="section-video">
-    <div class="glass-card">
-        <div class="card-header-gradient blue">
-            <h5><i class="bi bi-camera-video-fill"></i> Video darslar statistikasi</h5>
-            <span class="count-badge">{{ video_stats|length }} ta dars</span>
+<!-- TAB 2: Video -->
+<div class="tab-panel" id="tab2">
+    <div class="card">
+        <div class="card-head">
+            <h6><i class="bi bi-camera-video-fill" style="color:var(--blue)"></i>Video darslar</h6>
+            <span class="badge">{{ video_stats|length }}</span>
         </div>
-        
         {% if video_stats %}
-        {% for item in video_stats %}
-        <div class="lesson-item">
-            <div class="lesson-header">
+        {% for v in video_stats %}
+        <div class="lesson-card">
+            <div class="lesson-top">
                 <div>
-                    <h6 class="lesson-title">{{ item.lesson.title }}</h6>
-                    <p class="lesson-course">
-                        <i class="bi bi-folder2"></i>{{ item.lesson.profession.name }}
-                    </p>
+                    <h6 class="lesson-title">{{ v.lesson.title }}</h6>
+                    <p class="lesson-sub">{{ v.lesson.profession.name }}</p>
                 </div>
-                <span class="completion-badge {% if item.completion_rate >= 70 %}success{% elif item.completion_rate >= 40 %}warning{% else %}danger{% endif %}">
-                    {{ item.completion_rate }}% ko'rgan
+                <span class="rate-badge {% if v.completion_rate >= 70 %}high{% elif v.completion_rate >= 40 %}mid{% else %}low{% endif %}">
+                    {{ v.completion_rate }}%
                 </span>
             </div>
-            
-            <div class="progress-wrapper">
-                <div class="progress-fill {% if item.completion_rate >= 70 %}success{% elif item.completion_rate >= 40 %}warning{% else %}danger{% endif %}" style="width: {{ item.completion_rate }}%;"></div>
+            <div class="progress-bar">
+                <div class="fill {% if v.completion_rate >= 70 %}high{% elif v.completion_rate >= 40 %}mid{% else %}low{% endif %}" style="width:{{ v.completion_rate }}%"></div>
             </div>
-            
-            <div class="lesson-stats">
-                <div class="lesson-stat success">
-                    <i class="bi bi-check-circle-fill"></i>
-                    <span>{{ item.watched }} ko'rgan</span>
-                </div>
-                <div class="lesson-stat danger">
-                    <i class="bi bi-x-circle-fill"></i>
-                    <span>{{ item.not_watched }} ko'rmagan</span>
-                </div>
+            <div class="lesson-meta">
+                <span><i class="bi bi-eye success"></i> {{ v.total_views }} ochilgan</span>
+                <span><i class="bi bi-check-circle success"></i> {{ v.watched }} ko'rgan</span>
+                <span><i class="bi bi-x-circle danger"></i> {{ v.not_watched }} ko'rmagan</span>
             </div>
-            
-            {% if item.not_watched_users %}
-            <div class="user-chips">
-                <span class="user-chips-label">Ko'rmaganlar:</span>
-                {% for user in item.not_watched_users %}
-                <span class="user-chip">{{ user.full_name }}</span>
-                {% endfor %}
-                {% if item.not_watched > 5 %}<span class="user-chip">+{{ item.not_watched|add:"-5" }} boshqa</span>{% endif %}
-            </div>
-            {% endif %}
         </div>
         {% endfor %}
         {% else %}
-        <div class="empty-state">
-            <i class="bi bi-camera-video"></i>
-            <p>Video darslar statistikasi yo'q</p>
-        </div>
+        <div class="empty"><i class="bi bi-camera-video"></i><p>Video darslar yo'q</p></div>
         {% endif %}
     </div>
 </div>
 
-<!-- ==================== TESTLAR TAB ==================== -->
-<div class="content-section" id="section-test">
-    <div class="glass-card">
-        <div class="card-header-gradient green">
-            <h5><i class="bi bi-clipboard-check-fill"></i> Testlar statistikasi</h5>
-            <span class="count-badge">{{ test_stats|length }} ta test</span>
-        </div>
-        
-        {% if test_stats %}
-        {% for item in test_stats %}
-        <div class="lesson-item">
-            <div class="lesson-header">
-                <div>
-                    <h6 class="lesson-title">{{ item.lesson.title }}</h6>
-                    <p class="lesson-course">
-                        <i class="bi bi-folder2"></i>{{ item.lesson.profession.name }}
-                        <span class="mx-2">•</span>
-                        <i class="bi bi-bar-chart"></i>O'rtacha: {{ item.avg_score }}%
-                    </p>
-                </div>
-                <span class="completion-badge {% if item.completion_rate >= 70 %}success{% elif item.completion_rate >= 40 %}warning{% else %}danger{% endif %}">
-                    {{ item.completion_rate }}% yechgan
-                </span>
+<!-- TAB 3: Test -->
+<div class="tab-panel" id="tab3">
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-head">
+                <h6><i class="bi bi-clipboard-check-fill" style="color:var(--green)"></i>Testlar</h6>
+                <span class="badge">{{ test_stats|length }}</span>
             </div>
-            
-            <div class="progress-wrapper">
-                <div class="progress-fill {% if item.completion_rate >= 70 %}success{% elif item.completion_rate >= 40 %}warning{% else %}danger{% endif %}" style="width: {{ item.completion_rate }}%;"></div>
-            </div>
-            
-            <div class="lesson-stats">
-                <div class="lesson-stat success">
-                    <i class="bi bi-check-circle-fill"></i>
-                    <span>{{ item.completed }} yechgan</span>
+            {% if test_stats %}
+            {% for t in test_stats %}
+            <div class="lesson-card">
+                <div class="lesson-top">
+                    <div>
+                        <h6 class="lesson-title">{{ t.lesson.title }}</h6>
+                        <p class="lesson-sub">{{ t.lesson.profession.name }}</p>
+                    </div>
+                    <span class="rate-badge {% if t.avg_score >= 70 %}high{% elif t.avg_score >= 50 %}mid{% else %}low{% endif %}">
+                        {{ t.avg_score }}%
+                    </span>
                 </div>
-                <div class="lesson-stat danger">
-                    <i class="bi bi-x-circle-fill"></i>
-                    <span>{{ item.not_completed }} yechmagan</span>
+                <div class="progress-bar">
+                    <div class="fill {% if t.pass_rate >= 70 %}high{% elif t.pass_rate >= 50 %}mid{% else %}low{% endif %}" style="width:{{ t.pass_rate }}%"></div>
+                </div>
+                <div class="lesson-meta">
+                    <span><i class="bi bi-people"></i> {{ t.total_attempts }} urinish</span>
+                    <span><i class="bi bi-check-circle success"></i> {{ t.passed_count }} o'tdi</span>
+                    <span><i class="bi bi-x-circle danger"></i> {{ t.failed_count }} yiqildi</span>
+                    <span><i class="bi bi-arrow-repeat warning"></i> {{ t.retry_students }} qayta</span>
                 </div>
             </div>
-            
-            {% if item.not_completed_users %}
-            <div class="user-chips">
-                <span class="user-chips-label">Yechmaganlar:</span>
-                {% for user in item.not_completed_users %}
-                <span class="user-chip">{{ user.full_name }}</span>
-                {% endfor %}
-                {% if item.not_completed > 5 %}<span class="user-chip">+{{ item.not_completed|add:"-5" }} boshqa</span>{% endif %}
-            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty"><i class="bi bi-clipboard"></i><p>Testlar yo'q</p></div>
             {% endif %}
         </div>
-        {% endfor %}
-        {% else %}
-        <div class="empty-state">
-            <i class="bi bi-clipboard-check"></i>
-            <p>Test statistikasi yo'q</p>
+        
+        <div class="card">
+            <div class="card-head">
+                <h6><i class="bi bi-exclamation-diamond-fill" style="color:var(--red)"></i>Qiyin savollar</h6>
+                <span class="badge">{{ hardest_questions|length }}</span>
+            </div>
+            {% if hardest_questions %}
+            {% for q in hardest_questions %}
+            <div class="q-item">
+                <p class="q-text">{{ q.question.question_text|truncatewords:15 }}</p>
+                <div class="q-meta">
+                    <span>{{ q.test.lesson.title }}</span>
+                    <span>{{ q.total_answered }} javob</span>
+                    <span class="err">{{ q.error_rate }}% xato</span>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty"><i class="bi bi-question-circle"></i><p>Qiyin savol yo'q</p></div>
+            {% endif %}
         </div>
-        {% endif %}
     </div>
 </div>
 
-<!-- ==================== UY VAZIFALARI TAB ==================== -->
-<div class="content-section" id="section-homework">
-    <div class="glass-card">
-        <div class="card-header-gradient pink">
-            <h5><i class="bi bi-journal-text"></i> Uyga vazifalar statistikasi</h5>
-            <span class="count-badge">{{ homework_stats|length }} ta vazifa</span>
+<!-- TAB 4: Vazifa -->
+<div class="tab-panel" id="tab4">
+    <div class="card">
+        <div class="card-head">
+            <h6><i class="bi bi-journal-text" style="color:var(--orange)"></i>Uy vazifalari</h6>
+            <span class="badge">{{ homework_stats|length }}</span>
         </div>
-        
         {% if homework_stats %}
-        {% for item in homework_stats %}
-        <div class="lesson-item">
-            <div class="lesson-header">
+        {% for h in homework_stats %}
+        <div class="lesson-card">
+            <div class="lesson-top">
                 <div>
-                    <h6 class="lesson-title">{{ item.lesson.title }}</h6>
-                    <p class="lesson-course">
-                        <i class="bi bi-folder2"></i>{{ item.lesson.profession.name }}
-                    </p>
+                    <h6 class="lesson-title">{{ h.lesson.title }}</h6>
+                    <p class="lesson-sub">{{ h.lesson.profession.name }}</p>
                 </div>
-                <span class="completion-badge {% if item.completion_rate >= 70 %}success{% elif item.completion_rate >= 40 %}warning{% else %}danger{% endif %}">
-                    {{ item.completion_rate }}% topshirgan
+                <span class="rate-badge {% if h.completion_rate >= 70 %}high{% elif h.completion_rate >= 40 %}mid{% else %}low{% endif %}">
+                    {{ h.completion_rate }}%
                 </span>
             </div>
-            
-            <div class="progress-wrapper">
-                <div class="progress-fill {% if item.completion_rate >= 70 %}success{% elif item.completion_rate >= 40 %}warning{% else %}danger{% endif %}" style="width: {{ item.completion_rate }}%;"></div>
+            <div class="progress-bar">
+                <div class="fill {% if h.completion_rate >= 70 %}high{% elif h.completion_rate >= 40 %}mid{% else %}low{% endif %}" style="width:{{ h.completion_rate }}%"></div>
             </div>
-            
-            <div class="lesson-stats">
-                <div class="lesson-stat success">
-                    <i class="bi bi-check-circle-fill"></i>
-                    <span>{{ item.submitted }} topshirgan</span>
-                </div>
-                <div class="lesson-stat danger">
-                    <i class="bi bi-x-circle-fill"></i>
-                    <span>{{ item.not_submitted }} topshirmagan</span>
-                </div>
+            <div class="lesson-meta">
+                <span><i class="bi bi-check-circle success"></i> {{ h.submitted }} topshirgan</span>
+                <span><i class="bi bi-x-circle danger"></i> {{ h.not_submitted }} topshirmagan</span>
+                <span><i class="bi bi-hourglass warning"></i> {{ h.pending_count }} kutilmoqda</span>
+                <span><i class="bi bi-star-fill" style="color:var(--orange)"></i> {{ h.avg_grade }}%</span>
             </div>
-            
-            {% if item.not_submitted_users %}
-            <div class="user-chips">
-                <span class="user-chips-label">Topshirmaganlar:</span>
-                {% for user in item.not_submitted_users %}
-                <span class="user-chip">{{ user.full_name }}</span>
-                {% endfor %}
-                {% if item.not_submitted > 5 %}<span class="user-chip">+{{ item.not_submitted|add:"-5" }} boshqa</span>{% endif %}
-            </div>
-            {% endif %}
         </div>
         {% endfor %}
         {% else %}
-        <div class="empty-state">
-            <i class="bi bi-journal-text"></i>
-            <p>Uyga vazifa statistikasi yo'q</p>
-        </div>
+        <div class="empty"><i class="bi bi-journal"></i><p>Vazifalar yo'q</p></div>
         {% endif %}
     </div>
 </div>
 
+<!-- TAB 5: O'quvchilar -->
+<div class="tab-panel" id="tab5">
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-head">
+                <h6><i class="bi bi-moon-stars-fill" style="color:var(--purple)"></i>Passiv (7+ kun)</h6>
+                <span class="badge">{{ passive_students|length }}</span>
+            </div>
+            {% if passive_students %}
+            {% for s in passive_students %}
+            <div class="item">
+                <div class="item-avatar purple">
+                    {% if s.photo %}<img src="{{ s.photo.url }}">{% else %}{{ s.get_initials }}{% endif %}
+                </div>
+                <div class="item-info">
+                    <h6>{{ s.full_name }}</h6>
+                    <p>{% if s.last_activity %}{{ s.last_activity|timesince }} oldin{% else %}Hech qachon{% endif %}</p>
+                </div>
+                <div class="item-action">
+                    <a href="{% url 'admin_user_view' s.pk %}" class="btn-icon"><i class="bi bi-eye"></i></a>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty"><i class="bi bi-emoji-smile"></i><p>Hammasi faol!</p></div>
+            {% endif %}
+        </div>
+        
+        <div class="card">
+            <div class="card-head">
+                <h6><i class="bi bi-exclamation-triangle-fill" style="color:var(--red)"></i>Qiynalayotgan</h6>
+                <span class="badge">{{ struggling_students|length }}</span>
+            </div>
+            {% if struggling_students %}
+            {% for s in struggling_students %}
+            <div class="item">
+                <div class="item-avatar red">
+                    {% if s.photo %}<img src="{{ s.photo.url }}">{% else %}{{ s.get_initials }}{% endif %}
+                </div>
+                <div class="item-info">
+                    <h6>{{ s.full_name }}</h6>
+                    <p>{{ s.low_score_count }} past ball • O'rtacha: {{ s.avg_score|floatformat:0 }}%</p>
+                </div>
+                <div class="item-action">
+                    <a href="{% url 'admin_user_view' s.pk %}" class="btn-icon"><i class="bi bi-eye"></i></a>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty"><i class="bi bi-emoji-smile"></i><p>Hammasi yaxshi!</p></div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-function switchTab(tabName) {
-    // Map shortcut names to section names
-    const tabMap = {
-        'passive': 'students',
-        'struggling': 'students',
-        'students': 'students',
-        'video': 'video',
-        'test': 'test',
-        'homework': 'homework'
-    };
-    
-    const sectionName = tabMap[tabName] || tabName;
-    
-    // Hide all sections
-    document.querySelectorAll('.content-section').forEach(section => {
-        section.classList.remove('active');
-    });
-    
-    // Show target section
-    const targetSection = document.getElementById('section-' + sectionName);
-    if (targetSection) {
-        targetSection.classList.add('active');
-    }
-    
-    // Update tab buttons
-    document.querySelectorAll('.section-tab').forEach(tab => {
-        tab.classList.remove('active');
-        if (tab.dataset.tab === sectionName) {
-            tab.classList.add('active');
-        }
-    });
-    
-    // Scroll to section smoothly
-    if (targetSection) {
-        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+function openTab(e, id) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    e.currentTarget.classList.add('active');
 }
 
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Check URL hash for initial tab
-    const hash = window.location.hash.replace('#', '');
-    if (hash) {
-        switchTab(hash);
+const data = {{ daily_activity|safe }};
+new Chart(document.getElementById('activityChart'), {
+    type: 'line',
+    data: {
+        labels: data.map(d => d.date),
+        datasets: [
+            { label: 'Video', data: data.map(d => d.videos), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true, tension: 0.4, borderWidth: 2 },
+            { label: 'Test', data: data.map(d => d.tests), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.4, borderWidth: 2 },
+            { label: 'Vazifa', data: data.map(d => d.homeworks), borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', fill: true, tension: 0.4, borderWidth: 2 }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 15, font: { size: 11 } } } },
+        scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' } }, x: { grid: { display: false } } },
+        elements: { point: { radius: 0 } }
     }
 });
 </script>
