@@ -2726,28 +2726,97 @@ def admin_lesson_statistics(request):
         return redirect('home')
     
     profession_id = request.GET.get('profession')
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    search_query = request.GET.get('q', '')
     
-    # Barcha darslar
+    # Sana filterlari
+    if date_from:
+        try:
+            date_from = timezone.datetime.strptime(date_from, '%Y-%m-%d').date()
+        except:
+            date_from = None
+    if date_to:
+        try:
+            date_to = timezone.datetime.strptime(date_to, '%Y-%m-%d').date()
+        except:
+            date_to = None
+    
+    # ==================== UMUMIY STATISTIKA ====================
+    total_lessons = Lesson.objects.count()
+    total_video_lessons = Lesson.objects.filter(lesson_type='video').count()
+    total_test_lessons = Lesson.objects.filter(lesson_type='test').count()
+    total_homework_lessons = Lesson.objects.filter(lesson_type='homework').count()
+    
+    # Faol o'quvchilar (oxirgi 7 kunda)
+    week_ago = timezone.now() - timedelta(days=7)
+    active_students = CustomUser.objects.filter(
+        role='student', 
+        is_blocked=False,
+        last_activity__gte=week_ago
+    ).count()
+    total_students = CustomUser.objects.filter(role='student', is_blocked=False).count()
+    
+    # Ko'rilgan darslar soni
+    total_video_views = VideoProgress.objects.filter(watched=True).count()
+    total_test_attempts = TestResult.objects.count()
+    total_homework_submissions = HomeworkSubmission.objects.count()
+    
+    # O'rtacha test bali
+    avg_test_score = TestResult.objects.aggregate(avg=Avg('score'))['avg'] or 0
+    
+    # Tugallangan darslar foizi
+    total_possible_views = CourseEnrollment.objects.count() * total_video_lessons if total_video_lessons > 0 else 1
+    completion_percent = (total_video_views / total_possible_views * 100) if total_possible_views > 0 else 0
+    
+    # ==================== KUNLIK FAOLLIK (oxirgi 30 kun) ====================
+    thirty_days_ago = timezone.now() - timedelta(days=30)
+    daily_activity = []
+    for i in range(30):
+        day = timezone.now().date() - timedelta(days=29-i)
+        day_start = timezone.make_aware(timezone.datetime.combine(day, timezone.datetime.min.time()))
+        day_end = timezone.make_aware(timezone.datetime.combine(day, timezone.datetime.max.time()))
+        
+        videos_watched = VideoProgress.objects.filter(watched_at__range=(day_start, day_end)).count()
+        tests_taken = TestResult.objects.filter(completed_at__range=(day_start, day_end)).count()
+        homeworks_sent = HomeworkSubmission.objects.filter(submitted_at__range=(day_start, day_end)).count()
+        
+        daily_activity.append({
+            'date': day.strftime('%d.%m'),
+            'videos': videos_watched,
+            'tests': tests_taken,
+            'homeworks': homeworks_sent,
+            'total': videos_watched + tests_taken + homeworks_sent
+        })
+    
+    # ==================== BARCHA DARSLAR ====================
     lessons = Lesson.objects.select_related('profession', 'section').all()
     if profession_id:
         lessons = lessons.filter(profession_id=profession_id)
+    if search_query:
+        lessons = lessons.filter(title__icontains=search_query)
     
-    # Video darslar statistikasi - ko'rilmagan
+    # ==================== VIDEO DARSLAR STATISTIKASI ====================
     video_lessons = lessons.filter(lesson_type='video')
     video_stats = []
     for lesson in video_lessons:
         try:
             video = lesson.video
             total_enrolled = CourseEnrollment.objects.filter(profession=lesson.profession).count()
-            watched_count = VideoProgress.objects.filter(video=video, watched=True).count()
+            
+            video_progress_qs = VideoProgress.objects.filter(video=video)
+            if date_from:
+                video_progress_qs = video_progress_qs.filter(watched_at__date__gte=date_from)
+            if date_to:
+                video_progress_qs = video_progress_qs.filter(watched_at__date__lte=date_to)
+            
+            watched_count = video_progress_qs.filter(watched=True).count()
+            total_views = video_progress_qs.count()
             not_watched = total_enrolled - watched_count
-            if total_enrolled > 0:
-                completion_rate = (watched_count / total_enrolled) * 100
-            else:
-                completion_rate = 0
+            completion_rate = (watched_count / total_enrolled * 100) if total_enrolled > 0 else 0
             
             # Kim ko'rmagan
-            watched_user_ids = VideoProgress.objects.filter(video=video, watched=True).values_list('user_id', flat=True)
+            watched_user_ids = video_progress_qs.filter(watched=True).values_list('user_id', flat=True)
             not_watched_users = CustomUser.objects.filter(
                 enrollments__profession=lesson.profession
             ).exclude(pk__in=watched_user_ids)[:5]
@@ -2755,6 +2824,7 @@ def admin_lesson_statistics(request):
             video_stats.append({
                 'lesson': lesson,
                 'total_enrolled': total_enrolled,
+                'total_views': total_views,
                 'watched': watched_count,
                 'not_watched': not_watched,
                 'completion_rate': round(completion_rate, 1),
@@ -2763,83 +2833,135 @@ def admin_lesson_statistics(request):
         except:
             pass
     
-    # Eng ko'p tashlab ketilgan videolar
-    video_stats_sorted = sorted(video_stats, key=lambda x: x['not_watched'], reverse=True)[:10]
+    video_stats_sorted = sorted(video_stats, key=lambda x: x['completion_rate'])
     
-    # Test statistikasi - yechilmagan
+    # ==================== TEST STATISTIKASI ====================
     test_lessons = lessons.filter(lesson_type='test')
     test_stats = []
+    hardest_questions = []
+    
     for lesson in test_lessons:
         try:
             test = lesson.test
             total_enrolled = CourseEnrollment.objects.filter(profession=lesson.profession).count()
-            completed_count = TestResult.objects.filter(test=test).values('student').distinct().count()
-            not_completed = total_enrolled - completed_count
-            if total_enrolled > 0:
-                completion_rate = (completed_count / total_enrolled) * 100
-            else:
-                completion_rate = 0
             
-            # O'rtacha ball
-            avg_score = TestResult.objects.filter(test=test).aggregate(avg=Avg('score'))['avg'] or 0
+            results_qs = TestResult.objects.filter(test=test)
+            if date_from:
+                results_qs = results_qs.filter(completed_at__date__gte=date_from)
+            if date_to:
+                results_qs = results_qs.filter(completed_at__date__lte=date_to)
+            
+            completed_count = results_qs.values('student').distinct().count()
+            total_attempts = results_qs.count()
+            not_completed = total_enrolled - completed_count
+            completion_rate = (completed_count / total_enrolled * 100) if total_enrolled > 0 else 0
+            
+            avg_score = results_qs.aggregate(avg=Avg('score'))['avg'] or 0
+            passed_count = results_qs.filter(passed=True).count()
+            failed_count = results_qs.filter(passed=False).count()
+            pass_rate = (passed_count / total_attempts * 100) if total_attempts > 0 else 0
+            
+            # Qayta topshirganlar
+            retry_students = results_qs.values('student').annotate(
+                attempt_count=Count('id')
+            ).filter(attempt_count__gt=1).count()
             
             # Kim yechmagan
-            completed_user_ids = TestResult.objects.filter(test=test).values_list('student_id', flat=True)
+            completed_user_ids = results_qs.values_list('student_id', flat=True)
             not_completed_users = CustomUser.objects.filter(
                 enrollments__profession=lesson.profession
             ).exclude(pk__in=completed_user_ids)[:5]
             
+            # Kim o'ta olmadi
+            failed_users = CustomUser.objects.filter(
+                test_results__test=test,
+                test_results__passed=False
+            ).distinct()[:5]
+            
             test_stats.append({
                 'lesson': lesson,
+                'test': test,
                 'total_enrolled': total_enrolled,
                 'completed': completed_count,
+                'total_attempts': total_attempts,
                 'not_completed': not_completed,
                 'completion_rate': round(completion_rate, 1),
                 'avg_score': round(avg_score, 1),
+                'passed_count': passed_count,
+                'failed_count': failed_count,
+                'pass_rate': round(pass_rate, 1),
+                'retry_students': retry_students,
                 'not_completed_users': not_completed_users,
+                'failed_users': failed_users,
             })
+            
+            # Eng qiyin savollar
+            for question in test.questions.all():
+                total_answered = TestUserAnswer.objects.filter(question=question).count()
+                wrong_answers = TestUserAnswer.objects.filter(question=question, is_correct=False).count()
+                if total_answered > 0:
+                    error_rate = (wrong_answers / total_answered * 100)
+                    if error_rate > 40:
+                        hardest_questions.append({
+                            'question': question,
+                            'test': test,
+                            'total_answered': total_answered,
+                            'wrong_count': wrong_answers,
+                            'error_rate': round(error_rate, 1),
+                        })
         except:
             pass
     
-    # Eng ko'p tashlab ketilgan testlar
-    test_stats_sorted = sorted(test_stats, key=lambda x: x['not_completed'], reverse=True)[:10]
+    test_stats_sorted = sorted(test_stats, key=lambda x: x['avg_score'])
+    hardest_questions = sorted(hardest_questions, key=lambda x: x['error_rate'], reverse=True)[:15]
     
-    # Uyga vazifa statistikasi - topshirilmagan
+    # ==================== UY VAZIFASI STATISTIKASI ====================
     homework_lessons = lessons.filter(lesson_type='homework')
     homework_stats = []
     for lesson in homework_lessons:
         try:
             homework = lesson.homework
             total_enrolled = CourseEnrollment.objects.filter(profession=lesson.profession).count()
-            submitted_count = HomeworkSubmission.objects.filter(homework=homework).values('student').distinct().count()
+            
+            submissions_qs = HomeworkSubmission.objects.filter(homework=homework)
+            if date_from:
+                submissions_qs = submissions_qs.filter(submitted_at__date__gte=date_from)
+            if date_to:
+                submissions_qs = submissions_qs.filter(submitted_at__date__lte=date_to)
+            
+            submitted_count = submissions_qs.values('student').distinct().count()
             not_submitted = total_enrolled - submitted_count
-            if total_enrolled > 0:
-                completion_rate = (submitted_count / total_enrolled) * 100
-            else:
-                completion_rate = 0
+            completion_rate = (submitted_count / total_enrolled * 100) if total_enrolled > 0 else 0
+            
+            avg_grade = submissions_qs.filter(grade__isnull=False).aggregate(avg=Avg('grade'))['avg'] or 0
+            pending_count = submissions_qs.filter(status='pending').count()
+            graded_count = submissions_qs.filter(status='graded').count()
             
             # Kim topshirmagan
-            submitted_user_ids = HomeworkSubmission.objects.filter(homework=homework).values_list('student_id', flat=True)
+            submitted_user_ids = submissions_qs.values_list('student_id', flat=True)
             not_submitted_users = CustomUser.objects.filter(
                 enrollments__profession=lesson.profession
             ).exclude(pk__in=submitted_user_ids)[:5]
             
             homework_stats.append({
                 'lesson': lesson,
+                'homework': homework,
                 'total_enrolled': total_enrolled,
                 'submitted': submitted_count,
                 'not_submitted': not_submitted,
                 'completion_rate': round(completion_rate, 1),
+                'avg_grade': round(avg_grade, 1),
+                'pending_count': pending_count,
+                'graded_count': graded_count,
                 'not_submitted_users': not_submitted_users,
             })
         except:
             pass
     
-    # Eng ko'p tashlab ketilgan vazifalar
-    homework_stats_sorted = sorted(homework_stats, key=lambda x: x['not_submitted'], reverse=True)[:10]
+    homework_stats_sorted = sorted(homework_stats, key=lambda x: x['completion_rate'])
     
+    # ==================== O'QUVCHILAR FAOLLIGI ====================
     # Passiv o'quvchilar - oxirgi 7 kunda faollik ko'rsatmaganlar
-    week_ago = timezone.now() - timedelta(days=7)
     passive_students = CustomUser.objects.filter(
         role='student',
         is_blocked=False
@@ -2856,16 +2978,137 @@ def admin_lesson_statistics(request):
         avg_score=Avg('test_results__score')
     ).filter(low_score_count__gte=2).order_by('-low_score_count')[:15]
     
+    # ==================== TOP DARSLAR ====================
+    top_video_lessons = sorted(video_stats, key=lambda x: x['watched'], reverse=True)[:10]
+    top_test_lessons = sorted(test_stats, key=lambda x: x['total_attempts'], reverse=True)[:10]
+    
+    # ==================== SERTIFIKATGA YAQIN O'QUVCHILAR ====================
+    near_certificate_students = []
+    for profession in Profession.objects.all():
+        total_lessons_in_course = profession.lessons.count()
+        if total_lessons_in_course == 0:
+            continue
+            
+        enrolled_students = CustomUser.objects.filter(enrollments__profession=profession)
+        for student in enrolled_students:
+            # Video progress
+            videos_watched = VideoProgress.objects.filter(
+                user=student,
+                video__lesson__profession=profession,
+                watched=True
+            ).count()
+            # Tests passed
+            tests_passed = TestResult.objects.filter(
+                student=student,
+                test__lesson__profession=profession,
+                passed=True
+            ).values('test').distinct().count()
+            # Homework graded
+            homework_done = HomeworkSubmission.objects.filter(
+                student=student,
+                homework__lesson__profession=profession,
+                status='graded'
+            ).values('homework').distinct().count()
+            
+            total_done = videos_watched + tests_passed + homework_done
+            progress = (total_done / total_lessons_in_course * 100) if total_lessons_in_course > 0 else 0
+            
+            if 70 <= progress < 100:
+                near_certificate_students.append({
+                    'student': student,
+                    'profession': profession,
+                    'progress': round(progress, 1),
+                    'remaining': total_lessons_in_course - total_done,
+                })
+    
+    near_certificate_students = sorted(near_certificate_students, key=lambda x: x['progress'], reverse=True)[:10]
+    
+    # ==================== SMART ALERTS ====================
+    alerts = []
+    
+    # 7 kun kirmagan o'quvchilar
+    inactive_count = passive_students.count()
+    if inactive_count > 0:
+        alerts.append({
+            'type': 'warning',
+            'icon': 'bi-clock-history',
+            'title': f'{inactive_count} ta o\'quvchi 7+ kun kirmagan',
+            'description': 'Bu o\'quvchilarga eslatma yuborishni o\'ylab ko\'ring.',
+        })
+    
+    # Testdan o'ta olmayotganlar
+    struggling_count = struggling_students.count()
+    if struggling_count > 0:
+        alerts.append({
+            'type': 'danger',
+            'icon': 'bi-exclamation-triangle',
+            'title': f'{struggling_count} ta o\'quvchi testlardan qiynalmoqda',
+            'description': 'Bu o\'quvchilarga qo\'shimcha yordam kerak bo\'lishi mumkin.',
+        })
+    
+    # Past tugallash darajasidagi darslar
+    low_completion_lessons = [v for v in video_stats if v['completion_rate'] < 30]
+    if len(low_completion_lessons) > 0:
+        alerts.append({
+            'type': 'info',
+            'icon': 'bi-camera-video-off',
+            'title': f'{len(low_completion_lessons)} ta video dars kam ko\'rilmoqda',
+            'description': 'Bu darslar kontentini tekshirib ko\'ring.',
+        })
+    
+    # Tekshirilmagan uy vazifalari
+    pending_hw_count = HomeworkSubmission.objects.filter(status='pending').count()
+    if pending_hw_count > 0:
+        alerts.append({
+            'type': 'primary',
+            'icon': 'bi-journal-text',
+            'title': f'{pending_hw_count} ta uy vazifasi tekshirilmagan',
+            'description': 'Uy vazifalarini baholash kutilmoqda.',
+        })
+    
     professions = Profession.objects.all()
     
     context = {
+        # Umumiy statistika
+        'total_lessons': total_lessons,
+        'total_video_lessons': total_video_lessons,
+        'total_test_lessons': total_test_lessons,
+        'total_homework_lessons': total_homework_lessons,
+        'active_students': active_students,
+        'total_students': total_students,
+        'total_video_views': total_video_views,
+        'total_test_attempts': total_test_attempts,
+        'total_homework_submissions': total_homework_submissions,
+        'avg_test_score': round(avg_test_score, 1),
+        'completion_percent': round(completion_percent, 1),
+        
+        # Kunlik faollik
+        'daily_activity': daily_activity,
+        
+        # Darslar statistikasi
         'video_stats': video_stats_sorted,
         'test_stats': test_stats_sorted,
         'homework_stats': homework_stats_sorted,
+        'hardest_questions': hardest_questions,
+        
+        # O'quvchilar
         'passive_students': passive_students,
         'struggling_students': struggling_students,
+        'near_certificate_students': near_certificate_students,
+        
+        # Top darslar
+        'top_video_lessons': top_video_lessons,
+        'top_test_lessons': top_test_lessons,
+        
+        # Alerts
+        'alerts': alerts,
+        
+        # Filterlar
         'professions': professions,
         'selected_profession': profession_id,
+        'date_from': date_from,
+        'date_to': date_to,
+        'search_query': search_query,
     }
     
     return render(request, 'accounts/admin/lesson_statistics.html', context)
