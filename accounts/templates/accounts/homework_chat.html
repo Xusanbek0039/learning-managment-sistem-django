@@ -1,412 +1,299 @@
 {% extends 'accounts/base.html' %}
-
-{% block title %}{{ submission.homework.lesson.title }} - Chat{% endblock %}
-
+{% block title %}{{ submission.homework.lesson.title }} - Muhokama{% endblock %}
 {% block content %}
 <style>
 :root {
-    --card-bg: #fff;
-    --border: #e5e7eb;
-    --text-dark: #1f2937;
-    --text-muted: #6b7280;
-    --soft-bg: #f8fafc;
-    --chat-mine: #8b5cf6;
-    --chat-other: #e5e7eb;
+    /* iOS Light Palette */
+    --ios-fon: #F2F2F7;
+    --ios-karta: #FFFFFF;
+    --ios-text: #000000;
+    --ios-text-secondary: #8E8E93;
+    --ios-blue: #007AFF;
+    --ios-green: #34C759;
+    --ios-orange: #FF9500;
+    --ios-red: #FF3B30;
+    --ios-indigo: #5856D6;
+    --ios-separator: #C6C6C8;
+    --ios-blur-bg: rgba(255, 255, 255, 0.7);
 }
+
 [data-bs-theme="dark"] {
-    --card-bg: #1e1e2d;
-    --border: #2d2d3a;
-    --text-dark: #e5e7eb;
-    --text-muted: #9ca3af;
-    --soft-bg: #151521;
-    --chat-other: #2d2d3a;
+    /* iOS Dark Palette */
+    --ios-fon: #000000;
+    --ios-karta: #1C1C1E;
+    --ios-text: #FFFFFF;
+    --ios-text-secondary: #8E8E93;
+    --ios-blue: #0A84FF;
+    --ios-green: #30D158;
+    --ios-orange: #FF9F0A;
+    --ios-red: #FF453A;
+    --ios-indigo: #5E5CE6;
+    --ios-separator: #38383A;
+    --ios-blur-bg: rgba(28, 28, 30, 0.8);
 }
 
-.container { max-width: 900px; }
+body { background-color: var(--ios-fon); color: var(--ios-text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
-.page-grid {
+.asosiy-konteyner { max-width: 1000px; margin: 0 auto; padding: 20px; }
+
+/* Sahifa strukturasi */
+.sahifa-to-ri {
     display: grid;
-    grid-template-columns: 1fr 360px;
-    gap: 20px;
+    grid-template-columns: 1fr 340px;
+    gap: 25px;
 }
-@media (max-width: 992px) {
-    .page-grid { grid-template-columns: 1fr; }
+@media (max-width: 992px) { .sahifa-to-ri { grid-template-columns: 1fr; } }
+
+/* iOS Card Style */
+.ios-karta {
+    background: var(--ios-karta);
+    border-radius: 14px;
+    border: none;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-.card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    overflow: hidden;
-    margin-bottom: 16px;
+.karta-sarlavha {
+    padding: 15px 20px;
+    border-bottom: 0.5px solid var(--ios-separator);
+    font-weight: 600;
+    font-size: 17px;
 }
-.card-head {
-    padding: 14px 18px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.card-head h6 { margin: 0; font-weight: 700; color: var(--text-dark); font-size: 0.9rem; }
-.card-body { padding: 18px; }
 
-/* Status */
-.status-banner {
-    padding: 14px 18px;
+/* Status Banner */
+.holat-paneli {
+    padding: 16px 20px;
+    border-radius: 14px 14px 0 0;
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: 0.9rem;
 }
-.status-banner.pending { background: rgba(245,158,11,0.08); color: #d97706; }
-.status-banner.reviewing { background: rgba(59,130,246,0.08); color: #2563eb; }
-.status-banner.revision { background: rgba(239,68,68,0.08); color: #dc2626; }
-.status-banner.accepted { background: rgba(16,185,129,0.08); color: #059669; }
-.status-banner.graded { background: rgba(139,92,246,0.08); color: #7c3aed; }
-.status-banner i { font-size: 1.3rem; }
+.holat-paneli.pending { background: rgba(255, 149, 0, 0.15); color: var(--ios-orange); }
+.holat-paneli.reviewing { background: rgba(0, 122, 255, 0.15); color: var(--ios-blue); }
+.holat-paneli.revision { background: rgba(255, 59, 48, 0.15); color: var(--ios-red); }
+.holat-paneli.accepted { background: rgba(52, 199, 89, 0.15); color: var(--ios-green); }
+.holat-paneli.graded { background: rgba(88, 86, 214, 0.15); color: var(--ios-indigo); }
 
-/* Info */
-.info-row {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-    padding: 14px 18px;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    border-bottom: 1px solid var(--border);
-}
-.info-row span { display: flex; align-items: center; gap: 6px; }
-
-/* File */
-.file-box {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 18px;
-    background: var(--soft-bg);
-    margin: 14px;
-    border-radius: 12px;
-}
-.file-icon {
-    width: 44px;
-    height: 44px;
-    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 1.2rem;
-}
-.file-info { flex: 1; }
-.file-info h6 { margin: 0; font-size: 0.85rem; color: var(--text-dark); }
-.file-info p { margin: 2px 0 0; font-size: 0.7rem; color: var(--text-muted); }
-
-/* Resubmit Form */
-.resubmit-box {
-    padding: 18px;
-    background: rgba(239,68,68,0.05);
-    border-top: 1px solid var(--border);
-}
-.resubmit-box h6 { margin: 0 0 12px; color: #dc2626; font-size: 0.9rem; }
-.resubmit-box .form-control {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 0.85rem;
-    color: var(--text-dark);
-    margin-bottom: 12px;
-}
-
-/* Grade Box */
-.grade-box {
-    text-align: center;
-    padding: 24px;
-    background: linear-gradient(135deg, rgba(139,92,246,0.08), rgba(167,139,250,0.08));
-}
-.grade-circle {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-    font-weight: 800;
-    margin: 0 auto 12px;
-}
-.grade-box p { margin: 0; color: var(--text-muted); font-size: 0.85rem; }
-
-/* Feedback */
-.feedback-box {
-    padding: 18px;
-    background: var(--soft-bg);
-}
-.feedback-box h6 { margin: 0 0 8px; font-size: 0.85rem; color: var(--text-dark); }
-.feedback-box p { margin: 0; font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
-
-/* Chat */
-.chat-card {
+/* Info List */
+.ma-lumot-qatori {
     display: flex;
     flex-direction: column;
-    height: 500px;
+    padding: 0 20px;
 }
-.chat-container {
-    flex: 1;
-    overflow-y: auto;
-    padding: 14px;
-    background: var(--soft-bg);
+.ma-lumot-element {
+    padding: 12px 0;
+    border-bottom: 0.5px solid var(--ios-separator);
+    display: flex;
+    justify-content: space-between;
+    font-size: 15px;
 }
-.chat-empty {
-    text-align: center;
-    padding: 40px;
-    color: var(--text-muted);
-}
-.chat-msg { display: flex; margin-bottom: 12px; }
-.chat-msg.mine { justify-content: flex-end; }
-.chat-bubble {
-    max-width: 85%;
-    padding: 10px 14px;
-    border-radius: 16px;
-    font-size: 0.85rem;
-    line-height: 1.4;
-}
-.chat-msg.mine .chat-bubble {
-    background: var(--chat-mine);
-    color: #fff;
-    border-bottom-right-radius: 4px;
-}
-.chat-msg.other .chat-bubble {
-    background: var(--chat-other);
-    color: var(--text-dark);
-    border-bottom-left-radius: 4px;
-}
-.chat-meta {
-    font-size: 0.65rem;
-    margin-top: 4px;
-    opacity: 0.7;
-}
-.chat-file {
+.ma-lumot-element:last-child { border-bottom: none; }
+.ma-lumot-label { color: var(--ios-text-secondary); }
+
+/* Fayl Box */
+.fayl-box {
+    margin: 15px 20px;
+    padding: 12px;
+    background: var(--ios-fon);
+    border-radius: 12px;
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 10px;
-    background: rgba(0,0,0,0.1);
-    border-radius: 8px;
-    margin-top: 6px;
-    font-size: 0.8rem;
-    text-decoration: none;
+    gap: 12px;
 }
-.chat-msg.mine .chat-file { background: rgba(255,255,255,0.2); color: #fff; }
-.chat-msg.other .chat-file { color: var(--text-dark); }
-
-.chat-input {
-    display: flex;
-    gap: 8px;
-    padding: 12px;
-    border-top: 1px solid var(--border);
-    background: var(--card-bg);
-}
-.chat-input input[type="text"] {
-    flex: 1;
-    padding: 10px 14px;
-    border: 1px solid var(--border);
+.fayl-ikonka {
+    width: 40px; height: 40px;
+    background: var(--ios-blue);
+    color: white;
     border-radius: 10px;
-    background: var(--soft-bg);
-    color: var(--text-dark);
-    font-size: 0.85rem;
+    display: flex; align-items: center; justify-content: center;
 }
-.chat-input .btn { padding: 10px 16px; border-radius: 10px; }
 
-/* Revisions */
-.rev-item {
+/* Chat iOS Style */
+.chat-konteyner {
+    height: 500px;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.xabar-pufagi {
+    max-width: 75%;
+    padding: 8px 16px;
+    border-radius: 18px;
+    font-size: 16px;
+    line-height: 1.3;
+    position: relative;
+}
+.xabar-mine {
+    align-self: flex-end;
+    background: var(--ios-blue);
+    color: white;
+}
+.xabar-other {
+    align-self: flex-start;
+    background: var(--ios-separator);
+    color: var(--ios-text);
+}
+.xabar-vaqti {
+    font-size: 11px;
+    margin-top: 4px;
+    opacity: 0.6;
+    display: block;
+    text-align: right;
+}
+
+/* iOS Input */
+.chat-pastki-qism {
+    padding: 10px 15px;
+    background: var(--ios-blur-bg);
+    backdrop-filter: blur(10px);
+    border-top: 0.5px solid var(--ios-separator);
+}
+.chat-input-guruhi {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 14px;
-    border-bottom: 1px solid var(--border);
-    font-size: 0.8rem;
+    background: var(--ios-karta);
+    border: 0.5px solid var(--ios-separator);
+    border-radius: 20px;
+    padding: 5px 15px;
 }
-.rev-item:last-child { border-bottom: none; }
+.chat-input-guruhi input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 8px 0;
+    color: var(--ios-text);
+    outline: none;
+}
+
+/* Grade Circle */
+.baho-aylanasi {
+    width: 70px; height: 70px;
+    border: 3px solid var(--ios-indigo);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 15px auto;
+    font-weight: 700; font-size: 24px; color: var(--ios-indigo);
+}
 </style>
 
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="asosiy-konteyner">
+    <div class="mb-4 d-flex align-items-center justify-content-between">
+        <a href="{% url 'my_homework_list' %}" class="text-decoration-none" style="color: var(--ios-blue);">
+            <i class="bi bi-chevron-left"></i> Orqaga
+        </a>
+        <h5 class="mb-0 fw-bold text-center flex-grow-1">{{ submission.homework.lesson.title }}</h5>
+        <div style="width: 50px;"></div> </div>
+
+    <div class="sahifa-to-ri">
         <div>
-            <a href="{% url 'my_homework_list' %}" class="btn btn-sm btn-outline-secondary rounded-pill mb-2">
-                <i class="bi bi-arrow-left me-1"></i>Vazifalarimga
-            </a>
-            <h4 class="mb-0 fw-bold"><i class="bi bi-journal-text text-primary me-2"></i>{{ submission.homework.lesson.title }}</h4>
-        </div>
-    </div>
-    
-    <div class="page-grid">
-        <!-- Left Column -->
-        <div>
-            <!-- Status Banner -->
-            <div class="card">
-                <div class="status-banner {{ submission.status }}">
-                    {% if submission.status == 'pending' %}
-                    <i class="bi bi-hourglass-split"></i>
-                    <div><strong>Kutilmoqda</strong><br><small>Vazifangiz tekshirish navbatida</small></div>
-                    {% elif submission.status == 'reviewing' %}
-                    <i class="bi bi-eye"></i>
-                    <div><strong>Ko'rib chiqilmoqda</strong><br><small>O'qituvchi vazifangizni tekshirmoqda</small></div>
-                    {% elif submission.status == 'revision' %}
-                    <i class="bi bi-arrow-repeat"></i>
-                    <div><strong>Qayta ishlash kerak!</strong><br><small>Quyida izohni o'qing va qayta topshiring</small></div>
-                    {% elif submission.status == 'accepted' %}
-                    <i class="bi bi-check-circle"></i>
-                    <div><strong>Qabul qilindi</strong><br><small>Vazifangiz muvaffaqiyatli qabul qilindi</small></div>
-                    {% elif submission.status == 'graded' %}
-                    <i class="bi bi-star-fill"></i>
-                    <div><strong>Baholandi</strong><br><small>Vazifangiz baholandi</small></div>
-                    {% endif %}
-                </div>
-                
-                <!-- Info -->
-                <div class="info-row">
-                    <span><i class="bi bi-folder"></i> {{ submission.homework.lesson.profession.name }}</span>
-                    <span><i class="bi bi-calendar3"></i> {{ submission.submitted_at|date:"d.m.Y H:i" }}</span>
-                    <span><i class="bi bi-layers"></i> Versiya {{ submission.version }}</span>
-                    {% if submission.is_late %}
-                    <span class="text-danger"><i class="bi bi-clock"></i> Kech topshirilgan</span>
-                    {% endif %}
-                </div>
-                
-                <!-- Current File -->
-                <div class="file-box">
-                    <div class="file-icon"><i class="bi bi-file-earmark-text"></i></div>
-                    <div class="file-info">
-                        <h6>{{ submission.file.name|cut:"homework_submissions/" }}</h6>
-                        <p>Joriy versiya</p>
+            <div class="ios-karta overflow-hidden">
+                <div class="holat-paneli {{ submission.status }}">
+                    <i class="bi {% if submission.status == 'graded' %}bi-star-fill{% else %}bi-info-circle-fill{% endif %} fs-4"></i>
+                    <div>
+                        <span class="fw-bold d-block">
+                            {% if submission.status == 'pending' %}Kutilmoqda{% elif submission.status == 'reviewing' %}Tekshirilmoqda{% elif submission.status == 'revision' %}Qayta ishlash{% elif submission.status == 'accepted' %}Qabul qilindi{% elif submission.status == 'graded' %}Baholandi{% endif %}
+                        </span>
                     </div>
-                    <a href="{{ submission.file.url }}" target="_blank" class="btn btn-sm btn-primary rounded-pill">
-                        <i class="bi bi-download"></i>
+                </div>
+
+                <div class="ma-lumot-qatori">
+                    <div class="ma-lumot-element">
+                        <span class="ma-lumot-label">Sana</span>
+                        <span>{{ submission.submitted_at|date:"d.m.Y" }}</span>
+                    </div>
+                    <div class="ma-lumot-element">
+                        <span class="ma-lumot-label">Kurs</span>
+                        <span>{{ submission.homework.lesson.profession.name }}</span>
+                    </div>
+                    <div class="ma-lumot-element">
+                        <span class="ma-lumot-label">Urinish</span>
+                        <span>{{ submission.version }}-urinish</span>
+                    </div>
+                </div>
+
+                <div class="fayl-box">
+                    <div class="fayl-ikonka"><i class="bi bi-file-earmark-arrow-down"></i></div>
+                    <div class="flex-grow-1 overflow-hidden">
+                        <div class="text-truncate fw-medium" style="font-size: 14px;">{{ submission.file.name|cut:"homework_submissions/" }}</div>
+                        <small class="text-secondary">Yuborilgan fayl</small>
+                    </div>
+                    <a href="{{ submission.file.url }}" target="_blank" class="btn btn-link text-decoration-none" style="color: var(--ios-blue);">
+                        <i class="bi bi-download fs-5"></i>
                     </a>
                 </div>
-                
-                <!-- Grade -->
+
                 {% if submission.status == 'graded' %}
-                <div class="grade-box">
-                    <div class="grade-circle">{{ submission.grade }}</div>
-                    <p>{% if submission.is_late %}Asl baho: {{ submission.grade }}% (Kechikish jarimasi: -{{ submission.homework.late_penalty }}%){% else %}Sizning bahongiz{% endif %}</p>
-                </div>
-                {% endif %}
-                
-                <!-- Feedback -->
-                {% if submission.feedback %}
-                <div class="feedback-box">
-                    <h6><i class="bi bi-chat-quote me-2"></i>O'qituvchi izohi</h6>
-                    <p>{{ submission.feedback }}</p>
-                    {% if submission.feedback_file %}
-                    <a href="{{ submission.feedback_file.url }}" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
-                        <i class="bi bi-paperclip me-1"></i>Izoh fayli
-                    </a>
-                    {% endif %}
-                </div>
-                {% endif %}
-                
-                <!-- Resubmit Form (only for revision status) -->
-                {% if submission.status == 'revision' %}
-                <div class="resubmit-box">
-                    <h6><i class="bi bi-arrow-repeat me-1"></i>Qayta topshirish</h6>
-                    <form method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <input type="hidden" name="action" value="resubmit">
-                        <input type="file" name="new_file" class="form-control" required>
-                        <textarea name="note" class="form-control" rows="2" placeholder="Izoh (ixtiyoriy)"></textarea>
-                        <button type="submit" class="btn btn-danger w-100">
-                            <i class="bi bi-upload me-1"></i>Qayta topshirish
-                        </button>
-                    </form>
+                <div class="text-center pb-3">
+                    <div class="baho-aylanasi">{{ submission.grade }}</div>
+                    <p class="small text-secondary">Sizning natijangiz</p>
                 </div>
                 {% endif %}
             </div>
-            
-            <!-- Previous Revisions -->
-            {% if revisions %}
-            <div class="card">
-                <div class="card-head">
-                    <h6><i class="bi bi-clock-history me-2"></i>Oldingi versiyalar</h6>
-                </div>
-                {% for rev in revisions %}
-                <div class="rev-item">
-                    <i class="bi bi-file-earmark text-muted"></i>
-                    <span style="flex:1;">{{ rev.note|default:"Oldingi versiya" }}</span>
-                    <span class="text-muted">{{ rev.submitted_at|date:"d.m.Y H:i" }}</span>
-                    <a href="{{ rev.file.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">
-                        <i class="bi bi-download"></i>
-                    </a>
-                </div>
-                {% endfor %}
+
+            {% if submission.status == 'revision' %}
+            <div class="ios-karta p-3 border-top border-danger border-4">
+                <h6 class="fw-bold text-danger"><i class="bi bi-arrow-repeat me-1"></i> Qayta topshirish</h6>
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="resubmit">
+                    <input type="file" name="new_file" class="form-control mb-2 rounded-3 border-0 bg-light" required>
+                    <textarea name="note" class="form-control mb-2 rounded-3 border-0 bg-light" rows="2" placeholder="Tuzatish haqida qisqacha..."></textarea>
+                    <button type="submit" class="btn w-100 rounded-3 fw-bold" style="background: var(--ios-red); color: white;">Topshirish</button>
+                </form>
             </div>
             {% endif %}
-            
-            <!-- Homework Description -->
-            {% if submission.homework.description %}
-            <div class="card">
-                <div class="card-head">
-                    <h6><i class="bi bi-info-circle me-2"></i>Vazifa tavsifi</h6>
-                </div>
-                <div class="card-body">
-                    <p style="font-size:0.9rem; color:var(--text-dark); margin:0; line-height:1.6;">{{ submission.homework.description }}</p>
-                    {% if submission.homework.due_date %}
-                    <p class="mt-3 mb-0 text-muted" style="font-size:0.8rem;">
-                        <i class="bi bi-calendar-event me-1"></i>Muddat: {{ submission.homework.due_date|date:"d.m.Y H:i" }}
-                    </p>
-                    {% endif %}
-                </div>
+
+            {% if submission.feedback %}
+            <div class="ios-karta p-3">
+                <h6 class="fw-bold mb-2">O'qituvchi izohi</h6>
+                <p class="mb-0 small text-secondary">{{ submission.feedback }}</p>
             </div>
             {% endif %}
         </div>
-        
-        <!-- Right Column: Chat -->
-        <div>
-            <div class="card chat-card">
-                <div class="card-head">
-                    <h6><i class="bi bi-chat-dots me-2" style="color:#8b5cf6"></i>O'qituvchi bilan chat</h6>
-                </div>
-                
-                <div class="chat-container" id="chatContainer">
-                    {% if chat_messages %}
+
+        <div class="ios-karta d-flex flex-column overflow-hidden" style="height: 600px;">
+            <div class="karta-sarlavha">
+                <i class="bi bi-chat-fill me-2" style="color: var(--ios-blue);"></i> Muhokama
+            </div>
+            
+            <div class="chat-konteyner" id="chatMaydoni">
+                {% if chat_messages %}
                     {% for msg in chat_messages %}
-                    <div class="chat-msg {% if msg.sender == request.user %}mine{% else %}other{% endif %}">
-                        <div class="chat-bubble">
-                            <div>{{ msg.message }}</div>
-                            {% if msg.file %}
-                            <a href="{{ msg.file.url }}" target="_blank" class="chat-file">
-                                <i class="bi bi-paperclip"></i>
-                                <span>Fayl</span>
-                            </a>
-                            {% endif %}
-                            <div class="chat-meta">
-                                {% if msg.sender != request.user %}{{ msg.sender.first_name }} • {% endif %}{{ msg.created_at|date:"H:i" }}
-                            </div>
-                        </div>
+                    <div class="xabar-pufagi {% if msg.sender == request.user %}xabar-mine{% else %}xabar-other{% endif %}">
+                        <div>{{ msg.message }}</div>
+                        {% if msg.file %}
+                        <a href="{{ msg.file.url }}" target="_blank" class="mt-1 d-block text-white small opacity-75">
+                            <i class="bi bi-paperclip"></i> Fayl biriktirilgan
+                        </a>
+                        {% endif %}
+                        <span class="xabar-vaqti">{{ msg.created_at|date:"H:i" }}</span>
                     </div>
                     {% endfor %}
-                    {% else %}
-                    <div class="chat-empty">
-                        <i class="bi bi-chat-dots" style="font-size:2rem; opacity:0.3;"></i>
-                        <p class="mt-2">Hali xabarlar yo'q</p>
-                        <small>O'qituvchiga savol bering</small>
+                {% else %}
+                    <div class="text-center py-5 opacity-25">
+                        <i class="bi bi-chat-dots fs-1"></i>
+                        <p class="small mt-2">Xabarlar mavjud emas</p>
                     </div>
-                    {% endif %}
-                </div>
-                
-                <form method="POST" enctype="multipart/form-data" class="chat-input">
+                {% endif %}
+            </div>
+
+            <div class="chat-pastki-qism">
+                <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="send_message">
-                    <input type="text" name="message" placeholder="Xabar yozing..." autocomplete="off">
-                    <label class="btn btn-outline-secondary" style="cursor:pointer;">
-                        <i class="bi bi-paperclip"></i>
-                        <input type="file" name="message_file" style="display:none;" onchange="this.form.submit()">
-                    </label>
-                    <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i></button>
+                    <div class="chat-input-guruhi">
+                        <label class="mb-0" style="cursor: pointer;">
+                            <i class="bi bi-plus-circle fs-5" style="color: var(--ios-blue);"></i>
+                            <input type="file" name="message_file" class="d-none" onchange="this.form.submit()">
+                        </label>
+                        <input type="text" name="message" placeholder="Xabar..." autocomplete="off">
+                        <button type="submit" class="btn btn-link p-0">
+                            <i class="bi bi-arrow-up-circle-fill fs-3" style="color: var(--ios-blue);"></i>
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -415,7 +302,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const chat = document.getElementById('chatContainer');
+    const chat = document.getElementById('chatMaydoni');
     if (chat) chat.scrollTop = chat.scrollHeight;
 });
 </script>
