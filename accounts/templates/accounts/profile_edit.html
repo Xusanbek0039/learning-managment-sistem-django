@@ -99,8 +99,8 @@ input[type=file]{border-radius:1rem}
 </div>
 
 <div class="col-md-6">
-    <label class="form-label">Yo‘nalish</label>
-    {{ form.profession }}
+    <label class="form-label">Email</label>
+    {{ form.email }}
 </div>
 
 <div class="col-md-6">
@@ -109,7 +109,7 @@ input[type=file]{border-radius:1rem}
 </div>
 
 <div class="col-md-6">
-    <label class="form-label">Tug‘ilgan sana</label>
+    <label class="form-label">Tug'ilgan sana</label>
     {{ form.birth_date }}
 </div>
 
@@ -123,17 +123,17 @@ input[type=file]{border-radius:1rem}
     {{ form.id_card }}
     {% if user.id_card %}
         <small class="text-muted d-block mt-1">
-            Joriy fayl: <a href="{{ user.id_card.url }}" target="_blank">Ko‘rish</a>
+            Joriy fayl: <a href="{{ user.id_card.url }}" target="_blank">Ko'rish</a>
         </small>
     {% endif %}
 </div>
 
 <div class="col-md-6">
-    <label class="form-label">Tug‘ilganlik guvohnomasi</label>
+    <label class="form-label">Tug'ilganlik guvohnomasi</label>
     {{ form.birth_certificate }}
     {% if user.birth_certificate %}
         <small class="text-muted d-block mt-1">
-            Joriy fayl: <a href="{{ user.birth_certificate.url }}" target="_blank">Ko‘rish</a>
+            Joriy fayl: <a href="{{ user.birth_certificate.url }}" target="_blank">Ko'rish</a>
         </small>
     {% endif %}
 </div>
@@ -142,7 +142,7 @@ input[type=file]{border-radius:1rem}
 
 <!-- BIO -->
 <div class="mt-3">
-    <label class="form-label">O‘zingiz haqida</label>
+    <label class="form-label">O'zingiz haqida</label>
     {{ form.bio }}
 </div>
 
