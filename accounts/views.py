@@ -134,8 +134,22 @@ def home_view(request):
     
     # O'quvchi uchun uning kurslari
     my_enrollments = []
-    if request.user.is_student:
-        my_enrollments = request.user.enrollments.all()[:4]
+    unread_messages_count = 0
+    
+    if request.user.is_authenticated:
+        if request.user.is_student:
+            my_enrollments = request.user.enrollments.all()[:4]
+        
+        # O'qilmagan xabarlar soni - shaxsiy xabarlar + tizim xabarlari
+        from django.db.models import Q
+        q_filter = Q(recipient=request.user, is_read=False)
+        # Umumiy xabarlar ham
+        q_filter |= Q(message_type='all', is_read=False)
+        if request.user.is_student:
+            q_filter |= Q(message_type='students', is_read=False)
+        if request.user.is_teacher:
+            q_filter |= Q(message_type='teachers', is_read=False)
+        unread_messages_count = Message.objects.filter(q_filter).distinct().count()
     
     context = {
         'professions': professions,
@@ -143,6 +157,7 @@ def home_view(request):
         'total_courses': total_courses,
         'total_lessons': total_lessons,
         'my_enrollments': my_enrollments,
+        'unread_messages_count': unread_messages_count,
     }
     return render(request, 'accounts/home.html', context)
 

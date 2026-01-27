@@ -9,6 +9,131 @@
 
 
 <div class="container py-4">
+  <!-- Notification Banner for Unread Messages -->
+  {% if unread_messages_count > 0 %}
+  <div class="notification-banner mb-4" id="notificationBanner">
+    <div class="notification-content">
+      <div class="notification-icon">
+        <i class="bi bi-envelope-fill"></i>
+        <span class="notification-badge">{{ unread_messages_count }}</span>
+      </div>
+      <div class="notification-text">
+        <strong>Sizga yangi xabar{% if unread_messages_count > 1 %}lar{% endif %} bor!</strong>
+        <p class="mb-0">{{ unread_messages_count }} ta o'qilmagan xabar. Xabarlar bo'limida ko'ring.</p>
+      </div>
+      <a href="{% url 'messages' %}" class="btn btn-light btn-sm btn-rounded notification-btn">
+        <i class="bi bi-arrow-right me-1"></i>Xabarlarni ko'rish
+      </a>
+      <button type="button" class="notification-close" onclick="document.getElementById('notificationBanner').style.display='none'">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+  </div>
+  <style>
+    .notification-banner {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+      border-radius: 16px;
+      padding: 16px 20px;
+      box-shadow: 0 8px 32px rgba(99, 102, 241, 0.3);
+      animation: slideDown 0.5s ease, pulse 2s ease-in-out infinite;
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 8px 32px rgba(99, 102, 241, 0.3); }
+      50% { box-shadow: 0 8px 40px rgba(99, 102, 241, 0.5); }
+    }
+    .notification-content {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .notification-icon {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .notification-icon i {
+      font-size: 1.5rem;
+      color: #fff;
+    }
+    .notification-badge {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background: #ef4444;
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      min-width: 20px;
+      height: 20px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #8b5cf6;
+    }
+    .notification-text {
+      flex: 1;
+      min-width: 200px;
+      color: #fff;
+    }
+    .notification-text strong {
+      font-size: 1rem;
+      display: block;
+      margin-bottom: 2px;
+    }
+    .notification-text p {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+    .notification-btn {
+      font-weight: 600;
+      padding: 8px 20px;
+      background: #fff;
+      color: #6366f1;
+      border: none;
+      transition: all 0.2s;
+    }
+    .notification-btn:hover {
+      background: #f0f0ff;
+      color: #4f46e5;
+      transform: translateX(4px);
+    }
+    .notification-close {
+      background: rgba(255,255,255,0.15);
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .notification-close:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    @media (max-width: 576px) {
+      .notification-content { flex-direction: column; text-align: center; }
+      .notification-btn { width: 100%; }
+      .notification-close { position: absolute; top: 8px; right: 8px; }
+      .notification-banner { position: relative; }
+    }
+  </style>
+  {% endif %}
+
   <!-- Hero -->
   <div class="hero-card mb-5">
     <div class="card-body p-4 p-md-5">
