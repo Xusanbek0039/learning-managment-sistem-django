@@ -51,6 +51,10 @@ urlpatterns = [
     path('homework/<int:pk>/grade/', views.grade_homework, name='grade_homework'),
     path('test-results/', views.all_test_results, name='all_test_results'),
     
+    # Student homework
+    path('my-homeworks/', views.my_homework_list, name='my_homework_list'),
+    path('homework/<int:pk>/chat/', views.homework_chat, name='homework_chat'),
+    
     # Messages
     path('messages/', views.messages_view, name='messages'),
     path('messages/<int:pk>/', views.message_detail, name='message_detail'),

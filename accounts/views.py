@@ -1377,12 +1377,40 @@ def homework_submissions(request):
     if not (request.user.is_admin or request.user.is_teacher):
         return redirect('home')
     
-    submissions = HomeworkSubmission.objects.filter(status='pending').select_related(
+    status_filter = request.GET.get('status', '')
+    profession_filter = request.GET.get('profession', '')
+    
+    submissions = HomeworkSubmission.objects.select_related(
         'homework__lesson__profession', 'student'
-    )
+    ).prefetch_related('messages')
+    
+    if status_filter:
+        submissions = submissions.filter(status=status_filter)
+    else:
+        submissions = submissions.exclude(status='graded')
+    
+    if profession_filter:
+        submissions = submissions.filter(homework__lesson__profession_id=profession_filter)
+    
+    submissions = submissions.order_by('-submitted_at')
+    
+    # Statistika
+    stats = {
+        'pending': HomeworkSubmission.objects.filter(status='pending').count(),
+        'reviewing': HomeworkSubmission.objects.filter(status='reviewing').count(),
+        'revision': HomeworkSubmission.objects.filter(status='revision').count(),
+        'accepted': HomeworkSubmission.objects.filter(status='accepted').count(),
+        'graded': HomeworkSubmission.objects.filter(status='graded').count(),
+    }
+    
+    professions = Profession.objects.all()
     
     return render(request, 'accounts/manage/homework_submissions.html', {
         'submissions': submissions,
+        'stats': stats,
+        'professions': professions,
+        'status_filter': status_filter,
+        'profession_filter': profession_filter,
     })
 
 
@@ -1393,42 +1421,210 @@ def grade_homework(request, pk):
     
     submission = get_object_or_404(HomeworkSubmission, pk=pk)
     was_graded = submission.grade is not None
+    chat_messages = submission.messages.all().order_by('created_at')
+    revisions = submission.revisions.all()
+    
+    # Xabarlarni o'qilgan deb belgilash
+    submission.messages.filter(is_read=False).exclude(sender=request.user).update(is_read=True)
     
     if request.method == 'POST':
-        form = HomeworkGradeForm(request.POST)
-        if form.is_valid():
-            submission.grade = form.cleaned_data['grade']
-            submission.feedback = form.cleaned_data.get('feedback', '')
-            submission.status = 'graded'
-            submission.graded_by = request.user
-            submission.graded_at = timezone.now()
+        action = request.POST.get('action')
+        
+        # Xabar yuborish
+        if action == 'send_message':
+            message_text = request.POST.get('message', '').strip()
+            message_file = request.FILES.get('message_file')
+            if message_text or message_file:
+                from .models import HomeworkMessage
+                HomeworkMessage.objects.create(
+                    submission=submission,
+                    sender=request.user,
+                    message=message_text,
+                    file=message_file
+                )
+                messages.success(request, "Xabar yuborildi!")
+            return redirect('grade_homework', pk=pk)
+        
+        # Status o'zgartirish
+        elif action == 'set_reviewing':
+            submission.status = 'reviewing'
+            submission.save()
+            messages.info(request, "Status: Ko'rib chiqilmoqda")
+            return redirect('grade_homework', pk=pk)
+        
+        # Qayta ishlashga yuborish
+        elif action == 'request_revision':
+            revision_note = request.POST.get('revision_note', '')
+            submission.status = 'revision'
+            submission.feedback = revision_note
             submission.save()
             
-            # Baholangan vazifa uchun 5 coin (faqat birinchi marta)
-            if not was_graded and not submission.coin_awarded:
-                submission.student.add_coins(5, f"Vazifa baholandi: {submission.homework.lesson.title}")
-                submission.coin_awarded = True
+            # Xabar qoldirish
+            from .models import HomeworkMessage
+            HomeworkMessage.objects.create(
+                submission=submission,
+                sender=request.user,
+                message=f"⚠️ Qayta ishlash kerak: {revision_note}"
+            )
+            
+            # Notification
+            Message.objects.create(
+                title="Vazifani qayta ishlang",
+                content=f"'{submission.homework.lesson.title}' vazifangizni qayta ishlashingiz kerak.\n\nIzoh: {revision_note}",
+                message_type='warning',
+                recipient=submission.student
+            )
+            
+            messages.warning(request, "O'quvchiga qayta ishlash so'rovi yuborildi!")
+            return redirect('grade_homework', pk=pk)
+        
+        # Qabul qilish
+        elif action == 'accept':
+            submission.status = 'accepted'
+            submission.save()
+            messages.success(request, "Vazifa qabul qilindi!")
+            return redirect('grade_homework', pk=pk)
+        
+        # Baholash
+        elif action == 'grade':
+            grade = request.POST.get('grade')
+            feedback = request.POST.get('feedback', '')
+            feedback_file = request.FILES.get('feedback_file')
+            
+            if grade:
+                submission.grade = int(grade)
+                submission.feedback = feedback
+                if feedback_file:
+                    submission.feedback_file = feedback_file
+                submission.status = 'graded'
+                submission.graded_by = request.user
+                submission.graded_at = timezone.now()
                 submission.save()
                 
-                # Activity log
-                ActivityLog.objects.create(
-                    user=submission.student,
-                    action_type='Vazifa baxosi uchun',
-                    description=f"Vazifasi baholandi: {submission.homework.lesson.title} - Baho: {submission.grade}, +5 coin"
-                )
-            
-            # Avtomatik xabar yuborish
-            from .notifications import on_homework_graded
-            on_homework_graded(submission.student, submission, submission.grade)
-            
-            messages.success(request, "Vazifa baholandi!")
-            return redirect('homework_submissions')
-    else:
-        form = HomeworkGradeForm()
+                # Coin berish
+                if not submission.coin_awarded:
+                    # Vaqtida topshirganlar uchun bonus
+                    coin_amount = 5
+                    if not submission.is_late:
+                        coin_amount = 10
+                    
+                    # Yaxshi baho uchun bonus
+                    if submission.grade >= 90:
+                        coin_amount += 5
+                    elif submission.grade >= 80:
+                        coin_amount += 3
+                    
+                    submission.student.add_coins(coin_amount, f"Vazifa baholandi: {submission.homework.lesson.title}")
+                    submission.coin_awarded = True
+                    submission.save()
+                    
+                    ActivityLog.objects.create(
+                        user=submission.student,
+                        action_type='homework_graded',
+                        description=f"Vazifa baholandi: {submission.homework.lesson.title} - Baho: {submission.grade}, +{coin_amount} coin"
+                    )
+                
+                # Notification
+                from .notifications import on_homework_graded
+                on_homework_graded(submission.student, submission, submission.grade)
+                
+                messages.success(request, f"Vazifa baholandi: {submission.grade} ball!")
+                return redirect('homework_submissions')
     
     return render(request, 'accounts/manage/grade_homework.html', {
         'submission': submission,
-        'form': form,
+        'chat_messages': chat_messages,
+        'revisions': revisions,
+    })
+
+
+@login_required
+def homework_chat(request, pk):
+    """O'quvchi uchun vazifa chat sahifasi"""
+    submission = get_object_or_404(HomeworkSubmission, pk=pk, student=request.user)
+    chat_messages = submission.messages.all().order_by('created_at')
+    revisions = submission.revisions.all()
+    
+    # Xabarlarni o'qilgan deb belgilash
+    submission.messages.filter(is_read=False).exclude(sender=request.user).update(is_read=True)
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        # Xabar yuborish
+        if action == 'send_message':
+            message_text = request.POST.get('message', '').strip()
+            message_file = request.FILES.get('message_file')
+            if message_text or message_file:
+                from .models import HomeworkMessage
+                HomeworkMessage.objects.create(
+                    submission=submission,
+                    sender=request.user,
+                    message=message_text,
+                    file=message_file
+                )
+                messages.success(request, "Xabar yuborildi!")
+            return redirect('homework_chat', pk=pk)
+        
+        # Qayta topshirish
+        elif action == 'resubmit':
+            new_file = request.FILES.get('new_file')
+            note = request.POST.get('note', '')
+            
+            if new_file:
+                from .models import HomeworkRevision
+                # Eski faylni revision sifatida saqlash
+                HomeworkRevision.objects.create(
+                    submission=submission,
+                    file=submission.file,
+                    note=f"Versiya {submission.version}"
+                )
+                
+                # Yangi faylni yuklash
+                submission.file = new_file
+                submission.version += 1
+                submission.revision_count += 1
+                submission.status = 'pending'
+                submission.submitted_at = timezone.now()
+                submission.save()
+                
+                # Xabar qoldirish
+                from .models import HomeworkMessage
+                HomeworkMessage.objects.create(
+                    submission=submission,
+                    sender=request.user,
+                    message=f"📎 Yangi versiya yuklandi (v{submission.version}). {note}"
+                )
+                
+                messages.success(request, "Vazifa qayta topshirildi!")
+            return redirect('homework_chat', pk=pk)
+    
+    return render(request, 'accounts/homework_chat.html', {
+        'submission': submission,
+        'chat_messages': chat_messages,
+        'revisions': revisions,
+    })
+
+
+@login_required
+def my_homework_list(request):
+    """O'quvchining barcha vazifalari"""
+    submissions = HomeworkSubmission.objects.filter(student=request.user).select_related(
+        'homework__lesson__profession'
+    ).prefetch_related('messages').order_by('-submitted_at')
+    
+    # Statistika
+    stats = {
+        'total': submissions.count(),
+        'pending': submissions.filter(status__in=['pending', 'reviewing']).count(),
+        'revision': submissions.filter(status='revision').count(),
+        'graded': submissions.filter(status='graded').count(),
+        'avg_grade': submissions.filter(grade__isnull=False).aggregate(avg=Avg('grade'))['avg'] or 0,
+    }
+    
+    return render(request, 'accounts/my_homeworks.html', {
+        'submissions': submissions,
+        'stats': stats,
     })
 
 

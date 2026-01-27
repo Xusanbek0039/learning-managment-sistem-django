@@ -332,14 +332,27 @@ class Homework(models.Model):
     lesson = models.OneToOneField(Lesson, on_delete=models.CASCADE, related_name='homework')
     description = models.TextField(verbose_name="Vazifa tavsifi")
     due_date = models.DateTimeField(null=True, blank=True, verbose_name="Topshirish muddati")
+    max_score = models.IntegerField(default=100, verbose_name="Maksimal ball")
+    late_penalty = models.IntegerField(default=10, verbose_name="Kechikish jarimasi (%)")
+    allow_late = models.BooleanField(default=True, verbose_name="Kech topshirishga ruxsat")
     
     def __str__(self):
         return self.lesson.title
+    
+    @property
+    def is_deadline_passed(self):
+        if self.due_date:
+            from django.utils import timezone
+            return timezone.now() > self.due_date
+        return False
 
 
 class HomeworkSubmission(models.Model):
     STATUS_CHOICES = (
-        ('pending', 'Tekshirilmoqda'),
+        ('pending', 'Kutilmoqda'),
+        ('reviewing', 'Ko\'rib chiqilmoqda'),
+        ('revision', 'Qayta ishlash kerak'),
+        ('accepted', 'Qabul qilindi'),
         ('graded', 'Baholangan'),
     )
     
@@ -350,15 +363,57 @@ class HomeworkSubmission(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     grade = models.IntegerField(null=True, blank=True, verbose_name="Baho (1-100)")
     feedback = models.TextField(blank=True, null=True, verbose_name="Izoh")
+    feedback_file = models.FileField(upload_to='homework_feedback/', null=True, blank=True, verbose_name="Izoh fayli")
     graded_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='graded_homeworks')
     graded_at = models.DateTimeField(null=True, blank=True)
     coin_awarded = models.BooleanField(default=False)
+    is_late = models.BooleanField(default=False, verbose_name="Kech topshirilgan")
+    revision_count = models.IntegerField(default=0, verbose_name="Qayta topshirish soni")
+    version = models.IntegerField(default=1, verbose_name="Versiya")
     
     class Meta:
         ordering = ['-submitted_at']
     
     def __str__(self):
         return f"{self.student.full_name} - {self.homework.lesson.title}"
+    
+    @property
+    def unread_messages_count(self):
+        return self.messages.filter(is_read=False).exclude(sender=self.student).count()
+    
+    def calculate_final_grade(self):
+        if self.grade and self.is_late and self.homework.late_penalty:
+            penalty = self.grade * self.homework.late_penalty / 100
+            return max(0, int(self.grade - penalty))
+        return self.grade
+
+
+class HomeworkMessage(models.Model):
+    submission = models.ForeignKey(HomeworkSubmission, on_delete=models.CASCADE, related_name='messages')
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='homework_messages')
+    message = models.TextField(verbose_name="Xabar")
+    file = models.FileField(upload_to='homework_chat/', null=True, blank=True, verbose_name="Fayl")
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+    
+    class Meta:
+        ordering = ['created_at']
+    
+    def __str__(self):
+        return f"{self.sender.full_name}: {self.message[:30]}"
+
+
+class HomeworkRevision(models.Model):
+    submission = models.ForeignKey(HomeworkSubmission, on_delete=models.CASCADE, related_name='revisions')
+    file = models.FileField(upload_to='homework_revisions/')
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    note = models.TextField(blank=True, null=True, verbose_name="Izoh")
+    
+    class Meta:
+        ordering = ['-submitted_at']
+    
+    def __str__(self):
+        return f"Revision {self.pk} - {self.submission}"
 
 
 class Test(models.Model):

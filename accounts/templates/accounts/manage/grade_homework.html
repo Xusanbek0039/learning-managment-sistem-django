@@ -1,62 +1,490 @@
-{% extends 'accounts/base.html' %}
+{% extends 'accounts/admin/base_admin.html' %}
 
-{% block title %}Vazifani baholash - LMS{% endblock %}
+{% block title %}Vazifani tekshirish{% endblock %}
 
-{% block content %}
-<div class="container mt-5">
-    <a href="{% url 'homework_submissions' %}" class="btn btn-outline-secondary mb-4">
-        <i class="bi bi-arrow-left me-2"></i>Orqaga
-    </a>
+{% block extra_css %}
+<style>
+:root {
+    --card-bg: #fff;
+    --border: #e5e7eb;
+    --text-dark: #1f2937;
+    --text-muted: #6b7280;
+    --soft-bg: #f8fafc;
+    --chat-mine: #8b5cf6;
+    --chat-other: #e5e7eb;
+}
+[data-bs-theme="dark"] {
+    --card-bg: #1e1e2d;
+    --border: #2d2d3a;
+    --text-dark: #e5e7eb;
+    --text-muted: #9ca3af;
+    --soft-bg: #151521;
+    --chat-other: #2d2d3a;
+}
 
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-header" style="background: transparent;">
-                    <h5 style="color: var(--text-color); margin: 0;">
-                        <i class="bi bi-person me-2"></i>O'quvchi ma'lumotlari
-                    </h5>
+.page-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 20px;
+}
+@media (max-width: 992px) {
+    .page-grid { grid-template-columns: 1fr; }
+}
+
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+.card-head {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.card-head h6 { margin: 0; font-weight: 700; color: var(--text-dark); font-size: 0.9rem; }
+.card-body { padding: 18px; }
+
+/* Student Info */
+.student-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    background: var(--soft-bg);
+}
+.student-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+}
+.student-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 14px; }
+.student-details h5 { margin: 0; font-weight: 700; color: var(--text-dark); }
+.student-details p { margin: 4px 0 0; font-size: 0.8rem; color: var(--text-muted); }
+
+/* Status Badge */
+.status-lg {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+.status-lg.pending { background: rgba(245,158,11,0.12); color: #d97706; }
+.status-lg.reviewing { background: rgba(59,130,246,0.12); color: #2563eb; }
+.status-lg.revision { background: rgba(239,68,68,0.12); color: #dc2626; }
+.status-lg.accepted { background: rgba(16,185,129,0.12); color: #059669; }
+.status-lg.graded { background: rgba(139,92,246,0.12); color: #7c3aed; }
+
+/* Info Row */
+.info-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 14px 18px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+.info-row span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* File Preview */
+.file-preview {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: var(--soft-bg);
+    border-radius: 12px;
+    margin: 12px 18px;
+}
+.file-icon {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.2rem;
+}
+.file-info { flex: 1; }
+.file-info h6 { margin: 0; font-size: 0.85rem; color: var(--text-dark); }
+.file-info p { margin: 2px 0 0; font-size: 0.75rem; color: var(--text-muted); }
+.file-preview .btn { font-size: 0.8rem; padding: 6px 14px; border-radius: 8px; }
+
+/* Action Buttons */
+.action-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 14px 18px;
+    border-top: 1px solid var(--border);
+}
+.action-btns .btn {
+    flex: 1;
+    min-width: 100px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+/* Chat */
+.chat-container {
+    height: 400px;
+    overflow-y: auto;
+    padding: 14px;
+    background: var(--soft-bg);
+}
+.chat-empty {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+.chat-msg {
+    display: flex;
+    margin-bottom: 12px;
+}
+.chat-msg.mine { justify-content: flex-end; }
+.chat-bubble {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+.chat-msg.mine .chat-bubble {
+    background: var(--chat-mine);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+}
+.chat-msg.other .chat-bubble {
+    background: var(--chat-other);
+    color: var(--text-dark);
+    border-bottom-left-radius: 4px;
+}
+.chat-meta {
+    font-size: 0.65rem;
+    margin-top: 4px;
+    opacity: 0.7;
+}
+.chat-file {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(0,0,0,0.1);
+    border-radius: 8px;
+    margin-top: 8px;
+    font-size: 0.8rem;
+}
+.chat-msg.mine .chat-file { background: rgba(255,255,255,0.2); }
+
+.chat-input {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    border-top: 1px solid var(--border);
+    background: var(--card-bg);
+}
+.chat-input input[type="text"] {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--soft-bg);
+    color: var(--text-dark);
+    font-size: 0.85rem;
+}
+.chat-input .btn {
+    padding: 10px 16px;
+    border-radius: 10px;
+}
+
+/* Grade Form */
+.grade-form {
+    padding: 18px;
+}
+.grade-form label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    display: block;
+}
+.grade-form input,
+.grade-form textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--soft-bg);
+    color: var(--text-dark);
+    font-size: 0.9rem;
+    margin-bottom: 14px;
+}
+.grade-form textarea { resize: vertical; min-height: 80px; }
+
+/* Revision Note */
+.revision-modal-body { padding: 20px; }
+.revision-modal-body textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    min-height: 100px;
+    font-size: 0.9rem;
+}
+
+/* Revisions List */
+.revision-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.8rem;
+}
+.revision-item:last-child { border-bottom: none; }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <a href="{% url 'homework_submissions' %}" class="btn btn-sm btn-outline-secondary rounded-pill mb-2">
+            <i class="bi bi-arrow-left me-1"></i>Orqaga
+        </a>
+        <h4 class="mb-0 fw-bold"><i class="bi bi-journal-check text-primary me-2"></i>Vazifani tekshirish</h4>
+    </div>
+    <span class="status-lg {{ submission.status }}">
+        {% if submission.status == 'pending' %}⏳ Kutilmoqda
+        {% elif submission.status == 'reviewing' %}👀 Ko'rilmoqda
+        {% elif submission.status == 'revision' %}🔄 Qayta ishlash
+        {% elif submission.status == 'accepted' %}✅ Qabul qilindi
+        {% elif submission.status == 'graded' %}📊 {{ submission.grade }}%
+        {% endif %}
+    </span>
+</div>
+
+<div class="page-grid">
+    <!-- Left Column -->
+    <div>
+        <!-- Student & Homework Info -->
+        <div class="card">
+            <div class="student-info">
+                <div class="student-avatar">
+                    {% if submission.student.photo %}
+                    <img src="{{ submission.student.photo.url }}" alt="">
+                    {% else %}
+                    {{ submission.student.get_initials }}
+                    {% endif %}
                 </div>
-                <div class="card-body">
-                    <p><strong>Ism:</strong> {{ submission.student.full_name }}</p>
-                    <p><strong>Username:</strong> @{{ submission.student.username }}</p>
-                    <p><strong>Yo'nalish:</strong> {{ submission.homework.lesson.profession.name }}</p>
-                    <p><strong>Vazifa:</strong> {{ submission.homework.lesson.title }}</p>
-                    <p><strong>Yuborilgan:</strong> {{ submission.submitted_at|date:"d.m.Y H:i" }}</p>
-                    <a href="{{ submission.file.url }}" class="btn btn-primary w-100" target="_blank">
-                        <i class="bi bi-download me-2"></i>Faylni yuklab olish
-                    </a>
+                <div class="student-details">
+                    <h5>{{ submission.student.full_name }}</h5>
+                    <p>{{ submission.homework.lesson.title }} • {{ submission.homework.lesson.profession.name }}</p>
                 </div>
             </div>
+            
+            <div class="info-row">
+                <span><i class="bi bi-calendar3"></i> {{ submission.submitted_at|date:"d.m.Y H:i" }}</span>
+                <span><i class="bi bi-arrow-repeat"></i> Versiya: {{ submission.version }}</span>
+                {% if submission.is_late %}
+                <span class="text-danger"><i class="bi bi-clock"></i> Kech topshirilgan</span>
+                {% endif %}
+                {% if submission.revision_count > 0 %}
+                <span class="text-warning"><i class="bi bi-arrow-clockwise"></i> {{ submission.revision_count }}x qayta</span>
+                {% endif %}
+            </div>
+            
+            <!-- File -->
+            <div class="file-preview">
+                <div class="file-icon"><i class="bi bi-file-earmark-arrow-down"></i></div>
+                <div class="file-info">
+                    <h6>{{ submission.file.name|cut:"homework_submissions/" }}</h6>
+                    <p>Topshirilgan fayl</p>
+                </div>
+                <a href="{{ submission.file.url }}" target="_blank" class="btn btn-primary btn-sm">
+                    <i class="bi bi-download me-1"></i>Yuklab olish
+                </a>
+            </div>
+            
+            <!-- Homework Description -->
+            {% if submission.homework.description %}
+            <div class="card-body">
+                <h6 class="text-muted mb-2"><i class="bi bi-info-circle me-1"></i>Vazifa tavsifi</h6>
+                <p style="font-size: 0.9rem; color: var(--text-dark);">{{ submission.homework.description }}</p>
+            </div>
+            {% endif %}
+            
+            <!-- Action Buttons -->
+            {% if submission.status != 'graded' %}
+            <div class="action-btns">
+                {% if submission.status == 'pending' %}
+                <form method="POST" style="flex:1;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="set_reviewing">
+                    <button type="submit" class="btn btn-info w-100"><i class="bi bi-eye me-1"></i>Ko'rib chiqish</button>
+                </form>
+                {% endif %}
+                
+                {% if submission.status != 'accepted' %}
+                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#revisionModal">
+                    <i class="bi bi-arrow-repeat me-1"></i>Qayta ishlat
+                </button>
+                <form method="POST" style="flex:1;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="accept">
+                    <button type="submit" class="btn btn-success w-100"><i class="bi bi-check-lg me-1"></i>Qabul qilish</button>
+                </form>
+                {% endif %}
+            </div>
+            {% endif %}
         </div>
         
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header" style="background: transparent;">
-                    <h5 style="color: var(--text-color); margin: 0;">
-                        <i class="bi bi-check-circle me-2"></i>Baholash
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <form method="POST">
-                        {% csrf_token %}
-                        
-                        <div class="mb-3">
-                            <label class="form-label" style="color: var(--text-color);">Baho (1-100)</label>
-                            {{ form.grade }}
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="form-label" style="color: var(--text-color);">Izoh (ixtiyoriy)</label>
-                            {{ form.feedback }}
-                        </div>
-                        
-                        <button type="submit" class="btn btn-success w-100">
-                            <i class="bi bi-check-lg me-2"></i>Baholash
-                        </button>
-                    </form>
-                </div>
+        <!-- Previous Revisions -->
+        {% if revisions %}
+        <div class="card">
+            <div class="card-head">
+                <h6><i class="bi bi-clock-history me-2"></i>Oldingi versiyalar</h6>
             </div>
+            {% for rev in revisions %}
+            <div class="revision-item">
+                <i class="bi bi-file-earmark text-muted"></i>
+                <span style="flex:1;">{{ rev.note|default:"Versiya" }}</span>
+                <span class="text-muted">{{ rev.submitted_at|date:"d.m.Y H:i" }}</span>
+                <a href="{{ rev.file.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-download"></i>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Grade Form -->
+        <div class="card">
+            <div class="card-head">
+                <h6><i class="bi bi-star me-2" style="color: #f59e0b;"></i>Baholash</h6>
+            </div>
+            <form method="POST" enctype="multipart/form-data" class="grade-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="grade">
+                
+                <label>Ball (0-100)</label>
+                <input type="number" name="grade" min="0" max="100" value="{{ submission.grade|default:'' }}" required placeholder="Masalan: 85">
+                
+                <label>Izoh</label>
+                <textarea name="feedback" placeholder="O'quvchiga izoh yozing...">{{ submission.feedback|default:'' }}</textarea>
+                
+                <label>Izoh fayli (ixtiyoriy)</label>
+                <input type="file" name="feedback_file">
+                {% if submission.feedback_file %}
+                <p class="text-muted" style="font-size:0.8rem;">
+                    <i class="bi bi-paperclip me-1"></i>Mavjud: <a href="{{ submission.feedback_file.url }}" target="_blank">{{ submission.feedback_file.name|cut:"homework_feedback/" }}</a>
+                </p>
+                {% endif %}
+                
+                <button type="submit" class="btn btn-primary w-100 mt-2">
+                    <i class="bi bi-check-circle me-1"></i>Baholash
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Right Column: Chat -->
+    <div>
+        <div class="card" style="height: calc(100vh - 200px); display: flex; flex-direction: column;">
+            <div class="card-head">
+                <h6><i class="bi bi-chat-dots me-2" style="color: #8b5cf6;"></i>Chat</h6>
+                <span class="badge bg-secondary">{{ chat_messages.count }}</span>
+            </div>
+            
+            <div class="chat-container" id="chatContainer">
+                {% if chat_messages %}
+                {% for msg in chat_messages %}
+                <div class="chat-msg {% if msg.sender == request.user %}mine{% else %}other{% endif %}">
+                    <div class="chat-bubble">
+                        <div>{{ msg.message }}</div>
+                        {% if msg.file %}
+                        <a href="{{ msg.file.url }}" target="_blank" class="chat-file">
+                            <i class="bi bi-paperclip"></i>
+                            <span>Fayl</span>
+                        </a>
+                        {% endif %}
+                        <div class="chat-meta">
+                            {{ msg.sender.first_name }} • {{ msg.created_at|date:"H:i" }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="chat-empty">
+                    <i class="bi bi-chat-dots" style="font-size: 2rem; opacity: 0.3;"></i>
+                    <p class="mt-2">Hali xabarlar yo'q</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <form method="POST" enctype="multipart/form-data" class="chat-input">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="send_message">
+                <input type="text" name="message" placeholder="Xabar yozing..." autocomplete="off">
+                <label class="btn btn-outline-secondary" style="cursor:pointer;">
+                    <i class="bi bi-paperclip"></i>
+                    <input type="file" name="message_file" style="display:none;" onchange="this.form.submit()">
+                </label>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i></button>
+            </form>
         </div>
     </div>
 </div>
+
+<!-- Revision Modal -->
+<div class="modal fade" id="revisionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-arrow-repeat me-2"></i>Qayta ishlashga yuborish</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="request_revision">
+                <div class="revision-modal-body">
+                    <label class="form-label">Nima uchun qayta ishlash kerak?</label>
+                    <textarea name="revision_note" required placeholder="O'quvchiga nimani to'g'rilash kerakligini tushuntiring..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                    <button type="submit" class="btn btn-warning"><i class="bi bi-send me-1"></i>Yuborish</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Scroll to bottom of chat
+document.addEventListener('DOMContentLoaded', function() {
+    const chat = document.getElementById('chatContainer');
+    if (chat) chat.scrollTop = chat.scrollHeight;
+});
+</script>
 {% endblock %}
