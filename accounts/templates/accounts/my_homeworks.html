@@ -1,0 +1,233 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Mening vazifalarim{% endblock %}
+
+{% block content %}
+<style>
+:root {
+    --card-bg: #fff;
+    --border: #e5e7eb;
+    --text-dark: #1f2937;
+    --text-muted: #6b7280;
+    --soft-bg: #f8fafc;
+}
+[data-bs-theme="dark"] {
+    --card-bg: #1e1e2d;
+    --border: #2d2d3a;
+    --text-dark: #e5e7eb;
+    --text-muted: #9ca3af;
+    --soft-bg: #151521;
+}
+
+.container { max-width: 900px; }
+
+.page-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+.page-head h4 { margin: 0; font-weight: 700; color: var(--text-dark); }
+
+.stat-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+}
+@media (max-width: 768px) { .stat-row { grid-template-columns: repeat(2, 1fr); } }
+
+.stat-box {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    text-align: center;
+}
+.stat-box h3 { margin: 0; font-size: 1.5rem; font-weight: 800; color: var(--text-dark); }
+.stat-box p { margin: 4px 0 0; font-size: 0.75rem; color: var(--text-muted); }
+.stat-box.purple { border-top: 3px solid #8b5cf6; }
+.stat-box.orange { border-top: 3px solid #f59e0b; }
+.stat-box.red { border-top: 3px solid #ef4444; }
+.stat-box.green { border-top: 3px solid #10b981; }
+
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.hw-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+}
+.hw-item:last-child { border-bottom: none; }
+.hw-item:hover { background: var(--soft-bg); }
+
+.hw-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+.hw-icon.pending { background: rgba(245,158,11,0.12); color: #f59e0b; }
+.hw-icon.reviewing { background: rgba(59,130,246,0.12); color: #3b82f6; }
+.hw-icon.revision { background: rgba(239,68,68,0.12); color: #ef4444; }
+.hw-icon.accepted { background: rgba(16,185,129,0.12); color: #10b981; }
+.hw-icon.graded { background: rgba(139,92,246,0.12); color: #8b5cf6; }
+
+.hw-info { flex: 1; min-width: 0; }
+.hw-info h6 { margin: 0; font-weight: 600; color: var(--text-dark); font-size: 0.9rem; }
+.hw-info p { margin: 3px 0 0; font-size: 0.75rem; color: var(--text-muted); }
+
+.hw-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    flex-shrink: 0;
+}
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+.status-badge.pending { background: rgba(245,158,11,0.12); color: #d97706; }
+.status-badge.reviewing { background: rgba(59,130,246,0.12); color: #2563eb; }
+.status-badge.revision { background: rgba(239,68,68,0.12); color: #dc2626; }
+.status-badge.accepted { background: rgba(16,185,129,0.12); color: #059669; }
+.status-badge.graded { background: rgba(139,92,246,0.12); color: #7c3aed; }
+
+.msg-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 6px;
+    background: #ef4444;
+    color: #fff;
+    border-radius: 8px;
+    font-size: 0.65rem;
+    font-weight: 700;
+}
+
+.btn-chat {
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    background: var(--soft-bg);
+    color: var(--text-dark);
+    border: 1px solid var(--border);
+    transition: all 0.15s;
+}
+.btn-chat:hover { background: #8b5cf6; color: #fff; border-color: #8b5cf6; }
+.btn-chat.revision { background: rgba(239,68,68,0.1); border-color: #ef4444; color: #dc2626; }
+.btn-chat.revision:hover { background: #ef4444; color: #fff; }
+
+.empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+.empty i { font-size: 3rem; opacity: 0.3; margin-bottom: 12px; display: block; }
+</style>
+
+<div class="container py-4">
+    <div class="page-head">
+        <h4><i class="bi bi-journal-text text-primary me-2"></i>Mening Vazifalarim</h4>
+        <a href="{% url 'profile' %}" class="btn btn-sm btn-outline-secondary rounded-pill">
+            <i class="bi bi-arrow-left me-1"></i>Profilga
+        </a>
+    </div>
+    
+    <!-- Stats -->
+    <div class="stat-row">
+        <div class="stat-box purple">
+            <h3>{{ stats.total }}</h3>
+            <p>Jami</p>
+        </div>
+        <div class="stat-box orange">
+            <h3>{{ stats.pending }}</h3>
+            <p>Kutilmoqda</p>
+        </div>
+        <div class="stat-box red">
+            <h3>{{ stats.revision }}</h3>
+            <p>Qayta ishlash</p>
+        </div>
+        <div class="stat-box green">
+            <h3>{{ stats.avg_grade|floatformat:0 }}%</h3>
+            <p>O'rtacha baho</p>
+        </div>
+    </div>
+    
+    <!-- Submissions List -->
+    <div class="card">
+        {% if submissions %}
+        {% for sub in submissions %}
+        <div class="hw-item">
+            <div class="hw-icon {{ sub.status }}">
+                {% if sub.status == 'pending' %}<i class="bi bi-hourglass-split"></i>
+                {% elif sub.status == 'reviewing' %}<i class="bi bi-eye"></i>
+                {% elif sub.status == 'revision' %}<i class="bi bi-arrow-repeat"></i>
+                {% elif sub.status == 'accepted' %}<i class="bi bi-check-lg"></i>
+                {% elif sub.status == 'graded' %}<i class="bi bi-star-fill"></i>
+                {% endif %}
+            </div>
+            
+            <div class="hw-info">
+                <h6>
+                    {{ sub.homework.lesson.title }}
+                    {% if sub.unread_messages_count > 0 %}
+                    <span class="msg-badge"><i class="bi bi-chat-dots"></i> {{ sub.unread_messages_count }}</span>
+                    {% endif %}
+                </h6>
+                <p>
+                    {{ sub.homework.lesson.profession.name }}
+                    <span class="mx-1">•</span>
+                    {{ sub.submitted_at|date:"d.m.Y" }}
+                    {% if sub.version > 1 %}
+                    <span class="mx-1">•</span>
+                    <span class="text-warning">v{{ sub.version }}</span>
+                    {% endif %}
+                </p>
+            </div>
+            
+            <div class="hw-meta">
+                <span class="status-badge {{ sub.status }}">
+                    {% if sub.status == 'pending' %}Kutilmoqda
+                    {% elif sub.status == 'reviewing' %}Ko'rilmoqda
+                    {% elif sub.status == 'revision' %}Qayta ishlash!
+                    {% elif sub.status == 'accepted' %}Qabul qilindi
+                    {% elif sub.status == 'graded' %}{{ sub.grade }}%
+                    {% endif %}
+                </span>
+                {% if sub.is_late %}
+                <span style="font-size:0.65rem; color:#ef4444;">KECH</span>
+                {% endif %}
+            </div>
+            
+            <a href="{% url 'homework_chat' sub.pk %}" class="btn-chat {% if sub.status == 'revision' %}revision{% endif %}">
+                {% if sub.status == 'revision' %}
+                <i class="bi bi-arrow-repeat me-1"></i>Qayta topshirish
+                {% else %}
+                <i class="bi bi-chat-dots me-1"></i>Ko'rish
+                {% endif %}
+            </a>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="empty">
+            <i class="bi bi-inbox"></i>
+            <p>Siz hali vazifa topshirmagansiz</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
