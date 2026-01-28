@@ -66,3 +66,21 @@ class PostComment(models.Model):
     
     def __str__(self):
         return f"{self.user.full_name}: {self.content[:30]}"
+    
+    @property
+    def likes_count(self):
+        return self.likes.count()
+
+
+class CommentLike(models.Model):
+    comment = models.ForeignKey(PostComment, on_delete=models.CASCADE, related_name='likes')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='comment_likes')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['comment', 'user']
+        verbose_name = "Izoh Like"
+        verbose_name_plural = "Izoh Likelar"
+    
+    def __str__(self):
+        return f"{self.user.full_name} liked {self.comment}"
