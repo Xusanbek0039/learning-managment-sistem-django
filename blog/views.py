@@ -94,23 +94,21 @@ def toggle_like(request, pk):
     like = PostLike.objects.filter(post=post, user=request.user).first()
     
     if like:
-        # Unlike - coin qaytarib olinmaydi
+        # Unlike - coin qaytarib olish
+        if like.coin_awarded:
+            request.user.remove_coins(1, f"Postga like olib tashlandi: {post.title}")
+            messages.info(request, "Like olib tashlandi (-1 coin)")
         like.delete()
     else:
-        # Like - avval like bosgan bo'lsa coin berilmaydi
-        previous_like = PostLike.objects.filter(post=post, user=request.user, coin_awarded=True).exists()
-        like = PostLike.objects.create(post=post, user=request.user)
-        
-        if not previous_like:
-            # Birinchi marta like - coin berish
-            request.user.add_coins(1, f"Postga like bosildi: {post.title}")
-            like.coin_awarded = True
-            like.save()
-            ActivityLog.objects.create(
-                user=request.user,
-                action_type='like_post',
-                description=f"Postga like bosdi: {post.title}"
-            )
+        # Like - coin berish
+        like = PostLike.objects.create(post=post, user=request.user, coin_awarded=True)
+        request.user.add_coins(1, f"Postga like bosildi: {post.title}")
+        ActivityLog.objects.create(
+            user=request.user,
+            action_type='like_post',
+            description=f"Postga like bosdi: {post.title}"
+        )
+        messages.success(request, "Like bosildi (+1 coin)")
         
     return redirect('blog:post_detail', pk=pk)
 
