@@ -38,6 +38,7 @@ urlpatterns = [
     path('profile/change-password/', views.change_password_view, name='change_password'),
     path('profile/statistics/', views.student_statistics, name='my_statistics'),
     path('profile/statistics/pdf/', views.export_student_pdf, name='my_statistics_pdf'),
+    path('settings/', views.site_settings, name='site_settings'),
     
     # Kursdoshlar va boshqa o'quvchilar profili
     path('professions/<int:pk>/classmates/', views.classmates_view, name='classmates'),

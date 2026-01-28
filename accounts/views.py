@@ -480,6 +480,12 @@ def profile_view(request):
 
 
 @login_required
+def site_settings(request):
+    """Sayt sozlamalari sahifasi"""
+    return render(request, 'accounts/settings.html')
+
+
+@login_required
 def classmates_view(request, pk):
     """Kursdoshlar ro'yxati"""
     profession = get_object_or_404(Profession, pk=pk)

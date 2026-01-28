@@ -1,0 +1,198 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Sozlamalar - LMS{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h2 class="mb-4" style="color: var(--text-color);">
+                <i class="bi bi-gear me-2"></i>Sayt Sozlamalari
+            </h2>
+
+            <!-- Weather Effects -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0" style="color: var(--text-color);">
+                        <i class="bi bi-cloud-snow me-2"></i>Ob-havo Effektlari
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-4">Saytda ko'rinadigan fasliy effektlarni tanlang</p>
+                    
+                    <div class="row g-3">
+                        <!-- Off -->
+                        <div class="col-6 col-md-4">
+                            <div class="weather-option" data-effect="off">
+                                <div class="weather-icon">
+                                    <i class="bi bi-x-circle fs-1"></i>
+                                </div>
+                                <div class="weather-label">O'chirilgan</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Auto -->
+                        <div class="col-6 col-md-4">
+                            <div class="weather-option" data-effect="auto">
+                                <div class="weather-icon">
+                                    <i class="bi bi-magic fs-1"></i>
+                                </div>
+                                <div class="weather-label">Avtomatik</div>
+                                <small class="text-muted">Faslga qarab</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Winter / Snow -->
+                        <div class="col-6 col-md-4">
+                            <div class="weather-option" data-effect="winter">
+                                <div class="weather-icon">
+                                    ❄️
+                                </div>
+                                <div class="weather-label">Qor</div>
+                                <small class="text-muted">Qish rejimi</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Spring / Rain -->
+                        <div class="col-6 col-md-4">
+                            <div class="weather-option" data-effect="spring">
+                                <div class="weather-icon">
+                                    🌧️
+                                </div>
+                                <div class="weather-label">Yomg'ir</div>
+                                <small class="text-muted">Bahor rejimi</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Summer / Sun -->
+                        <div class="col-6 col-md-4">
+                            <div class="weather-option" data-effect="summer">
+                                <div class="weather-icon">
+                                    ☀️
+                                </div>
+                                <div class="weather-label">Quyosh</div>
+                                <small class="text-muted">Yoz rejimi</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Autumn / Leaves -->
+                        <div class="col-6 col-md-4">
+                            <div class="weather-option" data-effect="autumn">
+                                <div class="weather-icon">
+                                    🍁
+                                </div>
+                                <div class="weather-label">Kuz</div>
+                                <small class="text-muted">Barglar</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theme Settings -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0" style="color: var(--text-color);">
+                        <i class="bi bi-palette me-2"></i>Mavzu
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex gap-3">
+                        <button class="btn btn-outline-secondary theme-btn" data-theme="light">
+                            <i class="bi bi-sun me-2"></i>Yorug'
+                        </button>
+                        <button class="btn btn-outline-secondary theme-btn" data-theme="dark">
+                            <i class="bi bi-moon me-2"></i>Qorong'u
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <a href="{% url 'profile' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Profilga qaytish
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .weather-option {
+        background: var(--card-bg, #fff);
+        border: 2px solid var(--border-color, #e5e7eb);
+        border-radius: 16px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .weather-option:hover {
+        border-color: var(--primary-blue, #6366f1);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.15);
+    }
+    
+    .weather-option.active {
+        border-color: var(--primary-blue, #6366f1);
+        background: rgba(99, 102, 241, 0.1);
+    }
+    
+    .weather-icon {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+    
+    .weather-label {
+        font-weight: 600;
+        color: var(--text-color);
+    }
+    
+    .theme-btn.active {
+        background: var(--primary-blue);
+        color: white;
+        border-color: var(--primary-blue);
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Weather effect
+    const currentEffect = localStorage.getItem('weatherEffect') || 'auto';
+    document.querySelectorAll('.weather-option').forEach(opt => {
+        if (opt.dataset.effect === currentEffect) {
+            opt.classList.add('active');
+        }
+        
+        opt.addEventListener('click', function() {
+            document.querySelectorAll('.weather-option').forEach(o => o.classList.remove('active'));
+            this.classList.add('active');
+            
+            const effect = this.dataset.effect;
+            localStorage.setItem('weatherEffect', effect);
+            
+            // Reload to apply
+            location.reload();
+        });
+    });
+    
+    // Theme
+    const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+        if (btn.dataset.theme === currentTheme) {
+            btn.classList.add('active');
+        }
+        
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            const theme = this.dataset.theme;
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            localStorage.setItem('theme', theme);
+        });
+    });
+});
+</script>
+{% endblock %}
