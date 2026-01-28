@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
-from .models import Post, PostComment, PostLike
+from .models import Post, PostComment, PostLike, CommentLike
 from .forms import PostForm, CommentForm
 from coin.models import ActivityLog
 
@@ -169,3 +169,25 @@ def post_delete(request, pk):
         return redirect('blog:admin_posts')
     
     return render(request, 'blog/post_delete.html', {'post': post})
+
+
+@login_required
+def toggle_comment_like(request, pk):
+    comment = get_object_or_404(PostComment, pk=pk)
+    like = CommentLike.objects.filter(comment=comment, user=request.user).first()
+    
+    if like:
+        like.delete()
+        comment.user.remove_coins(1, f"Izohga like olib tashlandi")
+        messages.info(request, "Like olib tashlandi (-1 coin izoh egasidan)")
+    else:
+        CommentLike.objects.create(comment=comment, user=request.user)
+        comment.user.add_coins(1, f"Izohga like olindi")
+        ActivityLog.objects.create(
+            user=comment.user,
+            action_type='comment_liked',
+            description=f"Izohga like olindi: {comment.content[:30]}"
+        )
+        messages.success(request, "Like bosildi (+1 coin izoh egasiga)")
+    
+    return redirect('blog:post_detail', pk=comment.post.pk)
