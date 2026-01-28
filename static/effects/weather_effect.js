@@ -2,10 +2,15 @@ const box = document.getElementById("weather_effect");
 
 /* Sozlamalardan o'qish */
 const savedEffect = localStorage.getItem('weatherEffect') || 'auto';
+console.log('Weather effect setting:', savedEffect);
 
-/* Agar o'chirilgan bo'lsa, hech narsa qilmaymiz */
+/* Agar o'chirilgan bo'lsa, box ni yashiramiz va to'xtatamiz */
 if (savedEffect === 'off') {
-    // Weather effect o'chirilgan
+    console.log('Weather OFF - hiding box');
+    if (box) {
+        box.style.display = 'none';
+        box.innerHTML = '';
+    }
 } else {
     let season;
     
