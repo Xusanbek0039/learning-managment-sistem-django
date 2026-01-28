@@ -1,667 +1,433 @@
 {% extends 'accounts/admin/base_admin.html' %}
 {% load static %}
 
-{% block title %}Darslar Tahlili{% endblock %}
-
-{% block extra_css %}
-<style>
-/* ===== SCOPED STYLES - ls prefix ===== */
-.ls-wrap { color: var(--text-color, #1f2937); }
-
-.ls-wrap .ls-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin-bottom: 20px;
-}
-.ls-wrap .ls-head h4 {
-    margin: 0;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-/* Alerts */
-.ls-alerts {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    padding-bottom: 4px;
-    margin-bottom: 16px;
-}
-.ls-alert {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    background: var(--card-bg, #fff);
-    border: 1px solid var(--border-color, #e5e7eb);
-    border-radius: 10px;
-    white-space: nowrap;
-    font-size: 0.8rem;
-    font-weight: 500;
-    flex-shrink: 0;
-}
-.ls-alert.warn { border-left: 3px solid #f59e0b; }
-.ls-alert.warn i { color: #f59e0b; }
-.ls-alert.danger { border-left: 3px solid #ef4444; }
-.ls-alert.danger i { color: #ef4444; }
-.ls-alert.info { border-left: 3px solid #3b82f6; }
-.ls-alert.info i { color: #3b82f6; }
-.ls-alert.primary { border-left: 3px solid #8b5cf6; }
-.ls-alert.primary i { color: #8b5cf6; }
-
-/* Filter */
-.ls-filter {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-}
-.ls-filter input,
-.ls-filter select {
-    padding: 8px 12px !important;
-    border: 1px solid var(--border-color, #e5e7eb) !important;
-    border-radius: 10px !important;
-    background: var(--card-bg, #fff) !important;
-    color: var(--text-color, #1f2937) !important;
-    font-size: 0.85rem !important;
-}
-.ls-filter .ls-btn-search {
-    padding: 8px 16px;
-    background: #8b5cf6;
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    font-weight: 600;
-    cursor: pointer;
-}
-.ls-filter .ls-btn-clear {
-    padding: 8px 12px;
-    background: var(--bg-color, #f8fafc);
-    color: var(--text-color, #6b7280);
-    border: 1px solid var(--border-color, #e5e7eb);
-    border-radius: 10px;
-    cursor: pointer;
-    text-decoration: none;
-}
-
-/* Stats Grid */
-.ls-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 12px;
-    margin-bottom: 20px;
-}
-.ls-stat {
-    background: var(--card-bg, #fff);
-    border: 1px solid var(--border-color, #e5e7eb);
-    border-radius: 16px;
-    padding: 16px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
-.ls-stat::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-}
-.ls-stat.purple::before { background: #8b5cf6; }
-.ls-stat.blue::before { background: #3b82f6; }
-.ls-stat.green::before { background: #10b981; }
-.ls-stat.orange::before { background: #f59e0b; }
-.ls-stat.pink::before { background: #ec4899; }
-.ls-stat.red::before { background: #ef4444; }
-.ls-stat i { font-size: 1.4rem; margin-bottom: 8px; display: block; }
-.ls-stat.purple i { color: #8b5cf6; }
-.ls-stat.blue i { color: #3b82f6; }
-.ls-stat.green i { color: #10b981; }
-.ls-stat.orange i { color: #f59e0b; }
-.ls-stat.pink i { color: #ec4899; }
-.ls-stat.red i { color: #ef4444; }
-.ls-stat h3 { margin: 0; font-size: 1.5rem; font-weight: 800; }
-.ls-stat span { font-size: 0.7rem; color: var(--text-muted, #6b7280); text-transform: uppercase; }
-
-/* Chart */
-.ls-chart {
-    background: var(--card-bg, #fff);
-    border: 1px solid var(--border-color, #e5e7eb);
-    border-radius: 16px;
-    padding: 16px;
-    margin-bottom: 20px;
-}
-.ls-chart h6 { margin: 0 0 12px; font-weight: 600; font-size: 0.9rem; }
-
-/* Tabs */
-.ls-tabs {
-    display: flex;
-    gap: 4px;
-    background: var(--bg-color, #f8fafc);
-    padding: 4px;
-    border-radius: 10px;
-    margin-bottom: 16px;
-    overflow-x: auto;
-}
-.ls-tab {
-    flex: 1;
-    min-width: 80px;
-    padding: 10px 12px;
-    background: transparent;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-muted, #6b7280);
-    cursor: pointer;
-    white-space: nowrap;
-}
-.ls-tab:hover { color: var(--text-color, #1f2937); }
-.ls-tab.active {
-    background: var(--card-bg, #fff);
-    color: #8b5cf6;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-}
-.ls-tab i { margin-right: 4px; }
-
-.ls-panel { display: none; }
-.ls-panel.active { display: block; animation: lsFadeIn 0.2s ease; }
-@keyframes lsFadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-/* Card */
-.ls-card {
-    background: var(--card-bg, #fff) !important;
-    border: 1px solid var(--border-color, #e5e7eb) !important;
-    border-radius: 16px !important;
-    margin-bottom: 16px;
-    overflow: hidden;
-}
-.ls-card-head {
-    padding: 12px 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--border-color, #e5e7eb);
-}
-.ls-card-head h6 {
-    margin: 0;
-    font-size: 0.85rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.ls-badge {
-    background: var(--bg-color, #f8fafc);
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--text-muted, #6b7280);
-}
-
-/* List Item */
-.ls-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border-color, #e5e7eb);
-    transition: background 0.15s;
-}
-.ls-item:last-child { border-bottom: none; }
-.ls-item:hover { background: var(--bg-color, #f8fafc); }
-
-.ls-avatar {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 0.8rem;
-    color: #fff;
-    flex-shrink: 0;
-}
-.ls-avatar.purple { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
-.ls-avatar.blue { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
-.ls-avatar.green { background: linear-gradient(135deg, #10b981, #34d399); }
-.ls-avatar.orange { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
-.ls-avatar.red { background: linear-gradient(135deg, #ef4444, #f87171); }
-.ls-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
-
-.ls-info { flex: 1; min-width: 0; }
-.ls-info h6 { margin: 0; font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ls-info p { margin: 2px 0 0; font-size: 0.75rem; color: var(--text-muted, #6b7280); }
-
-.ls-mini {
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    background: var(--bg-color, #f8fafc);
-    color: var(--text-muted, #6b7280);
-}
-.ls-mini.success { background: rgba(16,185,129,0.1); color: #059669; }
-.ls-mini.danger { background: rgba(239,68,68,0.1); color: #dc2626; }
-
-.ls-btn-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    border: none;
-    background: var(--bg-color, #f8fafc);
-    color: var(--text-muted, #6b7280);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-}
-.ls-btn-icon:hover { background: #8b5cf6; color: #fff; }
-
-/* Lesson */
-.ls-lesson {
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border-color, #e5e7eb);
-}
-.ls-lesson:last-child { border-bottom: none; }
-.ls-lesson:hover { background: var(--bg-color, #f8fafc); }
-
-.ls-lesson-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-.ls-lesson-title { font-size: 0.85rem; font-weight: 600; margin: 0; }
-.ls-lesson-sub { font-size: 0.7rem; color: var(--text-muted, #6b7280); margin: 2px 0 0; }
-
-.ls-rate {
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    flex-shrink: 0;
-}
-.ls-rate.high { background: rgba(16,185,129,0.1); color: #059669; }
-.ls-rate.mid { background: rgba(245,158,11,0.1); color: #d97706; }
-.ls-rate.low { background: rgba(239,68,68,0.1); color: #dc2626; }
-
-.ls-progress {
-    height: 6px;
-    background: var(--bg-color, #f8fafc);
-    border-radius: 6px;
-    overflow: hidden;
-    margin-bottom: 10px;
-}
-.ls-progress-fill {
-    height: 100%;
-    border-radius: 6px;
-}
-.ls-progress-fill.high { background: linear-gradient(90deg, #10b981, #34d399); }
-.ls-progress-fill.mid { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
-.ls-progress-fill.low { background: linear-gradient(90deg, #ef4444, #f87171); }
-
-.ls-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    font-size: 0.75rem;
-    color: var(--text-muted, #6b7280);
-}
-.ls-meta span { display: flex; align-items: center; gap: 4px; }
-.ls-meta .success { color: #10b981; }
-.ls-meta .danger { color: #ef4444; }
-.ls-meta .warning { color: #f59e0b; }
-
-/* Grid */
-.ls-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-@media (max-width: 768px) { .ls-grid { grid-template-columns: 1fr; } }
-
-/* Empty */
-.ls-empty {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--text-muted, #6b7280);
-}
-.ls-empty i { font-size: 2.5rem; opacity: 0.3; margin-bottom: 10px; display: block; }
-
-/* Question */
-.ls-q {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border-color, #e5e7eb);
-}
-.ls-q:last-child { border-bottom: none; }
-.ls-q-text { font-size: 0.85rem; margin: 0 0 6px; line-height: 1.4; }
-.ls-q-meta {
-    display: flex;
-    gap: 12px;
-    font-size: 0.7rem;
-    color: var(--text-muted, #6b7280);
-}
-.ls-q-err {
-    background: rgba(239,68,68,0.1);
-    color: #dc2626;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-weight: 700;
-}
-</style>
-{% endblock %}
+{% block title %}Darslar Tahlili - Admin Panel{% endblock %}
 
 {% block admin_content %}
-<div class="ls-wrap">
-
-<!-- Header -->
-<div class="ls-head">
-    <h4><i class="bi bi-bar-chart-line-fill" style="color:#8b5cf6"></i> Darslar Tahlili</h4>
-    <a href="{% url 'admin_reports' %}" class="btn btn-sm btn-outline-primary rounded-pill">
-        <i class="bi bi-file-pdf me-1"></i>PDF
-    </a>
+<!-- Top Bar -->
+<div class="top-bar">
+    <h1 class="page-title"><i class="bi bi-bar-chart-line me-2"></i>Darslar Tahlili</h1>
+    <div class="d-flex gap-2">
+        <a href="{% url 'admin_reports' %}" class="btn btn-primary">
+            <i class="bi bi-file-pdf me-2"></i>PDF Hisobot
+        </a>
+    </div>
 </div>
 
-<!-- Alerts -->
+<!-- Ogohlantirishlar -->
 {% if alerts %}
-<div class="ls-alerts">
+<div class="row g-2 mb-4">
     {% for a in alerts %}
-    <div class="ls-alert {{ a.type }}">
-        <i class="bi {{ a.icon }}"></i>
-        <span>{{ a.title }}</span>
+    <div class="col-md-3">
+        <div class="alert alert-{{ a.type }} d-flex align-items-center gap-2 mb-0 py-2">
+            <i class="bi {{ a.icon }}"></i>
+            <small>{{ a.title }}</small>
+        </div>
     </div>
     {% endfor %}
 </div>
 {% endif %}
 
 <!-- Filter -->
-<form method="GET" class="ls-filter">
-    <input type="text" name="q" placeholder="🔍 Qidirish..." value="{{ search_query }}" style="flex:1; max-width:180px;">
-    <select name="profession" style="max-width:160px;">
-        <option value="">Barcha kurslar</option>
-        {% for p in professions %}
-        <option value="{{ p.pk }}" {% if selected_profession == p.pk|stringformat:"i" %}selected{% endif %}>{{ p.name }}</option>
-        {% endfor %}
-    </select>
-    <input type="date" name="date_from" value="{% if date_from %}{{ date_from|date:'Y-m-d' }}{% endif %}" style="max-width:130px;">
-    <input type="date" name="date_to" value="{% if date_to %}{{ date_to|date:'Y-m-d' }}{% endif %}" style="max-width:130px;">
-    <button type="submit" class="ls-btn-search"><i class="bi bi-search"></i></button>
-    <a href="{% url 'admin_lesson_statistics' %}" class="ls-btn-clear"><i class="bi bi-x-lg"></i></a>
-</form>
-
-<!-- Stats -->
-<div class="ls-stats">
-    <div class="ls-stat purple">
-        <i class="bi bi-journal-bookmark-fill"></i>
-        <h3>{{ total_lessons }}</h3>
-        <span>Darslar</span>
-    </div>
-    <div class="ls-stat blue">
-        <i class="bi bi-people-fill"></i>
-        <h3>{{ active_students }}<small style="font-size:0.7rem;opacity:0.7">/{{ total_students }}</small></h3>
-        <span>Faol</span>
-    </div>
-    <div class="ls-stat green">
-        <i class="bi bi-play-circle-fill"></i>
-        <h3>{{ total_video_views }}</h3>
-        <span>Ko'rilgan</span>
-    </div>
-    <div class="ls-stat orange">
-        <i class="bi bi-clipboard-check-fill"></i>
-        <h3>{{ total_test_attempts }}</h3>
-        <span>Test</span>
-    </div>
-    <div class="ls-stat pink">
-        <i class="bi bi-percent"></i>
-        <h3>{{ avg_test_score }}%</h3>
-        <span>O'rtacha</span>
-    </div>
-    <div class="ls-stat red">
-        <i class="bi bi-check2-circle"></i>
-        <h3>{{ completion_percent }}%</h3>
-        <span>Tugallangan</span>
-    </div>
-</div>
-
-<!-- Chart -->
-<div class="ls-chart">
-    <h6><i class="bi bi-graph-up me-2" style="color:#8b5cf6"></i>Kunlik faollik (30 kun)</h6>
-    <canvas id="lsActivityChart" height="80"></canvas>
-</div>
-
-<!-- Tabs -->
-<div class="ls-tabs">
-    <button class="ls-tab active" onclick="lsOpenTab(event,'lsTab1')"><i class="bi bi-grid"></i>Umumiy</button>
-    <button class="ls-tab" onclick="lsOpenTab(event,'lsTab2')"><i class="bi bi-camera-video"></i>Video</button>
-    <button class="ls-tab" onclick="lsOpenTab(event,'lsTab3')"><i class="bi bi-clipboard"></i>Test</button>
-    <button class="ls-tab" onclick="lsOpenTab(event,'lsTab4')"><i class="bi bi-journal"></i>Vazifa</button>
-    <button class="ls-tab" onclick="lsOpenTab(event,'lsTab5')"><i class="bi bi-people"></i>O'quvchi</button>
-</div>
-
-<!-- TAB 1 -->
-<div class="ls-panel active" id="lsTab1">
-    <div class="ls-grid">
-        <div class="ls-card">
-            <div class="ls-card-head">
-                <h6><i class="bi bi-award-fill" style="color:#10b981"></i>Sertifikatga yaqin</h6>
-                <span class="ls-badge">{{ near_certificate_students|length }}</span>
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small">Qidirish</label>
+                <input type="text" name="q" class="form-control" placeholder="Dars nomi..." value="{{ search_query }}">
             </div>
-            {% if near_certificate_students %}
-            {% for s in near_certificate_students %}
-            <div class="ls-item">
-                <div class="ls-avatar green">{% if s.student.photo %}<img src="{{ s.student.photo.url }}">{% else %}{{ s.student.get_initials }}{% endif %}</div>
-                <div class="ls-info"><h6>{{ s.student.full_name }}</h6><p>{{ s.profession.name }} • {{ s.remaining }} dars qoldi</p></div>
-                <span class="ls-mini success">{{ s.progress }}%</span>
+            <div class="col-md-3">
+                <label class="form-label small">Kurs</label>
+                <select name="profession" class="form-select">
+                    <option value="">Barcha kurslar</option>
+                    {% for p in professions %}
+                    <option value="{{ p.pk }}" {% if selected_profession == p.pk|stringformat:"i" %}selected{% endif %}>{{ p.name }}</option>
+                    {% endfor %}
+                </select>
             </div>
-            {% endfor %}
-            {% else %}
-            <div class="ls-empty"><i class="bi bi-award"></i><p>Hozircha yo'q</p></div>
-            {% endif %}
+            <div class="col-md-2">
+                <label class="form-label small">Dan</label>
+                <input type="date" name="date_from" class="form-control" value="{% if date_from %}{{ date_from|date:'Y-m-d' }}{% endif %}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Gacha</label>
+                <input type="date" name="date_to" class="form-control" value="{% if date_to %}{{ date_to|date:'Y-m-d' }}{% endif %}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search me-1"></i>Qidirish</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Statistika kartochkalari -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card text-center">
+            <div class="stat-icon purple mx-auto mb-2"><i class="bi bi-journal-bookmark"></i></div>
+            <div class="stat-number">{{ total_lessons }}</div>
+            <div class="stat-label">Jami darslar</div>
         </div>
-        
-        <div class="ls-card">
-            <div class="ls-card-head">
-                <h6><i class="bi bi-trophy-fill" style="color:#f59e0b"></i>TOP Videolar</h6>
-            </div>
-            {% if top_video_lessons %}
-            {% for v in top_video_lessons|slice:":5" %}
-            <div class="ls-item">
-                <div class="ls-avatar blue">{{ forloop.counter }}</div>
-                <div class="ls-info"><h6>{{ v.lesson.title }}</h6><p>{{ v.lesson.profession.name }}</p></div>
-                <span class="ls-mini">{{ v.watched }} ko'rilgan</span>
-            </div>
-            {% endfor %}
-            {% else %}
-            <div class="ls-empty"><i class="bi bi-camera-video"></i><p>Ma'lumot yo'q</p></div>
-            {% endif %}
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card text-center">
+            <div class="stat-icon blue mx-auto mb-2"><i class="bi bi-people"></i></div>
+            <div class="stat-number">{{ active_students }}/{{ total_students }}</div>
+            <div class="stat-label">Faol o'quvchilar</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card text-center">
+            <div class="stat-icon green mx-auto mb-2"><i class="bi bi-play-circle"></i></div>
+            <div class="stat-number">{{ total_video_views }}</div>
+            <div class="stat-label">Ko'rilgan videolar</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card text-center">
+            <div class="stat-icon orange mx-auto mb-2"><i class="bi bi-clipboard-check"></i></div>
+            <div class="stat-number">{{ total_test_attempts }}</div>
+            <div class="stat-label">Test urinishlari</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card text-center">
+            <div class="stat-icon cyan mx-auto mb-2"><i class="bi bi-percent"></i></div>
+            <div class="stat-number">{{ avg_test_score }}%</div>
+            <div class="stat-label">O'rtacha ball</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="stat-card text-center">
+            <div class="stat-icon red mx-auto mb-2"><i class="bi bi-check2-circle"></i></div>
+            <div class="stat-number">{{ completion_percent }}%</div>
+            <div class="stat-label">Tugallangan</div>
         </div>
     </div>
 </div>
 
-<!-- TAB 2 -->
-<div class="ls-panel" id="lsTab2">
-    <div class="ls-card">
-        <div class="ls-card-head">
-            <h6><i class="bi bi-camera-video-fill" style="color:#3b82f6"></i>Video darslar</h6>
-            <span class="ls-badge">{{ video_stats|length }}</span>
-        </div>
-        {% if video_stats %}
-        {% for v in video_stats %}
-        <div class="ls-lesson">
-            <div class="ls-lesson-top">
-                <div><h6 class="ls-lesson-title">{{ v.lesson.title }}</h6><p class="ls-lesson-sub">{{ v.lesson.profession.name }}</p></div>
-                <span class="ls-rate {% if v.completion_rate >= 70 %}high{% elif v.completion_rate >= 40 %}mid{% else %}low{% endif %}">{{ v.completion_rate }}%</span>
-            </div>
-            <div class="ls-progress"><div class="ls-progress-fill {% if v.completion_rate >= 70 %}high{% elif v.completion_rate >= 40 %}mid{% else %}low{% endif %}" style="width:{{ v.completion_rate }}%"></div></div>
-            <div class="ls-meta">
-                <span><i class="bi bi-eye success"></i> {{ v.total_views }} ochilgan</span>
-                <span><i class="bi bi-check-circle success"></i> {{ v.watched }} ko'rgan</span>
-                <span><i class="bi bi-x-circle danger"></i> {{ v.not_watched }} ko'rmagan</span>
-            </div>
-        </div>
-        {% endfor %}
-        {% else %}
-        <div class="ls-empty"><i class="bi bi-camera-video"></i><p>Video darslar yo'q</p></div>
-        {% endif %}
+<!-- Grafik -->
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-graph-up me-2"></i>Kunlik faollik (oxirgi 30 kun)</div>
+    <div class="card-body">
+        <canvas id="activityChart" height="100"></canvas>
     </div>
 </div>
 
-<!-- TAB 3 -->
-<div class="ls-panel" id="lsTab3">
-    <div class="ls-grid">
-        <div class="ls-card">
-            <div class="ls-card-head">
-                <h6><i class="bi bi-clipboard-check-fill" style="color:#10b981"></i>Testlar</h6>
-                <span class="ls-badge">{{ test_stats|length }}</span>
-            </div>
-            {% if test_stats %}
-            {% for t in test_stats %}
-            <div class="ls-lesson">
-                <div class="ls-lesson-top">
-                    <div><h6 class="ls-lesson-title">{{ t.lesson.title }}</h6><p class="ls-lesson-sub">{{ t.lesson.profession.name }}</p></div>
-                    <span class="ls-rate {% if t.avg_score >= 70 %}high{% elif t.avg_score >= 50 %}mid{% else %}low{% endif %}">{{ t.avg_score }}%</span>
-                </div>
-                <div class="ls-progress"><div class="ls-progress-fill {% if t.pass_rate >= 70 %}high{% elif t.pass_rate >= 50 %}mid{% else %}low{% endif %}" style="width:{{ t.pass_rate }}%"></div></div>
-                <div class="ls-meta">
-                    <span><i class="bi bi-people"></i> {{ t.total_attempts }} urinish</span>
-                    <span><i class="bi bi-check-circle success"></i> {{ t.passed_count }} o'tdi</span>
-                    <span><i class="bi bi-x-circle danger"></i> {{ t.failed_count }} yiqildi</span>
-                    <span><i class="bi bi-arrow-repeat warning"></i> {{ t.retry_students }} qayta</span>
+<!-- Tab Navigation -->
+<ul class="nav nav-tabs mb-3" id="statTabs" role="tablist">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabOverview"><i class="bi bi-grid me-1"></i>Umumiy</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabVideos"><i class="bi bi-camera-video me-1"></i>Videolar</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabTests"><i class="bi bi-clipboard me-1"></i>Testlar</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabHomework"><i class="bi bi-journal-text me-1"></i>Vazifalar</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabStudents"><i class="bi bi-people me-1"></i>O'quvchilar</a></li>
+</ul>
+
+<div class="tab-content">
+    <!-- Umumiy -->
+    <div class="tab-pane fade show active" id="tabOverview">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <span><i class="bi bi-award me-2 text-success"></i>Sertifikatga yaqin o'quvchilar</span>
+                        <span class="badge bg-success">{{ near_certificate_students|length }}</span>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if near_certificate_students %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <tbody>
+                                    {% for s in near_certificate_students %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                {% if s.student.photo %}
+                                                <img src="{{ s.student.photo.url }}" class="user-avatar-sm">
+                                                {% else %}
+                                                <div class="user-avatar-placeholder">{{ s.student.get_initials }}</div>
+                                                {% endif %}
+                                                <div>
+                                                    <div class="fw-bold">{{ s.student.full_name }}</div>
+                                                    <small class="text-muted">{{ s.profession.name }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-end">
+                                            <span class="badge bg-success">{{ s.progress }}%</span>
+                                            <small class="text-muted d-block">{{ s.remaining }} dars qoldi</small>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5 text-muted">
+                            <i class="bi bi-award fs-1 opacity-25"></i>
+                            <p class="mt-2">Hozircha yo'q</p>
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
-            {% endfor %}
-            {% else %}
-            <div class="ls-empty"><i class="bi bi-clipboard"></i><p>Testlar yo'q</p></div>
-            {% endif %}
-        </div>
-        
-        <div class="ls-card">
-            <div class="ls-card-head">
-                <h6><i class="bi bi-exclamation-diamond-fill" style="color:#ef4444"></i>Qiyin savollar</h6>
-                <span class="ls-badge">{{ hardest_questions|length }}</span>
-            </div>
-            {% if hardest_questions %}
-            {% for q in hardest_questions %}
-            <div class="ls-q">
-                <p class="ls-q-text">{{ q.question.question_text|truncatewords:15 }}</p>
-                <div class="ls-q-meta">
-                    <span>{{ q.test.lesson.title }}</span>
-                    <span>{{ q.total_answered }} javob</span>
-                    <span class="ls-q-err">{{ q.error_rate }}% xato</span>
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header"><i class="bi bi-trophy me-2 text-warning"></i>TOP-5 Videolar</div>
+                    <div class="card-body p-0">
+                        {% if top_video_lessons %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <tbody>
+                                    {% for v in top_video_lessons|slice:":5" %}
+                                    <tr>
+                                        <td width="40"><span class="badge bg-primary">{{ forloop.counter }}</span></td>
+                                        <td>
+                                            <div class="fw-bold">{{ v.lesson.title }}</div>
+                                            <small class="text-muted">{{ v.lesson.profession.name }}</small>
+                                        </td>
+                                        <td class="text-end"><span class="badge bg-info">{{ v.watched }} ko'rilgan</span></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5 text-muted"><i class="bi bi-camera-video fs-1 opacity-25"></i><p class="mt-2">Ma'lumot yo'q</p></div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
-            {% endfor %}
-            {% else %}
-            <div class="ls-empty"><i class="bi bi-question-circle"></i><p>Qiyin savol yo'q</p></div>
-            {% endif %}
         </div>
     </div>
-</div>
-
-<!-- TAB 4 -->
-<div class="ls-panel" id="lsTab4">
-    <div class="ls-card">
-        <div class="ls-card-head">
-            <h6><i class="bi bi-journal-text" style="color:#f59e0b"></i>Uy vazifalari</h6>
-            <span class="ls-badge">{{ homework_stats|length }}</span>
-        </div>
-        {% if homework_stats %}
-        {% for h in homework_stats %}
-        <div class="ls-lesson">
-            <div class="ls-lesson-top">
-                <div><h6 class="ls-lesson-title">{{ h.lesson.title }}</h6><p class="ls-lesson-sub">{{ h.lesson.profession.name }}</p></div>
-                <span class="ls-rate {% if h.completion_rate >= 70 %}high{% elif h.completion_rate >= 40 %}mid{% else %}low{% endif %}">{{ h.completion_rate }}%</span>
+    
+    <!-- Videolar -->
+    <div class="tab-pane fade" id="tabVideos">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <span><i class="bi bi-camera-video me-2"></i>Video darslar statistikasi</span>
+                <span class="badge bg-primary">{{ video_stats|length }}</span>
             </div>
-            <div class="ls-progress"><div class="ls-progress-fill {% if h.completion_rate >= 70 %}high{% elif h.completion_rate >= 40 %}mid{% else %}low{% endif %}" style="width:{{ h.completion_rate }}%"></div></div>
-            <div class="ls-meta">
-                <span><i class="bi bi-check-circle success"></i> {{ h.submitted }} topshirgan</span>
-                <span><i class="bi bi-x-circle danger"></i> {{ h.not_submitted }} topshirmagan</span>
-                <span><i class="bi bi-hourglass warning"></i> {{ h.pending_count }} kutilmoqda</span>
-                <span><i class="bi bi-star-fill" style="color:#f59e0b"></i> {{ h.avg_grade }}%</span>
+            <div class="card-body p-0">
+                {% if video_stats %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr><th>Dars</th><th>Kurs</th><th>Ko'rilgan</th><th>Ko'rilmagan</th><th>Foiz</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for v in video_stats %}
+                            <tr>
+                                <td class="fw-bold">{{ v.lesson.title }}</td>
+                                <td><small class="text-muted">{{ v.lesson.profession.name }}</small></td>
+                                <td><span class="text-success"><i class="bi bi-check-circle me-1"></i>{{ v.watched }}</span></td>
+                                <td><span class="text-danger"><i class="bi bi-x-circle me-1"></i>{{ v.not_watched }}</span></td>
+                                <td>
+                                    <div class="progress" style="height:8px;width:80px;">
+                                        <div class="progress-bar {% if v.completion_rate >= 70 %}bg-success{% elif v.completion_rate >= 40 %}bg-warning{% else %}bg-danger{% endif %}" style="width:{{ v.completion_rate }}%"></div>
+                                    </div>
+                                    <small>{{ v.completion_rate }}%</small>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted"><i class="bi bi-camera-video fs-1 opacity-25"></i><p class="mt-2">Video darslar yo'q</p></div>
+                {% endif %}
             </div>
-        </div>
-        {% endfor %}
-        {% else %}
-        <div class="ls-empty"><i class="bi bi-journal"></i><p>Vazifalar yo'q</p></div>
-        {% endif %}
-    </div>
-</div>
-
-<!-- TAB 5 -->
-<div class="ls-panel" id="lsTab5">
-    <div class="ls-grid">
-        <div class="ls-card">
-            <div class="ls-card-head">
-                <h6><i class="bi bi-moon-stars-fill" style="color:#8b5cf6"></i>Passiv (7+ kun)</h6>
-                <span class="ls-badge">{{ passive_students|length }}</span>
-            </div>
-            {% if passive_students %}
-            {% for s in passive_students %}
-            <div class="ls-item">
-                <div class="ls-avatar purple">{% if s.photo %}<img src="{{ s.photo.url }}">{% else %}{{ s.get_initials }}{% endif %}</div>
-                <div class="ls-info"><h6>{{ s.full_name }}</h6><p>{% if s.last_activity %}{{ s.last_activity|timesince }} oldin{% else %}Hech qachon{% endif %}</p></div>
-                <a href="{% url 'admin_user_view' s.pk %}" class="ls-btn-icon"><i class="bi bi-eye"></i></a>
-            </div>
-            {% endfor %}
-            {% else %}
-            <div class="ls-empty"><i class="bi bi-emoji-smile"></i><p>Hammasi faol!</p></div>
-            {% endif %}
-        </div>
-        
-        <div class="ls-card">
-            <div class="ls-card-head">
-                <h6><i class="bi bi-exclamation-triangle-fill" style="color:#ef4444"></i>Qiynalayotgan</h6>
-                <span class="ls-badge">{{ struggling_students|length }}</span>
-            </div>
-            {% if struggling_students %}
-            {% for s in struggling_students %}
-            <div class="ls-item">
-                <div class="ls-avatar red">{% if s.photo %}<img src="{{ s.photo.url }}">{% else %}{{ s.get_initials }}{% endif %}</div>
-                <div class="ls-info"><h6>{{ s.full_name }}</h6><p>{{ s.low_score_count }} past ball • O'rtacha: {{ s.avg_score|floatformat:0 }}%</p></div>
-                <a href="{% url 'admin_user_view' s.pk %}" class="ls-btn-icon"><i class="bi bi-eye"></i></a>
-            </div>
-            {% endfor %}
-            {% else %}
-            <div class="ls-empty"><i class="bi bi-emoji-smile"></i><p>Hammasi yaxshi!</p></div>
-            {% endif %}
         </div>
     </div>
-</div>
-
+    
+    <!-- Testlar -->
+    <div class="tab-pane fade" id="tabTests">
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <span><i class="bi bi-clipboard-check me-2"></i>Testlar statistikasi</span>
+                        <span class="badge bg-success">{{ test_stats|length }}</span>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if test_stats %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead><tr><th>Test</th><th>Urinish</th><th>O'tdi</th><th>Yiqildi</th><th>O'rtacha</th></tr></thead>
+                                <tbody>
+                                    {% for t in test_stats %}
+                                    <tr>
+                                        <td><div class="fw-bold">{{ t.lesson.title }}</div><small class="text-muted">{{ t.lesson.profession.name }}</small></td>
+                                        <td>{{ t.total_attempts }}</td>
+                                        <td><span class="text-success">{{ t.passed_count }}</span></td>
+                                        <td><span class="text-danger">{{ t.failed_count }}</span></td>
+                                        <td><span class="badge {% if t.avg_score >= 70 %}bg-success{% elif t.avg_score >= 50 %}bg-warning{% else %}bg-danger{% endif %}">{{ t.avg_score }}%</span></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5 text-muted"><i class="bi bi-clipboard fs-1 opacity-25"></i><p class="mt-2">Testlar yo'q</p></div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <span><i class="bi bi-exclamation-diamond me-2 text-danger"></i>Qiyin savollar</span>
+                        <span class="badge bg-danger">{{ hardest_questions|length }}</span>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if hardest_questions %}
+                        <ul class="list-group list-group-flush">
+                            {% for q in hardest_questions %}
+                            <li class="list-group-item">
+                                <div class="small">{{ q.question.question_text|truncatewords:15 }}</div>
+                                <div class="d-flex gap-2 mt-1">
+                                    <small class="text-muted">{{ q.test.lesson.title }}</small>
+                                    <span class="badge bg-danger">{{ q.error_rate }}% xato</span>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <div class="text-center py-5 text-muted"><i class="bi bi-question-circle fs-1 opacity-25"></i><p class="mt-2">Qiyin savol yo'q</p></div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Vazifalar -->
+    <div class="tab-pane fade" id="tabHomework">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <span><i class="bi bi-journal-text me-2"></i>Uy vazifalari statistikasi</span>
+                <span class="badge bg-warning text-dark">{{ homework_stats|length }}</span>
+            </div>
+            <div class="card-body p-0">
+                {% if homework_stats %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead><tr><th>Vazifa</th><th>Kurs</th><th>Topshirgan</th><th>Topshirmagan</th><th>Kutilmoqda</th><th>O'rtacha baho</th></tr></thead>
+                        <tbody>
+                            {% for h in homework_stats %}
+                            <tr>
+                                <td class="fw-bold">{{ h.lesson.title }}</td>
+                                <td><small class="text-muted">{{ h.lesson.profession.name }}</small></td>
+                                <td><span class="text-success">{{ h.submitted }}</span></td>
+                                <td><span class="text-danger">{{ h.not_submitted }}</span></td>
+                                <td><span class="text-warning">{{ h.pending_count }}</span></td>
+                                <td><span class="badge bg-info">{{ h.avg_grade }}%</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted"><i class="bi bi-journal fs-1 opacity-25"></i><p class="mt-2">Vazifalar yo'q</p></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- O'quvchilar -->
+    <div class="tab-pane fade" id="tabStudents">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <span><i class="bi bi-moon-stars me-2 text-warning"></i>Passiv o'quvchilar (7+ kun)</span>
+                        <span class="badge bg-warning text-dark">{{ passive_students|length }}</span>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if passive_students %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <tbody>
+                                    {% for s in passive_students %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                {% if s.photo %}<img src="{{ s.photo.url }}" class="user-avatar-sm">{% else %}<div class="user-avatar-placeholder">{{ s.get_initials }}</div>{% endif %}
+                                                <div>
+                                                    <div class="fw-bold">{{ s.full_name }}</div>
+                                                    <small class="text-muted">{% if s.last_activity %}{{ s.last_activity|timesince }} oldin{% else %}Hech qachon{% endif %}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-end"><a href="{% url 'admin_user_view' s.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5 text-muted"><i class="bi bi-emoji-smile fs-1 opacity-25"></i><p class="mt-2">Hammasi faol!</p></div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <span><i class="bi bi-exclamation-triangle me-2 text-danger"></i>Qiynalayotgan o'quvchilar</span>
+                        <span class="badge bg-danger">{{ struggling_students|length }}</span>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if struggling_students %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <tbody>
+                                    {% for s in struggling_students %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                {% if s.photo %}<img src="{{ s.photo.url }}" class="user-avatar-sm">{% else %}<div class="user-avatar-placeholder">{{ s.get_initials }}</div>{% endif %}
+                                                <div>
+                                                    <div class="fw-bold">{{ s.full_name }}</div>
+                                                    <small class="text-muted">{{ s.low_score_count }} past ball • O'rtacha: {{ s.avg_score|floatformat:0 }}%</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-end"><a href="{% url 'admin_user_view' s.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-eye"></i></a></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5 text-muted"><i class="bi bi-emoji-smile fs-1 opacity-25"></i><p class="mt-2">Hammasi yaxshi!</p></div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-function lsOpenTab(e, id) {
-    document.querySelectorAll('.ls-panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.ls-tab').forEach(b => b.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    e.currentTarget.classList.add('active');
-}
-
-const lsData = {{ daily_activity|safe }};
-new Chart(document.getElementById('lsActivityChart'), {
+const chartData = {{ daily_activity|safe }};
+new Chart(document.getElementById('activityChart'), {
     type: 'line',
     data: {
-        labels: lsData.map(d => d.date),
+        labels: chartData.map(d => d.date),
         datasets: [
-            { label: 'Video', data: lsData.map(d => d.videos), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true, tension: 0.4, borderWidth: 2 },
-            { label: 'Test', data: lsData.map(d => d.tests), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.4, borderWidth: 2 },
-            { label: 'Vazifa', data: lsData.map(d => d.homeworks), borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', fill: true, tension: 0.4, borderWidth: 2 }
+            { label: 'Video', data: chartData.map(d => d.videos), borderColor: '#0d6efd', backgroundColor: 'rgba(13,110,253,0.1)', fill: true, tension: 0.4 },
+            { label: 'Test', data: chartData.map(d => d.tests), borderColor: '#198754', backgroundColor: 'rgba(25,135,84,0.1)', fill: true, tension: 0.4 },
+            { label: 'Vazifa', data: chartData.map(d => d.homeworks), borderColor: '#fd7e14', backgroundColor: 'rgba(253,126,20,0.1)', fill: true, tension: 0.4 }
         ]
     },
     options: {
         responsive: true,
-        plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 15, font: { size: 11 } } } },
-        scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' } }, x: { grid: { display: false } } },
-        elements: { point: { radius: 0 } }
+        plugins: { legend: { position: 'top' } },
+        scales: { y: { beginAtZero: true } },
+        elements: { point: { radius: 2 } }
     }
 });
 </script>
-
 {% endblock %}
