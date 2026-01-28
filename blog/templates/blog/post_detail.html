@@ -97,6 +97,13 @@
                                     </div>
                                     <p class="mb-0 text-secondary">{{ comment.content }}</p>
                                 </div>
+                                <div class="mt-2">
+                                    <a href="{% url 'blog:toggle_comment_like' comment.pk %}" 
+                                       class="btn btn-sm {% if comment.pk in liked_comment_ids %}btn-danger{% else %}btn-outline-secondary{% endif %} rounded-pill">
+                                        <i class="bi {% if comment.pk in liked_comment_ids %}bi-heart-fill{% else %}bi-heart{% endif %} me-1"></i>
+                                        {{ comment.likes_count }}
+                                    </a>
+                                </div>
                             </div>
                         </div>
                         {% empty %}

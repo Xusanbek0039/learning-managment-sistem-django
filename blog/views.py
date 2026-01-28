@@ -36,6 +36,10 @@ def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
     comments = post.comments.all()
     is_liked = post.likes.filter(user=request.user).exists()
+    liked_comment_ids = list(CommentLike.objects.filter(
+        user=request.user, 
+        comment__in=comments
+    ).values_list('comment_id', flat=True))
     
     if request.method == 'POST':
         form = CommentForm(request.POST)
@@ -61,6 +65,7 @@ def post_detail(request, pk):
         'post': post,
         'comments': comments,
         'is_liked': is_liked,
+        'liked_comment_ids': liked_comment_ids,
         'form': form
     })
 
