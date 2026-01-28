@@ -28,7 +28,7 @@
                 <div class="card-body">
                     <h5 style="color: var(--text-color);">Vazifa tavsifi:</h5>
                     <div style="color: var(--text-color); line-height: 1.8;">
-                        {{ homework.description|linebreaks }}
+                        {{ homework.description|safe }}
                     </div>
                 </div>
             </div>
