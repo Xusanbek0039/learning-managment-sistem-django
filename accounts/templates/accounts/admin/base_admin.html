@@ -2,396 +2,22 @@
 <html lang="uz" data-bs-theme="light">
 
 <head>
+    {% load static %}
+
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/base_admin.css' %}">
+    <link rel="stylesheet" href="{% static 'effects/weather_effect.css' %}">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Admin Panel - LMS{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary-blue: #0d6efd;
-            --dark-blue: #0a58ca;
-            --primary-black: #212529;
-        }
 
-        [data-bs-theme="light"] {
-            --bg-color: #f0f2f5;
-            --card-bg: #ffffff;
-            --text-color: #212529;
-            --border-color: #dee2e6;
-            --sidebar-bg: #1a1a2e;
-            --sidebar-text: #ffffff;
-        }
-
-        [data-bs-theme="dark"] {
-            --bg-color: #0f0f1a;
-            --card-bg: #1a1a2e;
-            --text-color: #f8f9fa;
-            --border-color: #2d2d44;
-            --sidebar-bg: #0a0a15;
-            --sidebar-text: #ffffff;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            min-height: 100vh;
-            transition: all 0.3s ease;
-        }
-
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            width: 280px;
-            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-            padding: 20px;
-            z-index: 1000;
-            overflow-y: auto;
-        }
-
-        .sidebar-brand {
-            color: white;
-            font-size: 1.5rem;
-            font-weight: 700;
-            padding: 20px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 20px;
-        }
-
-        .sidebar-brand i {
-            color: var(--primary-blue);
-        }
-
-        .sidebar-nav .nav-link {
-            color: rgba(255, 255, 255, 0.7);
-            padding: 12px 15px;
-            border-radius: 10px;
-            margin-bottom: 5px;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-        }
-
-        .sidebar-nav .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-
-        .sidebar-nav .nav-link.active {
-            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
-            color: white;
-        }
-
-        .sidebar-nav .nav-link i {
-            width: 24px;
-            margin-right: 10px;
-            font-size: 1.1rem;
-        }
-
-        .main-content {
-            margin-left: 280px;
-            padding: 30px;
-            min-height: 100vh;
-        }
-
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding: 20px 25px;
-            background-color: var(--card-bg);
-            border-radius: 15px;
-            border: 1px solid var(--border-color);
-        }
-
-        .page-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-color);
-            margin: 0;
-        }
-
-        .stat-card {
-            background-color: var(--card-bg);
-            border-radius: 15px;
-            padding: 25px;
-            border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .stat-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-
-        .stat-icon.blue {
-            background: linear-gradient(135deg, #0d6efd, #0a58ca);
-            color: white;
-        }
-
-        .stat-icon.green {
-            background: linear-gradient(135deg, #198754, #157347);
-            color: white;
-        }
-
-        .stat-icon.orange {
-            background: linear-gradient(135deg, #fd7e14, #e85d04);
-            color: white;
-        }
-
-        .stat-icon.purple {
-            background: linear-gradient(135deg, #6f42c1, #5a32a3);
-            color: white;
-        }
-
-        .stat-icon.red {
-            background: linear-gradient(135deg, #dc3545, #b02a37);
-            color: white;
-        }
-
-        .stat-icon.cyan {
-            background: linear-gradient(135deg, #0dcaf0, #0aa2c0);
-            color: white;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--text-color);
-        }
-
-        .stat-label {
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 15px;
-        }
-
-        .card-header {
-            background-color: transparent;
-            border-bottom: 1px solid var(--border-color);
-            padding: 20px 25px;
-            font-weight: 600;
-        }
-
-        .table {
-            color: var(--text-color);
-        }
-
-        .table th {
-            border-color: var(--border-color);
-            font-weight: 600;
-            color: #6c757d;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-        }
-
-        .table td {
-            border-color: var(--border-color);
-            vertical-align: middle;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: 600;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(13, 110, 253, 0.4);
-        }
-
-        .form-control,
-        .form-select {
-            background-color: var(--bg-color);
-            border: 2px solid var(--border-color);
-            color: var(--text-color);
-            padding: 12px 15px;
-            border-radius: 10px;
-        }
-
-        .form-control:focus,
-        .form-select:focus {
-            background-color: var(--bg-color);
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
-            color: var(--text-color);
-        }
-
-        .theme-toggle-admin {
-            background-color: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .theme-toggle-admin:hover {
-            background-color: var(--primary-blue);
-        }
-
-        .sidebar-footer {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-        }
-
-        .user-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            margin-right: 12px;
-        }
-
-        .user-name {
-            color: white;
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-
-        .user-role {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.8rem;
-        }
-
-        .alert {
-            border-radius: 10px;
-            border: none;
-        }
-
-        .profession-img {
-            width: 60px;
-            height: 60px;
-            border-radius: 10px;
-            object-fit: cover;
-        }
-
-        .action-btns .btn {
-            padding: 8px 12px;
-            border-radius: 8px;
-            margin-right: 5px;
-        }
-
-        .back-link {
-            color: var(--text-color);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .back-link:hover {
-            color: var(--primary-blue);
-        }
-
-        .online-badge {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: #198754;
-            display: inline-block;
-            margin-left: 5px;
-        }
-
-        .offline-badge {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: #6c757d;
-            display: inline-block;
-            margin-left: 5px;
-        }
-
-        .user-avatar-sm {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            object-fit: cover;
-        }
-
-        .user-avatar-placeholder {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 0.8rem;
-        }
-
-        @media (max-width: 992px) {
-            .sidebar {
-                width: 80px;
-                padding: 15px;
-            }
-
-            .sidebar-brand span,
-            .sidebar-nav .nav-link span,
-            .sidebar-footer .user-info>div:last-child {
-                display: none;
-            }
-
-            .sidebar-nav .nav-link {
-                justify-content: center;
-                padding: 15px;
-            }
-
-            .sidebar-nav .nav-link i {
-                margin: 0;
-            }
-
-            .main-content {
-                margin-left: 80px;
-            }
-        }
-    </style>
 </head>
 
 <body>
+    <div id="weather_effect"></div>
+
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-brand" style="text-decoration: none;">
@@ -426,7 +52,7 @@
                 <i class="bi bi-envelope"></i>
                 <span>Xabarlar</span>
             </a>
-            
+
             <a href="{% url 'admin_payments' %}"
                 class="nav-link {% if 'payment' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="bi bi-credit-card"></i>
@@ -456,7 +82,7 @@
                 <i class="bi bi-newspaper"></i>
                 <span>Blog</span>
             </a>
-        
+
         </nav>
 
         <div class="sidebar-footer">
@@ -518,6 +144,8 @@
             }
         }
     </script>
+    <script src="{% static 'effects/weather_effect.js' %}"></script>
+
 </body>
 
 </html>

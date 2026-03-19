@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}LMS - O'quv Markazi{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'effects/weather_effect.css' %}">
 
     <!-- Bootstrap & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -225,6 +226,17 @@
 </head>
 
 <body>
+<!-- 🌦 Weather Effect -->
+<div id="weather_effect"></div>
+
+<!-- ⏳ Page Loading -->
+<div id="pageLoader">
+  <div class="loader-card">
+    <div class="spinner"></div>
+    <div class="loader-text">Yuklanmoqda...</div>
+  </div>
+</div>
+
     <!-- Coin Celebration -->
     <div class="coin-celebration" id="coinCelebration" aria-hidden="true">
         <div class="coin-celebration-content text-center text-white shadow-soft">
@@ -380,17 +392,17 @@
                                         <small class="text-muted">{{ user.email }}</small>
                                         {% endif %}
                                     </div>
-                                    
+
                                 </div>
                                 <span class="role-badge role-{{ user.role }}">
-                                        {% if user.role == 'admin' %}
-                                        Admin
-                                        {% elif user.role == 'teacher' %}
-                                        Ustoz
-                                        {% else %}
-                                        O'quvchi
-                                        {% endif %}
-                                    </span>
+                                    {% if user.role == 'admin' %}
+                                    Admin
+                                    {% elif user.role == 'teacher' %}
+                                    Ustoz
+                                    {% else %}
+                                    O'quvchi
+                                    {% endif %}
+                                </span>
                             </li>
 
                             <li>
@@ -409,8 +421,7 @@
                             </li>
                             {% if user.is_admin %}
                             <li class="nav-item">
-                                <a class="dropdown-item rounded-3"
-                                    href="{% url 'admin_dashboard' %}">
+                                <a class="dropdown-item rounded-3" href="{% url 'admin_dashboard' %}">
                                     <i class="bi bi-speedometer2 me-2"></i>Panel
                                 </a>
                             </li>
@@ -532,6 +543,8 @@
             });
         });
     </script>
+    <script src="{% static 'effects/weather_effect.js' %}"></script>
+
 
     {% block extra_js %}{% endblock %}
 </body>

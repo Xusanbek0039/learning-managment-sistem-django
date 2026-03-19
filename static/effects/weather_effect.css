@@ -1,0 +1,108 @@
+/* ================= WEATHER EFFECT ================= */
+
+#weather_effect{
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.weather-item{
+  position: absolute;
+  top: -20px;
+  user-select: none;
+  animation-timing-function: linear;
+}
+
+/* ❄️ QISH — SNOW */
+.winter{
+  color: white;
+  filter: drop-shadow(0 0 6px rgba(255,255,255,.8));
+  animation:
+    fall linear forwards,
+    sway ease-in-out infinite,
+    sparkle ease-in-out infinite;
+}
+
+@keyframes fall{ to{ transform: translateY(110vh); } }
+@keyframes sway{ 0%{margin-left:0}50%{margin-left:30px}100%{margin-left:0} }
+@keyframes sparkle{0%,100%{opacity:.6}50%{opacity:1}}
+
+/* 🌧 BAHOR — RAIN */
+.spring{
+  width:2px;
+  height:16px;
+  background:linear-gradient(transparent,#7dd3fc);
+  opacity:.8;
+  animation: rainFall linear forwards;
+}
+
+@keyframes rainFall{
+  to{ transform: translateY(110vh); }
+}
+
+/* ☀️ YOZ — SUN */
+.summer{
+  animation: floatSun linear forwards;
+}
+
+@keyframes floatSun{
+  to{ transform: translateY(110vh) rotate(360deg); }
+}
+
+/* 🍁 KUZ — LEAVES */
+.autumn{
+  animation:
+    leafFall linear forwards,
+    leafSway ease-in-out infinite;
+}
+
+@keyframes leafFall{ to{ transform: translateY(110vh); } }
+@keyframes leafSway{ 0%{margin-left:0}50%{margin-left:40px}100%{margin-left:0} }
+
+/* ================= LOADING ================= */
+
+#pageLoader{
+  position:fixed;
+  inset:0;
+  background:rgba(255,255,255,.75);
+  backdrop-filter:blur(10px);
+  z-index:10000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+[data-bs-theme="dark"] #pageLoader{
+  background:rgba(2,6,23,.75);
+}
+
+.loader-card{
+  background:rgba(255,255,255,.9);
+  padding:30px 40px;
+  border-radius:20px;
+  text-align:center;
+  box-shadow:0 20px 50px rgba(0,0,0,.3);
+}
+
+[data-bs-theme="dark"] .loader-card{
+  background:rgba(15,23,42,.9);
+  color:white;
+}
+
+.spinner{
+  width:42px;height:42px;
+  border:4px solid #c7d2fe;
+  border-top-color:#6366f1;
+  border-radius:50%;
+  margin:auto;
+  animation:spin 1s linear infinite;
+}
+
+@keyframes spin{ to{ transform:rotate(360deg);} }
+
+.loader-text{
+  margin-top:12px;
+  font-weight:600;
+}

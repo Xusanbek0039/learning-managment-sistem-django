@@ -6,12 +6,9 @@
 <style>
 /* ================= BACKGROUND ================= */
 body{
-  background:radial-gradient(circle at top,#e0e7ff,#f8fafc);
   min-height:100vh;
 }
-[data-bs-theme="dark"] body{
-  background:radial-gradient(circle at top,#0f172a,#020617);
-}
+
 
 /* ================= CENTER ================= */
 .page-center{
@@ -28,7 +25,6 @@ body{
 .blob{
   position:absolute;
   width:380px;height:380px;
-  background:linear-gradient(135deg,#6366f1,#22d3ee);
   filter:blur(140px);
   opacity:.35;
   animation:float 12s ease-in-out infinite;
@@ -174,6 +170,7 @@ body{
 }
 
 </style>
+
 {% endblock %}
 
 {% block content %}
