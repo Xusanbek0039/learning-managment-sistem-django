@@ -9,334 +9,507 @@
 <meta name="keywords" content="Suyunov Husan, IT Creative, LMS classmates page, Django student profile UI, dark light bootstrap">
 
 <style>
-:root{
-    --cm-bg: #ffffff;
-    --cm-border: rgba(15,23,42,.08);
-    --cm-muted: #64748b;
-    --cm-soft: #f8fafc;
-    --cm-soft2: #f1f5f9;
+/* =====================================================
+   KURSDOŞLAR — Glass Bento + Motion
+   ===================================================== */
+.cm-scene{
+    --cm-glass: rgba(255,255,255,.72);
+    --cm-gb: rgba(15,23,42,.08);
     --cm-text: #0f172a;
-    --cm-brand1: #6366f1;
-    --cm-brand2: #8b5cf6;
-    --cm-shadow: 0 10px 30px rgba(15,23,42,.08);
-    --cm-shadow-hover: 0 20px 45px rgba(99,102,241,.22);
-}
-[data-bs-theme="dark"]{
-    --cm-bg: #0f172a;
-    --cm-border: rgba(255,255,255,.08);
-    --cm-muted: #94a3b8;
-    --cm-soft: rgba(255,255,255,.03);
-    --cm-soft2: rgba(255,255,255,.06);
-    --cm-text: #e2e8f0;
-    --cm-shadow: 0 10px 30px rgba(0,0,0,.4);
-    --cm-shadow-hover: 0 20px 45px rgba(0,0,0,.55);
-}
-
-.cm-wrap{ max-width:1180px; }
-
-/* ============ HERO ============ */
-.cm-hero{
-    position:relative;
-    border-radius:26px;
-    padding:30px 28px;
-    background:
-        radial-gradient(120% 140% at 100% 0%, rgba(139,92,246,.35), transparent 55%),
-        radial-gradient(120% 140% at 0% 100%, rgba(37,99,235,.30), transparent 55%),
-        linear-gradient(135deg, #4f46e5, #7c3aed);
-    color:#fff;
-    overflow:hidden;
-    box-shadow:0 18px 45px rgba(79,70,229,.35);
-}
-.cm-hero::after{
-    content:"";
-    position:absolute; inset:0;
-    background-image:
-        radial-gradient(circle at 18% 30%, rgba(255,255,255,.18) 0 2px, transparent 3px),
-        radial-gradient(circle at 80% 70%, rgba(255,255,255,.12) 0 2px, transparent 3px);
-    background-size:90px 90px, 120px 120px;
-    opacity:.5; pointer-events:none;
-}
-.cm-hero-content{ position:relative; z-index:1; }
-.cm-back{
-    width:46px;height:46px;flex:0 0 46px;
-    display:inline-flex;align-items:center;justify-content:center;
-    border-radius:14px;
-    background:rgba(255,255,255,.16);
-    color:#fff; border:1px solid rgba(255,255,255,.25);
-    transition:.2s;
-}
-.cm-back:hover{ background:rgba(255,255,255,.30); color:#fff; transform:translateX(-3px); }
-.cm-hero h1{ font-size:1.6rem; font-weight:800; margin:0; letter-spacing:-.3px; }
-.cm-hero .cm-sub{ opacity:.9; font-size:.92rem; }
-
-.cm-stats{ display:flex; gap:14px; flex-wrap:wrap; }
-.cm-stat{
-    background:rgba(255,255,255,.14);
-    border:1px solid rgba(255,255,255,.22);
-    border-radius:16px;
-    padding:12px 18px; min-width:108px;
-    backdrop-filter:blur(6px);
-}
-.cm-stat .v{ font-size:1.4rem; font-weight:800; line-height:1; }
-.cm-stat .l{ font-size:.72rem; text-transform:uppercase; letter-spacing:.6px; opacity:.85; }
-
-/* ============ SEARCH ============ */
-.cm-search{
-    position:relative; max-width:340px; width:100%;
-}
-.cm-search i{
-    position:absolute; left:16px; top:50%; transform:translateY(-50%);
-    color:var(--cm-muted);
-}
-.cm-search input{
-    width:100%; border-radius:14px;
-    border:1px solid var(--cm-border);
-    background:var(--cm-bg);
+    --cm-muted: #64748b;
+    --cm-soft: rgba(15,23,42,.04);
+    --cm-b1: #6366f1;
+    --cm-b2: #ec4899;
+    --cm-b3: #06b6d4;
+    --cm-gold1: #fde68a;
+    --cm-gold2: #f59e0b;
+    --cm-gold3: #d97706;
+    --cm-shadow: 0 10px 30px rgba(15,23,42,.07);
+    --cm-ease: cubic-bezier(.22,1,.36,1);
+    --cm-spring: cubic-bezier(.34,1.56,.64,1);
+    position:relative; isolation:isolate;
+    max-width:1200px;
     color:var(--cm-text);
-    padding:12px 14px 12px 44px;
-    outline:none; transition:.2s;
 }
-.cm-search input:focus{ border-color:var(--cm-brand1); box-shadow:0 0 0 4px rgba(99,102,241,.15); }
-
-/* ============ CARD ============ */
-.cm-card{
-    background:var(--cm-bg);
-    border:1px solid var(--cm-border);
-    border-radius:22px;
-    padding:22px 20px 20px;
-    box-shadow:var(--cm-shadow);
-    transition:transform .25s ease, box-shadow .25s ease, border-color .25s;
-    position:relative; overflow:hidden;
-    height:100%;
-}
-.cm-card::before{
-    content:""; position:absolute; inset:0 0 auto 0; height:5px;
-    background:linear-gradient(90deg,var(--cm-brand1),var(--cm-brand2));
-    opacity:0; transition:.25s;
-}
-.cm-card:hover{ transform:translateY(-6px); box-shadow:var(--cm-shadow-hover); border-color:transparent; }
-.cm-card:hover::before{ opacity:1; }
-
-/* Rank */
-.cm-rank{
-    position:absolute; top:14px; right:14px;
-    width:34px;height:34px;border-radius:12px;
-    display:flex;align-items:center;justify-content:center;
-    font-weight:800; font-size:.85rem;
-    background:var(--cm-soft2); color:var(--cm-muted);
-}
-.cm-rank.gold{   background:linear-gradient(135deg,#fde047,#f59e0b); color:#7c2d12; box-shadow:0 6px 16px rgba(245,158,11,.4); }
-.cm-rank.silver{ background:linear-gradient(135deg,#e5e7eb,#9ca3af); color:#1f2937; box-shadow:0 6px 16px rgba(156,163,175,.4); }
-.cm-rank.bronze{ background:linear-gradient(135deg,#fcd9b6,#d97706); color:#fff; box-shadow:0 6px 16px rgba(217,119,6,.4); }
-
-/* Avatar */
-.cm-ava-ring{ position:relative; width:74px; height:74px; flex:0 0 74px; }
-.cm-ava{
-    width:74px;height:74px;border-radius:20px;object-fit:cover;
-    border:3px solid var(--cm-soft2);
-}
-.cm-ava-fb{
-    width:74px;height:74px;border-radius:20px;
-    background:linear-gradient(135deg,var(--cm-brand1),var(--cm-brand2));
-    display:flex;align-items:center;justify-content:center;
-    color:#fff;font-size:1.5rem;font-weight:800;
-}
-.cm-presence{
-    position:absolute; bottom:-3px; right:-3px;
-    width:18px;height:18px;border-radius:50%;
-    border:3px solid var(--cm-bg);
-}
-.cm-presence.on{ background:#22c55e; box-shadow:0 0 0 3px rgba(34,197,94,.25); }
-.cm-presence.off{ background:#94a3b8; }
-
-.cm-name{ font-weight:700; font-size:1.02rem; color:var(--cm-text); margin:0; display:flex; align-items:center; gap:6px; }
-.cm-user{ color:var(--cm-muted); font-size:.82rem; }
-
-.cm-crown{ color:#f59e0b; font-size:.85rem; }
-
-/* Chips */
-.cm-chips{ display:flex; flex-wrap:wrap; gap:8px; margin:14px 0; }
-.cm-chip{
-    display:inline-flex; align-items:center; gap:6px;
-    padding:6px 12px; border-radius:999px;
-    font-size:.8rem; font-weight:600;
-    background:var(--cm-soft); color:var(--cm-text);
-    border:1px solid var(--cm-border);
-}
-.cm-chip.coin{ background:linear-gradient(135deg,#fef3c7,#fde68a); color:#92400e; border:none; }
-.cm-chip.streak{ background:linear-gradient(135deg,#ffedd5,#fed7aa); color:#9a3412; border:none; }
-[data-bs-theme="dark"] .cm-chip.coin{ background:rgba(245,158,11,.18); color:#fcd34d; }
-[data-bs-theme="dark"] .cm-chip.streak{ background:rgba(249,115,22,.18); color:#fdba74; }
-.cm-chip.online{ background:rgba(34,197,94,.12); color:#16a34a; border:none; }
-.cm-chip.offline{ color:var(--cm-muted); }
-
-.cm-bio{
-    background:var(--cm-soft);
-    border:1px solid var(--cm-border);
-    border-radius:14px; padding:11px 13px;
-    font-size:.84rem; color:var(--cm-muted);
-    margin-bottom:16px; line-height:1.45;
+[data-bs-theme="dark"] .cm-scene{
+    --cm-glass: rgba(255,255,255,.045);
+    --cm-gb: rgba(255,255,255,.09);
+    --cm-text: #e5e7eb;
+    --cm-muted: #8b95a7;
+    --cm-soft: rgba(255,255,255,.04);
+    --cm-shadow: 0 10px 30px rgba(0,0,0,.35);
 }
 
-.cm-btn{
-    display:flex; align-items:center; justify-content:center; gap:8px;
-    width:100%; padding:11px; border-radius:14px;
-    background:linear-gradient(135deg,var(--cm-brand1),var(--cm-brand2));
-    color:#fff; font-weight:600; border:none;
-    transition:.2s;
-}
-.cm-btn:hover{ color:#fff; filter:brightness(1.07); transform:translateY(-1px); box-shadow:0 10px 24px rgba(99,102,241,.4); }
+/* Fon şarlari */
+.cm-blobs{ position:absolute; inset:-40px -20px; z-index:-1; pointer-events:none; overflow:hidden; }
+.cm-blob{ position:absolute; border-radius:50%; filter:blur(80px); opacity:.35; }
+.cm-blob.b1{ width:460px; height:460px; background:var(--cm-b1); top:-120px; left:-120px; animation:cmBlob 18s ease-in-out infinite; }
+.cm-blob.b2{ width:380px; height:380px; background:var(--cm-b2); top:260px; right:-120px; opacity:.22; animation:cmBlob 22s ease-in-out infinite reverse; }
+.cm-blob.b3{ width:300px; height:300px; background:var(--cm-b3); bottom:-80px; left:30%; opacity:.18; animation:cmBlob 26s ease-in-out infinite 2s; }
+[data-bs-theme="dark"] .cm-blob{ opacity:.45; }
+[data-bs-theme="dark"] .cm-blob.b2{ opacity:.28; }
 
-/* Group çat CTA in hero */
-.cm-groupchat-btn{
-    display:inline-flex; align-items:center; gap:8px;
-    padding:11px 20px; border-radius:14px;
-    background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.3);
-    color:#fff; font-weight:700; text-decoration:none; backdrop-filter:blur(6px);
-    transition:.2s;
-}
-.cm-groupchat-btn:hover{ background:#fff; color:#4f46e5; transform:translateY(-2px); box-shadow:0 12px 28px rgba(0,0,0,.2); }
-
-/* Per-card action row */
-.cm-actions{ display:flex; gap:8px; margin-top:auto; }
-.cm-actions .cm-btn{ margin-top:0; }
-.cm-dm-btn{
-    flex:0 0 46px; width:46px; padding:11px 0;
-    display:flex; align-items:center; justify-content:center;
-    border-radius:14px; border:1px solid var(--cm-border);
-    background:var(--cm-soft); color:var(--cm-brand1); font-size:1.05rem;
-    transition:.2s;
-}
-.cm-dm-btn:hover{ background:var(--cm-brand1); color:#fff; border-color:transparent; transform:translateY(-1px); }
-
-/* Empty */
-.cm-empty{
-    text-align:center; padding:60px 20px;
-    background:var(--cm-bg); border:1px dashed var(--cm-border);
+.cm-g{
+    background:var(--cm-glass);
+    border:1px solid var(--cm-gb);
     border-radius:24px;
+    backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+    box-shadow:var(--cm-shadow);
 }
+
+/* ============ BENTO ============ */
+.cm-bento{ display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:16px; margin-bottom:22px; }
+.cm-main{ grid-row:span 2; padding:26px 28px; display:flex; flex-direction:column; justify-content:space-between; gap:20px; min-height:240px; position:relative; overflow:hidden; }
+.cm-main::after{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background-image:
+        radial-gradient(circle at 18% 30%, rgba(99,102,241,.25) 0 2px, transparent 3px),
+        radial-gradient(circle at 80% 70%, rgba(236,72,153,.2) 0 2px, transparent 3px);
+    background-size:90px 90px, 120px 120px;
+    animation:cmDrift 24s linear infinite; opacity:.6;
+}
+.cm-back{
+    width:44px; height:44px; border-radius:14px;
+    display:inline-flex; align-items:center; justify-content:center;
+    border:1px solid var(--cm-gb); background:var(--cm-soft);
+    color:var(--cm-text); text-decoration:none; transition:transform .3s var(--cm-spring), background .2s;
+}
+.cm-back:hover{ color:var(--cm-text); transform:translateX(-4px); background:var(--cm-glass); }
+.cm-title{
+    font-size:2.5rem; font-weight:900; letter-spacing:-1px; margin:16px 0 4px; line-height:1.05;
+    background:linear-gradient(90deg, var(--cm-text), var(--cm-b1) 45%, var(--cm-b2) 70%, var(--cm-text));
+    background-size:250% auto;
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:cmTitle 8s linear infinite;
+}
+.cm-sub{ color:var(--cm-muted); font-size:.95rem; }
+
+.cm-stack{ display:flex; align-items:center; position:relative; z-index:1; }
+.cm-stack .s{
+    width:40px; height:40px; border-radius:50%; margin-left:-10px;
+    border:2px solid var(--cm-glass); overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+    font-size:.72rem; font-weight:800; color:#fff;
+    background:linear-gradient(135deg,var(--cm-b1),var(--cm-b2));
+    transition:transform .35s var(--cm-spring);
+    animation:cmPopIn .5s var(--cm-spring) both;
+}
+.cm-stack .s:first-child{ margin-left:0; }
+.cm-stack .s img{ width:100%; height:100%; object-fit:cover; }
+.cm-stack .s.more{ background:#334155; }
+.cm-stack:hover .s{ transform:translateY(-4px); }
+.cm-stack:hover .s:nth-child(2){ transition-delay:.03s; }
+.cm-stack:hover .s:nth-child(3){ transition-delay:.06s; }
+.cm-stack:hover .s:nth-child(4){ transition-delay:.09s; }
+.cm-stack:hover .s:nth-child(5){ transition-delay:.12s; }
+.cm-stack small{ margin-left:12px; color:var(--cm-muted); }
+
+.cm-stat{ padding:20px; position:relative; overflow:hidden; }
+.cm-stat .ic{
+    width:42px; height:42px; border-radius:13px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.15rem; margin-bottom:14px; position:relative;
+}
+.cm-stat .v{ font-size:2rem; font-weight:900; line-height:1; font-variant-numeric:tabular-nums; }
+.cm-stat .l{ color:var(--cm-muted); font-size:.8rem; margin-top:4px; }
+.cm-stat.st-users .ic{ background:rgba(99,102,241,.15); color:#818cf8; }
+.cm-stat.st-online .ic{ background:rgba(34,197,94,.15); color:#22c55e; }
+.cm-stat.st-online .ic::after{
+    content:""; position:absolute; inset:0; border-radius:inherit;
+    border:2px solid #22c55e; animation:cmPing 2s cubic-bezier(0,0,.2,1) infinite;
+}
+.cm-stat.st-prem .ic{ background:linear-gradient(135deg,var(--cm-gold1),var(--cm-gold2)); color:#78350f; box-shadow:0 8px 20px rgba(245,158,11,.35); }
+.cm-stat.st-prem .ic i{ animation:cmGem 3s ease-in-out infinite; display:inline-block; }
+
+.cm-chat{
+    grid-column:span 3; padding:18px 22px;
+    display:flex; align-items:center; gap:16px;
+    text-decoration:none; color:var(--cm-text);
+    background:linear-gradient(120deg, rgba(99,102,241,.28), rgba(236,72,153,.2));
+    position:relative; overflow:hidden;
+    transition:transform .35s var(--cm-ease), box-shadow .3s;
+}
+.cm-chat:hover{ color:var(--cm-text); transform:translateY(-3px); box-shadow:0 18px 40px rgba(99,102,241,.25); }
+.cm-chat::after{
+    content:""; position:absolute; top:0; bottom:0; left:-60%; width:35%;
+    background:linear-gradient(100deg, transparent, rgba(255,255,255,.35), transparent);
+    transform:skewX(-20deg); animation:cmSweep 4s ease-in-out 1.5s infinite;
+}
+.cm-chat .ic{
+    width:50px; height:50px; border-radius:16px; flex:0 0 50px;
+    background:linear-gradient(135deg,var(--cm-b1),var(--cm-b2));
+    display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.3rem;
+    box-shadow:0 10px 24px rgba(99,102,241,.4);
+}
+.cm-chat:hover .ic i{ animation:cmWiggle .6s ease-in-out; }
+.cm-chat .go{
+    margin-left:auto; width:44px; height:44px; border-radius:50%; flex:0 0 44px;
+    background:var(--cm-text); color:var(--bs-body-bg, #fff);
+    display:flex; align-items:center; justify-content:center;
+    transition:transform .4s var(--cm-spring);
+}
+.cm-chat:hover .go{ transform:rotate(45deg) scale(1.08); }
+
+/* ============ FILTERS ============ */
+.cm-fl{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:18px; }
+.cm-pill{
+    padding:9px 16px; border-radius:99px; font-size:.85rem; font-weight:600;
+    color:var(--cm-muted); border:1px solid var(--cm-gb); background:var(--cm-glass);
+    backdrop-filter:blur(12px); cursor:pointer;
+    transition:transform .3s var(--cm-spring), color .2s, background .2s;
+}
+.cm-pill:hover{ transform:translateY(-2px); color:var(--cm-text); }
+.cm-pill.on{ color:#fff; background:linear-gradient(135deg,var(--cm-b1),var(--cm-b2)); border-color:transparent; box-shadow:0 8px 20px rgba(99,102,241,.3); }
+.cm-pill.prem i{ color:var(--cm-gold2); }
+.cm-pill.prem.on{ background:linear-gradient(135deg,var(--cm-gold2),var(--cm-gold3)); box-shadow:0 8px 20px rgba(245,158,11,.35); }
+.cm-pill.prem.on i{ color:#fff; }
+.cm-srch{ margin-left:auto; position:relative; width:300px; max-width:100%; }
+.cm-srch input{
+    width:100%; padding:11px 14px 11px 42px; border-radius:99px;
+    border:1px solid var(--cm-gb); background:var(--cm-glass); color:var(--cm-text);
+    outline:none; backdrop-filter:blur(12px); transition:border-color .2s, box-shadow .2s;
+}
+.cm-srch input:focus{ border-color:var(--cm-b1); box-shadow:0 0 0 4px rgba(99,102,241,.15); }
+.cm-srch i{ position:absolute; left:16px; top:50%; transform:translateY(-50%); color:var(--cm-muted); z-index:1; transition:color .2s, transform .3s var(--cm-spring); }
+.cm-srch:focus-within i{ color:var(--cm-b1); transform:translateY(-50%) scale(1.15) rotate(-8deg); }
+
+/* ============ CARDS ============ */
+.cm-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+.cm-card{
+    --rx:0deg; --ry:0deg; --lift:0px; --mx:50%; --my:0%;
+    position:relative; overflow:hidden; text-align:center;
+    display:flex; flex-direction:column;
+    transform:perspective(900px) rotateX(var(--rx)) rotateY(var(--ry)) translateY(var(--lift));
+    transition:transform .45s var(--cm-ease), border-color .3s, box-shadow .3s;
+    will-change:transform;
+}
+.cm-card:hover{ --lift:-6px; border-color:rgba(139,92,246,.45); box-shadow:0 22px 45px rgba(99,102,241,.2); }
+.cm-card.is-tilting{ transition:transform .12s linear, border-color .3s, box-shadow .3s; }
+.cm-card::after{
+    content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit; z-index:2;
+    background:radial-gradient(300px circle at var(--mx) var(--my), rgba(139,92,246,.14), transparent 60%);
+    opacity:0; transition:opacity .3s;
+}
+.cm-card:hover::after{ opacity:1; }
+
+.cm-bnr{
+    height:62px; position:relative;
+    background:linear-gradient(135deg, rgba(99,102,241,.22), rgba(6,182,212,.14));
+}
+.cm-rk{ position:absolute; top:12px; left:14px; font-size:.75rem; font-weight:800; color:var(--cm-muted); z-index:1; }
+.cm-st{ position:absolute; top:12px; right:12px; font-size:.7rem; font-weight:700; padding:3px 9px; border-radius:99px; z-index:1; backdrop-filter:blur(6px); }
+.cm-st.on{ background:rgba(34,197,94,.16); color:#16a34a; }
+[data-bs-theme="dark"] .cm-st.on{ color:#22c55e; }
+.cm-st.on i{ animation:cmBlink 1.6s ease-in-out infinite; }
+.cm-st.off{ background:rgba(148,163,184,.15); color:var(--cm-muted); }
+
+.cm-body{ padding:0 18px 18px; display:flex; flex-direction:column; flex:1; }
+.cm-av{
+    width:86px; height:86px; border-radius:50%; margin:-43px auto 12px; padding:3px;
+    position:relative; z-index:1;
+    background:conic-gradient(from var(--cm-ang,0deg), var(--cm-b1), var(--cm-b2), var(--cm-b3), var(--cm-b1));
+    transition:transform .45s var(--cm-spring);
+}
+.cm-card:hover .cm-av{ animation:cmRing 3s linear infinite; transform:scale(1.05); }
+.cm-av .in{
+    width:100%; height:100%; border-radius:50%; overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:1.35rem; color:#fff;
+    background:linear-gradient(135deg,var(--cm-b1),#8b5cf6);
+    border:3px solid var(--bs-body-bg, #fff);
+}
+.cm-av .in img{ width:100%; height:100%; object-fit:cover; }
+.cm-av .dot{
+    position:absolute; right:4px; bottom:4px; width:16px; height:16px; border-radius:50%;
+    border:3px solid var(--bs-body-bg, #fff); background:#94a3b8; z-index:2;
+}
+.cm-av .dot.on{ background:#22c55e; }
+.cm-av .dot.on::after{
+    content:""; position:absolute; inset:-3px; border-radius:50%;
+    border:2px solid #22c55e; animation:cmPing 1.8s cubic-bezier(0,0,.2,1) infinite;
+}
+
+.cm-nm{ font-weight:700; font-size:1rem; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cm-un{ color:var(--cm-muted); font-size:.8rem; }
+.cm-bio{
+    color:var(--cm-muted); font-size:.8rem; line-height:1.4; margin-top:8px;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.cm-mt{ display:flex; justify-content:center; gap:20px; margin:14px 0 16px; }
+.cm-mt > div{ transition:transform .3s var(--cm-spring); }
+.cm-mt > div:hover{ transform:translateY(-3px); }
+.cm-mt b{ display:flex; align-items:center; justify-content:center; gap:5px; font-size:1rem; font-variant-numeric:tabular-nums; }
+.cm-mt small{ color:var(--cm-muted); font-size:.66rem; letter-spacing:.6px; text-transform:uppercase; }
+.cm-mt .bi-coin{ color:var(--cm-gold2); display:inline-block; }
+.cm-mt > div:hover .bi-coin{ animation:cmCoinFlip .8s ease-in-out; }
+.cm-mt .bi-fire{ color:#f97316; display:inline-block; animation:cmFlicker 1.4s ease-in-out infinite; transform-origin:50% 100%; }
+
+.cm-ac{ display:flex; gap:8px; margin-top:auto; }
+.cm-ac a{
+    position:relative; overflow:hidden;
+    padding:10px; border-radius:13px; text-decoration:none; font-size:.86rem; font-weight:700;
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    transition:transform .25s var(--cm-ease), box-shadow .25s, filter .2s;
+}
+.cm-ac .p{ flex:1; background:var(--cm-text); color:var(--bs-body-bg, #fff); }
+.cm-ac .p:hover{ color:var(--bs-body-bg, #fff); transform:translateY(-2px); box-shadow:0 10px 22px rgba(15,23,42,.25); }
+.cm-ac .m{ flex:0 0 44px; border:1px solid var(--cm-gb); color:var(--cm-text); background:var(--cm-soft); }
+.cm-ac .m:hover{ color:#fff; background:linear-gradient(135deg,var(--cm-b1),var(--cm-b2)); border-color:transparent; transform:translateY(-2px); }
+.cm-ac i{ transition:transform .35s var(--cm-spring); }
+.cm-ac .m:hover i{ transform:rotate(-14deg) scale(1.15); }
+.cm-ripple{
+    position:absolute; border-radius:50%; pointer-events:none;
+    background:rgba(255,255,255,.45); transform:scale(0);
+    animation:cmRipple .6s ease-out forwards;
+}
+
+/* Top-3 */
+.cm-card.is-top .cm-rk{ color:var(--cm-gold2); }
+.cm-card.is-top .cm-rk i{ display:inline-block; animation:cmBounce 2.4s var(--cm-spring) infinite; }
+.cm-card.r2 .cm-rk{ color:#94a3b8; }
+.cm-card.r3 .cm-rk{ color:#d97706; }
+
+/* ============ PREMIUM ============ */
+@property --cm-ang{ syntax:'<angle>'; initial-value:0deg; inherits:false; }
+.cm-card.is-premium{
+    background:
+        linear-gradient(var(--cm-glass), var(--cm-glass)) padding-box,
+        conic-gradient(from var(--cm-ang), var(--cm-gold2), var(--cm-gold1), #fff7ed, var(--cm-gold3), var(--cm-gold2)) border-box;
+    border:1.5px solid transparent;
+    animation:cmBorder 6s linear infinite;
+    box-shadow:0 0 0 1px rgba(245,158,11,.08), 0 14px 40px rgba(245,158,11,.16);
+}
+.cm-card.is-premium:hover{ border-color:transparent; box-shadow:0 22px 50px rgba(245,158,11,.3); }
+.cm-card.is-premium .cm-bnr{
+    background:
+        radial-gradient(circle at 20% 20%, rgba(253,230,138,.55), transparent 55%),
+        linear-gradient(135deg, rgba(245,158,11,.38), rgba(236,72,153,.22));
+}
+.cm-card.is-premium .cm-bnr::before{
+    content:""; position:absolute; top:0; bottom:0; left:-60%; width:35%; z-index:0;
+    background:linear-gradient(100deg, transparent, rgba(255,255,255,.55), transparent);
+    transform:skewX(-20deg); animation:cmSweep 3.6s ease-in-out infinite;
+}
+.cm-card.is-premium .cm-av{
+    background:conic-gradient(from var(--cm-ang,0deg), var(--cm-gold2), var(--cm-gold1), var(--cm-gold3), var(--cm-gold2));
+    animation:cmRing 4s linear infinite;
+    box-shadow:0 0 24px rgba(245,158,11,.45);
+}
+.cm-crown{
+    position:absolute; top:-15px; left:50%; transform:translateX(-50%) rotate(-12deg);
+    font-size:1.25rem; color:var(--cm-gold2); z-index:3;
+    filter:drop-shadow(0 3px 6px rgba(245,158,11,.55));
+    animation:cmCrown 3s ease-in-out infinite;
+}
+.cm-badge{
+    display:inline-flex; align-items:center; gap:5px; align-self:center;
+    margin-top:8px; padding:4px 11px; border-radius:99px;
+    font-size:.68rem; font-weight:800; letter-spacing:.8px; text-transform:uppercase;
+    color:#78350f;
+    background:linear-gradient(110deg, var(--cm-gold1) 0%, var(--cm-gold2) 40%, var(--cm-gold1) 50%, var(--cm-gold2) 60%, var(--cm-gold1) 100%);
+    background-size:250% 100%;
+    animation:cmBadge 3s linear infinite;
+    box-shadow:0 6px 16px rgba(245,158,11,.35);
+}
+.cm-spark{
+    position:absolute; width:6px; height:6px; border-radius:50%; z-index:1; pointer-events:none;
+    background:#fff; box-shadow:0 0 8px 2px rgba(253,230,138,.9);
+    animation:cmSpark 2.8s ease-in-out infinite;
+}
+.cm-spark.k1{ top:16px; left:28%; }
+.cm-spark.k2{ top:38px; right:22%; animation-delay:.9s; width:4px; height:4px; }
+.cm-spark.k3{ top:10px; right:40%; animation-delay:1.7s; width:3px; height:3px; }
+.cm-card.is-premium .cm-ac .p{ background:linear-gradient(135deg,var(--cm-gold2),var(--cm-gold3)); color:#fff; }
+.cm-card.is-premium .cm-ac .p:hover{ color:#fff; box-shadow:0 10px 24px rgba(245,158,11,.4); }
+
+/* ============ EMPTY / NO RESULT ============ */
+.cm-empty{ text-align:center; padding:60px 20px; }
 .cm-empty-ico{
-    width:90px;height:90px;border-radius:26px; margin:0 auto 18px;
-    display:flex;align-items:center;justify-content:center;
-    background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(139,92,246,.15));
-    color:var(--cm-brand1); font-size:2.4rem;
+    width:92px; height:92px; border-radius:28px; margin:0 auto 18px;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg,rgba(99,102,241,.18),rgba(236,72,153,.15));
+    color:var(--cm-b1); font-size:2.4rem;
+    animation:cmFloat 4s ease-in-out infinite;
 }
 .cm-noresult{ display:none; text-align:center; padding:40px; color:var(--cm-muted); }
+.cm-noresult.is-shown{ display:block; animation:cmRise .45s var(--cm-ease) both; }
 
-@media (max-width:575px){
-    .cm-hero{ padding:24px 18px; }
-    .cm-hero h1{ font-size:1.3rem; }
-    .cm-stat{ min-width:92px; padding:10px 14px; }
+/* ============ ENTRANCE ============ */
+.cm-bento > *{ animation:cmRise .7s var(--cm-ease) both; }
+.cm-bento > :nth-child(2){ animation-delay:.08s; }
+.cm-bento > :nth-child(3){ animation-delay:.16s; }
+.cm-bento > :nth-child(4){ animation-delay:.24s; }
+.cm-bento > :nth-child(5){ animation-delay:.32s; }
+.cm-fl{ animation:cmRise .6s var(--cm-ease) .4s both; }
+.cm-motion .cm-card{ opacity:0; }
+.cm-motion .cm-card.is-in{ opacity:1; animation:cmCardIn .7s var(--cm-ease) var(--cm-delay,0ms) both; }
+.cm-motion .cm-card.is-premium.is-in{ animation:cmCardIn .7s var(--cm-ease) var(--cm-delay,0ms) both, cmBorder 6s linear infinite; }
+.cm-card.cm-pop{ animation:cmPopIn .45s var(--cm-spring) both !important; }
+
+/* ============ KEYFRAMES ============ */
+@keyframes cmRise{ from{ opacity:0; transform:translateY(18px); } to{ opacity:1; transform:none; } }
+@keyframes cmCardIn{ from{ opacity:0; translate:0 30px; scale:.96; } to{ opacity:1; translate:0 0; scale:1; } }
+@keyframes cmPopIn{ from{ opacity:0; scale:.9; } to{ opacity:1; scale:1; } }
+@keyframes cmBlob{ 0%,100%{ transform:translate(0,0) scale(1); } 33%{ transform:translate(40px,-30px) scale(1.08); } 66%{ transform:translate(-30px,25px) scale(.95); } }
+@keyframes cmDrift{ from{ background-position:0 0, 0 0; } to{ background-position:90px -90px, -120px 120px; } }
+@keyframes cmTitle{ to{ background-position:250% center; } }
+@keyframes cmPing{ 0%{ transform:scale(1); opacity:.8; } 80%,100%{ transform:scale(1.9); opacity:0; } }
+@keyframes cmGem{ 0%,100%{ transform:rotate(0) scale(1); } 50%{ transform:rotate(-10deg) scale(1.15); } }
+@keyframes cmSweep{ 0%{ left:-60%; } 45%,100%{ left:140%; } }
+@keyframes cmWiggle{ 0%,100%{ transform:rotate(0); } 25%{ transform:rotate(-14deg); } 50%{ transform:rotate(10deg); } 75%{ transform:rotate(-6deg); } }
+@keyframes cmBlink{ 0%,100%{ opacity:1; } 50%{ opacity:.35; } }
+@keyframes cmRing{ to{ --cm-ang:360deg; } }
+@keyframes cmBorder{ to{ --cm-ang:360deg; } }
+@keyframes cmBounce{ 0%,70%,100%{ transform:translateY(0); } 80%{ transform:translateY(-4px) scale(1.15); } 90%{ transform:translateY(0) scale(.95); } }
+@keyframes cmCoinFlip{ to{ transform:rotateY(720deg); } }
+@keyframes cmFlicker{ 0%,100%{ transform:scale(1) rotate(0); } 25%{ transform:scale(1.12,.94) rotate(-4deg); } 50%{ transform:scale(.95,1.1) rotate(3deg); } 75%{ transform:scale(1.06) rotate(-2deg); } }
+@keyframes cmCrown{ 0%,100%{ transform:translateX(-50%) translateY(0) rotate(-12deg); } 50%{ transform:translateX(-50%) translateY(-4px) rotate(-4deg); } }
+@keyframes cmBadge{ to{ background-position:-250% 0; } }
+@keyframes cmSpark{ 0%,100%{ opacity:0; transform:scale(.3); } 50%{ opacity:1; transform:scale(1); } }
+@keyframes cmRipple{ to{ transform:scale(4); opacity:0; } }
+@keyframes cmFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-10px); } }
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:1199px){ .cm-grid{ grid-template-columns:repeat(3,1fr); } }
+@media (max-width:991px){
+    .cm-bento{ grid-template-columns:repeat(3,1fr); }
+    .cm-main{ grid-column:span 3; grid-row:auto; min-height:0; }
+    .cm-grid{ grid-template-columns:repeat(2,1fr); }
 }
+@media (max-width:575px){
+    .cm-title{ font-size:1.9rem; }
+    .cm-main{ padding:22px 20px; }
+    .cm-stat{ padding:14px; }
+    .cm-stat .v{ font-size:1.5rem; }
+    .cm-stat .ic{ width:36px; height:36px; margin-bottom:10px; }
+    .cm-srch{ margin-left:0; width:100%; }
+    .cm-chat .sub{ display:none; }
+}
+@media (max-width:479px){ .cm-grid{ grid-template-columns:1fr; } }
+
+/* Kamroq harakat: tizim sozlamasi yoki LMS'dagi "motion" özgaruvçisi */
+@media (prefers-reduced-motion: reduce){
+    .cm-scene *, .cm-scene *::before, .cm-scene *::after{ animation:none !important; transition:none !important; }
+    .cm-motion .cm-card{ opacity:1; }
+}
+[data-motion="off"] .cm-scene *, [data-motion="off"] .cm-scene *::before, [data-motion="off"] .cm-scene *::after{ animation:none !important; transition:none !important; }
+[data-motion="off"] .cm-motion .cm-card{ opacity:1; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container cm-wrap py-4">
+{% with total=classmates|length %}
+<div class="container cm-scene py-4">
+    <div class="cm-blobs" aria-hidden="true">
+        <span class="cm-blob b1"></span><span class="cm-blob b2"></span><span class="cm-blob b3"></span>
+    </div>
 
-    <!-- ============ HERO ============ -->
-    <div class="cm-hero mb-4">
-        <div class="cm-hero-content d-flex flex-wrap align-items-center gap-3">
-            <a href="{% url 'profession_detail' profession.pk %}" class="cm-back" title="Orqaga">
-                <i class="bi bi-arrow-left fs-5"></i>
-            </a>
-            <div class="flex-grow-1">
-                <h1><i class="bi bi-people-fill me-2"></i>Kursdoşlar</h1>
-                <div class="cm-sub mt-1">
-                    <i class="bi bi-mortarboard-fill me-1"></i>{{ profession.name }}
-                </div>
+    <!-- ============ BENTO ============ -->
+    <div class="cm-bento">
+        <div class="cm-g cm-main">
+            <div style="position:relative; z-index:1;">
+                <a href="{% url 'profession_detail' profession.pk %}" class="cm-back" title="Orqaga"><i class="bi bi-arrow-left"></i></a>
+                <h1 class="cm-title">Kursdoşlar</h1>
+                <div class="cm-sub"><i class="bi bi-mortarboard-fill me-1"></i>{{ profession.name }}</div>
             </div>
-            <div class="cm-stats">
-                <div class="cm-stat">
-                    <div class="v">{{ classmates.count }}</div>
-                    <div class="l">Öquvçi</div>
-                </div>
+            {% if classmates %}
+            <div class="cm-stack">
+                {% for s in classmates|slice:":5" %}
+                <span class="s" style="animation-delay:{{ forloop.counter }}00ms">{% if s.photo %}<img src="{{ s.photo.url }}" alt="">{% else %}{{ s.get_initials|default:"?" }}{% endif %}</span>
+                {% endfor %}
+                {% if total > 5 %}<span class="s more">+{{ total|add:"-5" }}</span>{% endif %}
+                <small>siz bilan birga öqiyapti</small>
             </div>
+            {% endif %}
         </div>
-        <div class="cm-hero-content mt-3">
-            <a href="{% url 'group_chat' profession.pk %}" class="cm-groupchat-btn">
-                <i class="bi bi-chat-square-text-fill"></i> Guruppaga xabar yoziş
-            </a>
+
+        <div class="cm-g cm-stat st-users">
+            <div class="ic"><i class="bi bi-people-fill"></i></div>
+            <div class="v" data-count="{{ total }}">{{ total }}</div>
+            <div class="l">Öquvçi</div>
         </div>
+        <div class="cm-g cm-stat st-online">
+            <div class="ic"><i class="bi bi-broadcast"></i></div>
+            <div class="v" data-count="{{ online_count }}">{{ online_count }}</div>
+            <div class="l">Hozir online</div>
+        </div>
+        <div class="cm-g cm-stat st-prem">
+            <div class="ic"><i class="bi bi-gem"></i></div>
+            <div class="v" data-count="{{ premium_count }}">{{ premium_count }}</div>
+            <div class="l">Premium</div>
+        </div>
+
+        <a class="cm-g cm-chat" href="{% url 'group_chat' profession.pk %}">
+            <div class="ic"><i class="bi bi-chat-square-text-fill"></i></div>
+            <div>
+                <div class="fw-bold">Guruppaga xabar yoziş</div>
+                <small class="sub" style="color:var(--cm-muted)">Barça kursdoşlar bilan umumiy çat</small>
+            </div>
+            <div class="go"><i class="bi bi-arrow-up-right"></i></div>
+        </a>
     </div>
 
     {% if classmates %}
-    <!-- ============ SEARCH ============ -->
-    <div class="d-flex justify-content-end mb-4">
-        <div class="cm-search">
-            <i class="bi bi-search"></i>
-            <input type="text" id="cmSearch" placeholder="Kursdoş izlaş...">
-        </div>
+    <!-- ============ FILTERS ============ -->
+    <div class="cm-fl">
+        <button type="button" class="cm-pill on" data-filter="all">Hammasi · {{ total }}</button>
+        <button type="button" class="cm-pill" data-filter="online"><i class="bi bi-circle-fill text-success" style="font-size:.5rem;vertical-align:middle;"></i> Online · {{ online_count }}</button>
+        <button type="button" class="cm-pill prem" data-filter="premium"><i class="bi bi-gem"></i> Premium · {{ premium_count }}</button>
+        <div class="cm-srch"><i class="bi bi-search"></i><input type="text" id="cmSearch" placeholder="Kursdoş izlaş..."></div>
     </div>
 
     <!-- ============ GRID ============ -->
-    <div class="row g-4" id="cmGrid">
+    <div class="cm-grid" id="cmGrid">
         {% for student in classmates %}
-        <div class="col-sm-6 col-lg-4 cm-item"
-             data-name="{{ student|premium_name|lower }} {{ student.username|lower }}">
-            <div class="cm-card d-flex flex-column">
+        <div class="cm-g cm-card{% if student.premium_active %} is-premium{% endif %}{% if forloop.counter <= 3 %} is-top r{{ forloop.counter }}{% endif %}"
+             data-name="{{ student.full_name|lower }} {{ student.username|lower }}"
+             data-online="{{ student.is_online|yesno:'1,0' }}"
+             data-premium="{{ student.premium_active|yesno:'1,0' }}">
 
-                <!-- Rank -->
-                <div class="cm-rank {% if forloop.counter == 1 %}gold{% elif forloop.counter == 2 %}silver{% elif forloop.counter == 3 %}bronze{% endif %}">
-                    {% if forloop.counter <= 3 %}<i class="bi bi-trophy-fill"></i>{% else %}{{ forloop.counter }}{% endif %}
-                </div>
+            <div class="cm-bnr {{ student|deco_banner }}">{{ student|deco_banner_layer }}
+                <span class="cm-rk">{% if forloop.counter <= 3 %}<i class="bi bi-trophy-fill"></i> {% endif %}#{{ forloop.counter }}</span>
+                {% if student.is_online %}
+                <span class="cm-st on"><i class="bi bi-circle-fill" style="font-size:.45rem;vertical-align:middle;"></i> Online</span>
+                {% else %}
+                <span class="cm-st off">Offline</span>
+                {% endif %}
+                {% if student.premium_active %}
+                <span class="cm-spark k1"></span><span class="cm-spark k2"></span><span class="cm-spark k3"></span>
+                {% endif %}
+            </div>
 
-                <!-- TOP -->
-                <div class="d-flex align-items-center gap-3 mb-1" style="padding-right:38px;">
-                    <div class="cm-ava-ring">
-                        {% if student.photo %}
-                            <img src="{{ student.photo.url }}" class="cm-ava" alt="{{ student.username }}">
-                        {% else %}
-                            <div class="cm-ava-fb">{{ student.get_initials }}</div>
-                        {% endif %}
-                        <span class="cm-presence {% if student.is_online %}on{% else %}off{% endif %}"></span>
+            <div class="cm-body">
+                <div class="cm-av">
+                    {% if student.premium_active %}<i class="bi bi-gem cm-crown" title="Premium"></i>{% endif %}
+                    <div class="in {{ student|deco_frame }}">
+                        {% if student.photo %}<img src="{{ student.photo.url }}" alt="{{ student.username }}" loading="lazy">{% else %}{{ student.get_initials|default:"?" }}{% endif %}
                     </div>
-                    <div class="flex-grow-1 min-w-0">
-                        <p class="cm-name text-truncate">
-                            {{ student|premium_name }}
-                            {% if student.is_premium %}<i class="bi bi-patch-check-fill cm-crown" title="Premium"></i>{% endif %}
-                        </p>
-                        <span class="cm-user">@{{ student.username }}</span>
-                    </div>
+                    <span class="dot {% if student.is_online %}on{% endif %}"></span>
                 </div>
 
-                <!-- CHIPS -->
-                <div class="cm-chips">
-                    <span class="cm-chip coin">
-                        <i class="bi bi-coin"></i>{{ student.coins }}
-                    </span>
-                    {% if student.streak_days %}
-                    <span class="cm-chip streak">
-                        <i class="bi bi-fire"></i>{{ student.streak_days }} kun
-                    </span>
-                    {% endif %}
-                    <span class="cm-chip {% if student.is_online %}online{% else %}offline{% endif %}">
-                        <i class="bi bi-circle-fill" style="font-size:.55rem;"></i>
-                        {% if student.is_online %}Online{% else %}Offline{% endif %}
-                    </span>
-                </div>
-
-                <!-- BIO -->
+                <p class="cm-nm" title="{{ student.full_name }}">{{ student|premium_name }}</p>
+                <div class="cm-un">@{{ student.username }}</div>
+                {% if student.premium_active %}
+                <span class="cm-badge"><i class="bi bi-gem"></i> Premium</span>
+                {% endif %}
                 {% if student.bio %}
                 <div class="cm-bio">{{ student.bio|truncatewords:18 }}</div>
                 {% endif %}
 
-                <!-- ACTIONS -->
-                <div class="cm-actions">
-                    <a href="{% url 'student_public_profile' student.pk %}" class="cm-btn flex-grow-1">
-                        <i class="bi bi-person-lines-fill"></i> Profil
-                    </a>
-                    <a href="{% url 'direct_chat' student.pk %}" class="cm-dm-btn" title="Xabar yoziş">
-                        <i class="bi bi-chat-dots-fill"></i>
-                    </a>
+                <div class="cm-mt">
+                    <div><b><i class="bi bi-coin"></i>{{ student.coins }}</b><small>Coin</small></div>
+                    <div><b>{% if student.streak_days %}<i class="bi bi-fire"></i>{{ student.streak_days }}{% else %}—{% endif %}</b><small>Streak</small></div>
                 </div>
 
+                <div class="cm-ac">
+                    <a class="p" href="{% url 'student_public_profile' student.pk %}"><i class="bi bi-person-fill"></i> Profil</a>
+                    <a class="m" href="{% url 'direct_chat' student.pk %}" title="Xabar yoziş"><i class="bi bi-chat-dots-fill"></i></a>
+                </div>
             </div>
         </div>
         {% endfor %}
     </div>
 
-    <!-- No search result -->
     <div class="cm-noresult" id="cmNoResult">
         <i class="bi bi-search fs-1 d-block mb-2"></i>
         Heç narsa topilmadi.
@@ -344,31 +517,136 @@
 
     {% else %}
     <!-- ============ EMPTY ============ -->
-    <div class="cm-empty">
+    <div class="cm-g cm-empty">
         <div class="cm-empty-ico"><i class="bi bi-people"></i></div>
         <h5 class="fw-bold">Kursdoşlar yöq</h5>
-        <p class="text-muted mb-0">Hozirça bu kursga siz birinçi bölib yozilgansiz 🙂</p>
+        <p class="mb-0" style="color:var(--cm-muted)">Hozirça bu kursga siz birinçi bölib yozilgansiz 🙂</p>
     </div>
     {% endif %}
-
 </div>
+{% endwith %}
 
 <script>
 (function(){
+    var mq = function(q){ return window.matchMedia && window.matchMedia(q).matches; };
+    var reduce = mq('(prefers-reduced-motion: reduce)') || document.documentElement.getAttribute('data-motion') === 'off';
+    var finePointer = mq('(hover: hover) and (pointer: fine)');
+    var scene = document.querySelector('.cm-scene');
+    var cards = Array.prototype.slice.call(document.querySelectorAll('#cmGrid .cm-card'));
+
+    /* Statistika count-up */
+    if(!reduce){
+        document.querySelectorAll('.cm-stat .v[data-count]').forEach(function(el, i){
+            var target = parseInt(el.getAttribute('data-count'), 10) || 0;
+            if(!target) return;
+            el.textContent = '0';
+            setTimeout(function(){
+                var start = null, dur = 1100;
+                requestAnimationFrame(function step(ts){
+                    if(!start) start = ts;
+                    var p = Math.min((ts - start) / dur, 1);
+                    el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+                    if(p < 1) requestAnimationFrame(step);
+                });
+            }, 300 + i * 120);
+        });
+    }
+
+    /* Kartalar skrollda ketma-ket çiqadi */
+    if(scene && cards.length && !reduce && 'IntersectionObserver' in window){
+        scene.classList.add('cm-motion');
+        var io = new IntersectionObserver(function(entries){
+            var batch = 0;
+            entries.forEach(function(e){
+                if(!e.isIntersecting) return;
+                e.target.style.setProperty('--cm-delay', (batch++ * 70) + 'ms');
+                e.target.classList.add('is-in');
+                io.unobserve(e.target);
+            });
+        }, { threshold:.1, rootMargin:'0px 0px -30px 0px' });
+        cards.forEach(function(el){ io.observe(el); });
+    }
+
+    /* 3D tilt + spotlight (faqat sichqonçali qurilmalarda) */
+    if(finePointer && !reduce){
+        cards.forEach(function(card){
+            var raf = null;
+            card.addEventListener('mousemove', function(ev){
+                var r = card.getBoundingClientRect();
+                var x = (ev.clientX - r.left) / r.width;
+                var y = (ev.clientY - r.top) / r.height;
+                if(raf) cancelAnimationFrame(raf);
+                raf = requestAnimationFrame(function(){
+                    card.classList.add('is-tilting');
+                    card.style.setProperty('--ry', ((x - .5) * 8).toFixed(2) + 'deg');
+                    card.style.setProperty('--rx', ((.5 - y) * 8).toFixed(2) + 'deg');
+                    card.style.setProperty('--mx', (x * 100).toFixed(1) + '%');
+                    card.style.setProperty('--my', (y * 100).toFixed(1) + '%');
+                });
+            });
+            card.addEventListener('mouseleave', function(){
+                if(raf) cancelAnimationFrame(raf);
+                card.classList.remove('is-tilting');
+                card.style.setProperty('--rx', '0deg');
+                card.style.setProperty('--ry', '0deg');
+            });
+        });
+    }
+
+    /* Ripple */
+    if(!reduce){
+        document.querySelectorAll('.cm-ac a').forEach(function(btn){
+            btn.addEventListener('pointerdown', function(ev){
+                var r = btn.getBoundingClientRect();
+                var size = Math.max(r.width, r.height);
+                var s = document.createElement('span');
+                s.className = 'cm-ripple';
+                s.style.width = s.style.height = size + 'px';
+                s.style.left = (ev.clientX - r.left - size / 2) + 'px';
+                s.style.top = (ev.clientY - r.top - size / 2) + 'px';
+                btn.appendChild(s);
+                setTimeout(function(){ s.remove(); }, 650);
+            });
+        });
+    }
+
+    /* Filtr + qidiruv */
     var input = document.getElementById('cmSearch');
     if(!input) return;
-    var items = Array.prototype.slice.call(document.querySelectorAll('#cmGrid .cm-item'));
     var noResult = document.getElementById('cmNoResult');
-    input.addEventListener('input', function(){
-        var q = this.value.trim().toLowerCase();
+    var pills = document.querySelectorAll('.cm-pill[data-filter]');
+    var filter = 'all';
+
+    function apply(){
+        var q = input.value.trim().toLowerCase();
         var visible = 0;
-        items.forEach(function(el){
-            var match = el.getAttribute('data-name').indexOf(q) !== -1;
-            el.style.display = match ? '' : 'none';
-            if(match) visible++;
+        cards.forEach(function(el){
+            var ok = el.getAttribute('data-name').indexOf(q) !== -1 &&
+                (filter === 'all' || el.getAttribute('data-' + filter) === '1');
+            var wasHidden = el.style.display === 'none';
+            el.style.display = ok ? '' : 'none';
+            if(ok){
+                el.classList.add('is-in');
+                if(wasHidden && !reduce){
+                    el.classList.remove('cm-pop');
+                    void el.offsetWidth;
+                    el.classList.add('cm-pop');
+                }
+                visible++;
+            }
         });
-        noResult.style.display = visible === 0 ? 'block' : 'none';
+        noResult.classList.toggle('is-shown', visible === 0);
+    }
+
+    pills.forEach(function(p){
+        p.addEventListener('click', function(){
+            pills.forEach(function(x){ x.classList.remove('on'); });
+            p.classList.add('on');
+            filter = p.getAttribute('data-filter');
+            apply();
+        });
     });
+    input.addEventListener('input', apply);
 })();
 </script>
 {% endblock %}

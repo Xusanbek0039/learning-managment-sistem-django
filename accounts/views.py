@@ -7343,10 +7343,18 @@ def classmates_view(request, pk):
         enrollments__profession=profession,
         role='student'
     ).exclude(pk=request.user.pk).order_by('-coins', 'first_name')
-    
+
+    from .premium_bonus import is_active_premium
+
+    classmates = list(classmates)
+    for student in classmates:
+        student.premium_active = is_active_premium(student)
+
     return render(request, 'accounts/classmates.html', {
         'profession': profession,
         'classmates': classmates,
+        'online_count': sum(1 for s in classmates if s.is_online),
+        'premium_count': sum(1 for s in classmates if s.premium_active),
     })
 
 
