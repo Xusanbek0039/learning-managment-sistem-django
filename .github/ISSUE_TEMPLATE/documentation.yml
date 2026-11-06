@@ -1,0 +1,28 @@
+name: "📚 Documentation / Hujjatlar"
+description: Missing, wrong or unclear documentation, or a translation.
+labels: ["documentation"]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Page or file / Sahifa yoki fayl
+      placeholder: docs/INSTALLATION.md
+    validations:
+      required: true
+  - type: textarea
+    id: issue
+    attributes:
+      label: What is wrong or missing? / Nima notöğri yoki yetişmayapti?
+    validations:
+      required: true
+  - type: dropdown
+    id: language
+    attributes:
+      label: Language / Til
+      options: [English, Özbekça, Both]
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Contribution
+      options:
+        - label: I can open a pull request for this

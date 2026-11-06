@@ -1,28 +1,35 @@
 <p align="center">
-  <img src="static/images/logo.png" alt="IT Creative Zomin Logo" width="120" />
+  <img src="static/images/logo.png" alt="IT Creative Academy logo" width="120" />
 </p>
 
-<h1 align="center">🚀 IT Creative Zomin — Learning Management System</h1>
+<h1 align="center">IT Creative Academy LMS</h1>
 
 <p align="center">
-  <strong>Özbekiston IT ta'lim markazlari uçun töliq funksional ta'lim boşqaruv tizimi</strong>
-</p>
-
-<p align="center">
-  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" /></a>
-  <a href="https://www.djangoproject.com/"><img src="https://img.shields.io/badge/Django-5.1-092E20?style=for-the-badge&logo=django&logoColor=white" alt="Django" /></a>
-  <a href="https://www.django-rest-framework.org/"><img src="https://img.shields.io/badge/DRF-3.15-ff1709?style=for-the-badge&logo=django&logoColor=white" alt="DRF" /></a>
-  <a href="https://openai.com/"><img src="https://img.shields.io/badge/OpenAI-GPT-412991?style=for-the-badge&logo=openai&logoColor=white" alt="OpenAI" /></a>
-  <a href="https://core.telegram.org/bots/api"><img src="https://img.shields.io/badge/Telegram_Bot-API-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram" /></a>
-  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License" /></a>
+  <strong>Özbekiston IT ta'lim markazlari uçun Django asosidagi ta'lim boşqaruv tizimi (LMS)</strong><br/>
+  <sub>Öquvçi · Öqituvçi · Ota-ona · Admin · Yordamçi admin</sub>
 </p>
 
 <p align="center">
-  <a href="https://itc-academy.uz">🌐 Sayt</a> •
-  <a href="#-örnatish">⚙️ Örnatiş</a> •
-  <a href="#-api-hujjatlari">📡 API</a> •
-  <a href="#-xavfsizlik">🔐 Xavfsizlik</a> •
-  <a href="#-deploy-qilish">🚀 Deploy</a>
+  <a href="README.md">🇺🇿 Özbekça</a> •
+  <a href="README.en.md">🇬🇧 English</a>
+</p>
+
+<p align="center">
+  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python 3.10+" /></a>
+  <a href="https://www.djangoproject.com/"><img src="https://img.shields.io/badge/Django-5.1-092E20?style=flat-square&logo=django&logoColor=white" alt="Django 5.1" /></a>
+  <a href="https://www.django-rest-framework.org/"><img src="https://img.shields.io/badge/DRF-3.15-ff1709?style=flat-square&logo=django&logoColor=white" alt="DRF 3.15" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="MIT License" /></a>
+  <a href="https://github.com/Xusanbek0039/learning-managment-sistem-django/stargazers"><img src="https://img.shields.io/github/stars/Xusanbek0039/learning-managment-sistem-django?style=flat-square" alt="GitHub stars" /></a>
+  <a href="https://github.com/Xusanbek0039/learning-managment-sistem-django/issues"><img src="https://img.shields.io/github/issues/Xusanbek0039/learning-managment-sistem-django?style=flat-square" alt="GitHub issues" /></a>
+</p>
+
+<p align="center">
+  <a href="https://itc-academy.uz">🌐 Jonli sayt</a> •
+  <a href="docs/INSTALLATION.md">⚙️ Örnatiş</a> •
+  <a href="docs/API.md">📡 API</a> •
+  <a href="SECURITY.md">🔐 Xavfsizlik</a> •
+  <a href="CONTRIBUTING.md">🤝 Hissa qöşiş</a> •
+  <a href="docs/ROADMAP.md">🗺 Roadmap</a>
 </p>
 
 ---
@@ -30,126 +37,119 @@
 ## 📋 Mundarija
 
 - [Loyiha haqida](#-loyiha-haqida)
+- [Asosiy imkoniyatlar](#-asosiy-imkoniyatlar)
 - [Texnologiyalar](#-texnologiyalar)
 - [Arxitektura](#-arxitektura)
-- [Foydalanuvchi rollari](#-foydalanuvchi-rollari)
+- [Foydalanuvçi rollari](#-foydalanuvçi-rollari)
 - [Ilovalar (Apps)](#-ilovalar-apps)
-- [Örnatish](#-örnatish)
-- [Muhit özgaruvçilari](#-muhit-özgaruvchilari)
-- [API hujjatlari](#-api-hujjatlari)
+- [Tezkor boşlaş (lokal)](#-tezkor-boşlaş-lokal)
+- [Ma'lumotlar bazasi](#-malumotlar-bazasi)
+- [Muhit özgaruvçilari](#-muhit-özgaruvçilari)
+- [REST API](#-rest-api)
 - [Xavfsizlik](#-xavfsizlik)
 - [Telegram bot](#-telegram-bot)
-- [Deploy qiliş](#-deploy-qilish)
-- [Loyiha tuzilişi](#-loyiha-tuzilishi)
+- [Testlaş](#-testlaş)
+- [Deploy](#-deploy)
+- [Loyiha tuzilişi](#-loyiha-tuzilişi)
+- [Hujjatlar](#-hujjatlar)
+- [Roadmap](#-roadmap)
+- [Hissa qöşiş](#-hissa-qöşiş)
+- [Litsenziya](#-litsenziya)
 - [Muallif](#-muallif)
 
 ---
 
 ## 📖 Loyiha haqida
 
-**IT Creative Zomin LMS** — bu IT ta'lim markazlari uçun yaratilgan töliq funksional ta'lim boşqaruv tizimi. Tizim öquvçilar, öqituvçilar, adminlar va ota-onalar uçun alohida dashboardlar bilan ta'minlangan.
+**IT Creative Academy LMS** — IT Creative (Zomin) öquv markazi uçun işlab çiqilgan va real
+ta'lim jarayonida işlatilayotgan ta'lim boşqaruv tizimi. Tizimda öquvçilar, öqituvçilar,
+ota-onalar, adminlar va yordamçi adminlar uçun alohida panellar bor.
 
-### ✨ Asosiy imkoniyatlar
+- **Jonli sayt:** <https://itc-academy.uz>
+- **Foydalanuvçilar (maintainer ma'lumoti, 2026-11):** ~350 öquvçi, 20 öqituvçi, 150 ota-ona,
+  5 admin, 3 yordamçi admin.
+- **Interfeys tili:** özbekça (loyiha öz lotin yozuvi variantini işlatadi — `accounts/alphabet.py`).
+
+> Bu repozitoriyada **real foydalanuvçi ma'lumotlari yöq bölişi kerak**. Lokal işlaş uçun böş
+> baza yarating (pastga qarang). Xavfsizlik muammosini topsangiz — [SECURITY.md](SECURITY.md).
+
+## ✨ Asosiy imkoniyatlar
 
 | Yönaliş | Imkoniyatlar |
-|-----------|-------------|
-| 📚 **Ta'lim** | Kurslar, bölimlar, darslar (video, uyga vazifa, test, luğat, speaking) |
+|---------|--------------|
+| 📚 **Ta'lim** | Kurslar, bölimlar, darslar (video, uyga vazifa, test, luğat, speaking), öquv guruhlari, davomat |
 | 🤖 **Sun'iy intellekt** | OpenAI asosidagi AI yordamçi, uy vazifalarini AI bilan tekşiriş |
 | 🪙 **Coin iqtisodiyoti** | Coin qölga kiritiş, dökon, P2P transfer, faollik mukofotlari |
-| 🎮 **Öyinlar** | Typing challenge, söz öyini, shaxmat/shashka, musobaqalar |
-| 📝 **Blog** | Yangiliklar, maqolalar, likes & comments |
+| 🎮 **Öyinlar** | Typing challenge, söz öyini, shaxmat/shashka, musobaqalar, taşqi öyinlar API |
+| 📝 **Blog** | Yangiliklar, maqolalar, like va izohlar |
 | 🤖 **Telegram bot** | OTP login, bildirişnomalar, AI çat, ommaviy xabarlar |
-| 👨‍👩‍👧 **Ota-ona portali** | Farzand progressini kuzatiş, tölovlar, öqituvçi bilan aloqa |
-| 💳 **Tölov tizimi** | Payme & Click integratsiya, balans, avtomatik çegirmalar |
-| 📊 **Sertifikatlar** | Avtomatik PDF sertifikat generatsiya, CERT-ID bilan tekşiriş |
-| 💬 **Çat tizimi** | Guruh çat, şaxsiy xabarlar, reaktsiyalar, reply, pin |
-| 📋 **Sörovnomalar** | Dinamik sörovnoma yaratiş (8 xil savol turi) |
+| 👨‍👩‍👧 **Ota-ona portali** | Farzand progressi, tölovlar, öqituvçi bilan aloqa, Android ilova API |
+| 💳 **Tölovlar** | Payme, Click, Tezcheck, inPAY integratsiyalari, balans |
+| 📊 **Sertifikatlar** | Avtomatik PDF sertifikat, CERT-ID bilan tekşiriş |
+| 💬 **Çat** | Guruh çat, şaxsiy xabarlar, reaksiyalar, reply, pin |
+| 📋 **Sörovnomalar** | Dinamik sörovnoma (8 xil savol turi) |
 | 📖 **Kutubxona** | Kitob ijarasi, eslatmalar, qaytariş kuzatuvi |
-| 🏆 **Gamifikatsiya** | XP/level tizimi, streak, yutuqlar, reyting |
-
----
+| 🏆 **Gamifikatsiya** | XP/level, streak, yutuqlar, reyting |
+| 📱 **Ilovalar** | Android (öquvçi va ota-ona) va Windows mijozlari — `ilovalar/` |
 
 ## 🛠 Texnologiyalar
 
-### Backend
+| Qatlam | Texnologiya |
+|--------|-------------|
+| Backend | Python 3.10+ · Django 5.1 · Django REST Framework 3.15 · Jazzmin admin |
+| Ma'lumotlar bazasi | SQLite (dev va hozirgi production sozlamasi) |
+| Statik fayllar | WhiteNoise · `collectstatic` → `staticfiles/` |
+| Kutubxonalar | Pillow · ReportLab (PDF) · openpyxl (Excel) · OpenAI SDK · requests · argon2-cffi · youtube-transcript-api |
+| Ixtiyoriy | Redis (`django-redis`, default öçiq) · psycopg2 (hozir faol settings işlatmaydi) |
+| Frontend | Django templates · Bootstrap 5 · Bootstrap Icons · Vanilla JS · Quill.js · Chart.js · GSAP/Three.js (ayrim sahifalar, CDN) |
+| Hosting | cPanel + Phusion Passenger (`passenger_wsgi.py`), Nginx (Engintron) |
 
-| Texnologiya | Versiya | Vazifasi |
-|-------------|---------|----------|
-| Python | 3.10+ | Asosiy til |
-| Django | 5.1 | Web framework |
-| Django REST Framework | 3.15.2 | REST API |
-| Django Jazzmin | 3.0.2 | Admin panel UI (Cyborg tema) |
-| WhiteNoise | 6.11.0 | Statik fayllar |
-| Pillow | 12.1.1 | Rasm işlov beriş |
-| ReportLab | 4.4.10 | PDF sertifikat generatsiya |
-| OpenAI SDK | 2.21.0 | AI yordamçi |
-| openpyxl | 3.1.5 | Excel eksport |
-| psycopg2-binary | — | PostgreSQL driver |
-| argon2-cffi | 23.1+ | Kuçli parol haşlaş |
-| python-dotenv | 1.0.1 | Muhit özgaruvçilari |
-| requests | 2.32.5 | HTTP sörovlar (Telegram API) |
-
-### Frontend
-
-| Texnologiya | Vazifasi |
-|-------------|----------|
-| HTML5 + Bootstrap 5 | Asosiy UI |
-| Tailwind CSS (CDN) | Landing sahifalar |
-| Vanilla JS + Fetch API | Dinamik funksionallik |
-| Quill.js | Rich text editor |
-
-### Ma'lumotlar bazasi
-
-| Muhit | Texnologiya |
-|-------|------------|
-| Development | SQLite |
-| Production | PostgreSQL |
-
----
+To'liq ro'yxat: [`requirements.txt`](requirements.txt), [`requirements-dev.txt`](requirements-dev.txt).
 
 ## 🏗 Arxitektura
 
 ```mermaid
 graph TB
-    subgraph "Frontend"
-        A[HTML/Bootstrap/Tailwind]
-        B[Vanilla JS / Fetch API]
+    subgraph Mijozlar
+        W[Brauzer: Django templates + JS]
+        M[Android / Windows ilovalar]
+        TG[Telegram foydalanuvçilari]
     end
-
-    subgraph "Django Backend"
-        C[accounts - Asosiy modul]
-        D[teacher - O'qituvchi paneli]
-        E[parents - Ota-ona portali]
-        F[api - REST API]
-        G[ai_yordamchi - AI assistant]
-        H[coin - Market & Coin]
-        I[games - O'yinlar]
-        J[blog - Yangiliklar]
-        K[telegram_bot - Bot]
+    subgraph Django["Django (config/)"]
+        ACC[accounts — asosiy modul]
+        T[teacher]
+        P[parents]
+        API[api — DRF /api/v1/]
+        AI[ai_yordamchi]
+        C[coin]
+        G[games]
+        B[blog]
+        Q[quiz · video_quiz · kurslarim · startup]
+        BOT[telegram_bot]
+        BK[backup]
     end
-
-    subgraph "Tashqi xizmatlar"
-        L[OpenAI API]
-        M[Telegram Bot API]
-        N[Payme / Click]
+    subgraph Taşqi["Taşqi xizmatlar"]
+        OA[OpenAI API]
+        TGA[Telegram Bot API]
+        PAY[Payme · Click · Tezcheck · inPAY]
+        SMTP[SMTP]
     end
-
-    subgraph "Ma'lumotlar"
-        O[(SQLite / PostgreSQL)]
-        P[Media fayllar]
-        Q[Static fayllar]
-    end
-
-    A --> C
-    B --> F
-    C --> O
-    G --> L
-    K --> M
-    C --> N
-    F --> O
+    DB[(SQLite)]
+    FS[media/ · staticfiles/]
+    W --> ACC
+    M --> API
+    TG --> BOT
+    ACC --> DB
+    API --> DB
+    AI --> OA
+    BOT --> TGA
+    ACC --> PAY
+    ACC --> SMTP
+    BK --> TGA
+    ACC --> FS
 ```
 
----
+Batafsil: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## 👥 Foydalanuvçi rollari
 
@@ -192,8 +192,6 @@ graph TB
 - Tölov tarixi
 - Öqituvçi bilan xabar almaşiş
 - Kitob ijarasi köriş
-
----
 
 ## 📦 Ilovalar (Apps)
 
@@ -250,8 +248,8 @@ Alohida login tizimi bilan farzandlar progressini kuzatiş, tölov tarixi, öqit
 /api/v1/status/             — API holati
 /api/v1/profile/            — Profil ma'lumotlari
 /api/v1/profile/complete/   — Profil to'ldirish
-/api/v1/courses/            — Kurslar CRUD
-/api/v1/students/           — O'quvchilar ro'yxati
+/api/v1/courses/            — Kurslar (faqat öqiş)
+/api/v1/admin/students/     — O'quvchilar ro'yxati (admin)
 /api/v1/coin/               — Coin operatsiyalari
 /api/v1/reyting/            — Reyting/leaderboard
 ```
@@ -321,215 +319,92 @@ OpenAI GPT asosida kurs mavzulari böyiça savol-javob. Har bir sörov uçun coi
 | `TelegramBroadcastMessage` | Ommaviy xabar yuboriş |
 | `TelegramChatState` | Foydalanuvçi holati (AI çat, contact mode) |
 
----
+### Boşqa ilovalar
 
-## ⚙️ Örnatiş
+| Ilova | Vazifasi |
+|-------|----------|
+| `quiz` | Quiz moduli (sahifalar `/quiz/`, API `/api/v1/quiz/`) |
+| `video_quiz` | Video içidagi savollar (`/video-quiz/`) |
+| `kurslarim` | "Kurslarim" sahifalari (`/kurslarim/`) |
+| `startup` | Startap loyihalar va roadmap (`/startup/`) |
+| `backup` | Kunlik DB backup va Telegramga yuboriş ([docs/BACKUP.md](docs/BACKUP.md)) |
 
-### Talablar
+## ⚡ Tezkor boşlaş (lokal)
 
-- Python 3.10+
-- pip
-- Git
-- SQLite (development) yoki PostgreSQL (production)
-
-### 1. Repozitoriyani klonlaş
+Batafsil qöllanma: **[docs/INSTALLATION.md](docs/INSTALLATION.md)** · dasturçi ish oqimi: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
 ```bash
 git clone https://github.com/Xusanbek0039/learning-managment-sistem-django.git
 cd learning-managment-sistem-django
-```
-
-### 2. Virtual muhit yaratiş
-
-```bash
-python -m venv venv
-
-# Windows
-venv\Scripts\activate
-
-# Linux / macOS
-source venv/bin/activate
-```
-
-### 3. Kutubxonalarni örnatiş
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Muhit özgaruvçilarini sozlaş
-
-`.env` faylini yarating:
-
-```bash
-cp .env.example .env
-```
-
-`.env` faylini töldiring (pastdagi [Muhit özgaruvçilari](#-muhit-özgaruvchilari) bölimiga qarang).
-
-### 5. Ma'lumotlar bazasini migratsiya qiliş
-
-```bash
-python manage.py makemigrations
-python manage.py migrate
-```
-
-### 6. Superuser yaratiş
-
-```bash
+python -m venv .venv
+# Windows: .venv\Scripts\activate    Linux/macOS: source .venv/bin/activate
+pip install -r requirements.txt -r requirements-dev.txt
+cp .env.example .env               # keyin .env ni tahrirlang (pastga qarang)
+python manage.py migrate           # makemigrations SHART EMAS — migratsiyalar repoda bor
 python manage.py createsuperuser
-```
-
-### 7. Statik fayllarni yiğiş
-
-```bash
-python manage.py collectstatic --noinput
-```
-
-### 8. Serverni işga tuşiriş
-
-```bash
 python manage.py runserver
 ```
 
-Brauzerda oçing: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+Lokal `.env` uçun minimal qiymatlar:
 
-Admin panel: [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/)
+```env
+DEBUG=True
+DJANGO_SECRET_KEY=<lokal tasodifiy kalit>
+ALLOWED_HOSTS=127.0.0.1,localhost
+SITE_URL=http://127.0.0.1:8000
+SECURE_SSL_REDIRECT=False
+```
 
----
+> ⚠️ Repodagi `db.sqlite3` tarixiy sabablarga köra tracked va kelajakda olib taşlanadi.
+> Uni işlatmang: `.env` bilan böş baza yarating yoki fayl nomini özgartirib yangidan `migrate` qiling.
+
+## 🗄 Ma'lumotlar bazasi
+
+- Faol sozlama: `config/settings.py` → `DATABASES['default']` = **SQLite** (`BASE_DIR / 'db.sqlite3'`),
+  `timeout=30`, `transaction_mode='IMMEDIATE'`, WAL rejimi (`accounts/apps.py`).
+- `DB_ENGINE`, `DB_NAME`, `DB_USER`... özgaruvçilari **hozir öqilmaydi** (settings'da izohga olingan blok).
+  PostgreSQL'ga ötiş — roadmap'da ([docs/ROADMAP.md](docs/ROADMAP.md)).
+- Backup: `python manage.py send_backup` — [docs/BACKUP.md](docs/BACKUP.md).
 
 ## 🔑 Muhit özgaruvçilari
 
-`.env` faylida quyidagi özgaruvçilarni sozlang:
+Barça kalitlar nomi va izohlari: **[`.env.example`](.env.example)**. Real qiymatlarni hech qaçon commit qilmang.
 
-```env
-# ═══════════════════════════════════════
-# 🔐 ASOSIY SOZLAMALAR
-# ═══════════════════════════════════════
-DJANGO_SECRET_KEY=your-super-secret-key-here
-SECRET_KEY=your-super-secret-key-here
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
-CSRF_TRUSTED_ORIGINS=http://localhost:8000
+| Guruh | Asosiy özgaruvçilar |
+|-------|---------------------|
+| Django core | `DJANGO_SECRET_KEY` (yoki `SECRET_KEY`), `DEBUG`, `ALLOWED_HOSTS`, `SITE_URL`, `ADMIN_URL`, `CSRF_TRUSTED_ORIGINS` |
+| HTTPS / proxy | `SECURE_SSL_REDIRECT`, `SECURE_HSTS_SECONDS`, `USE_X_FORWARDED_FOR`, `TRUSTED_PROXY_COUNT` |
+| Email | `EMAIL_BACKEND`, `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USE_TLS`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `DEFAULT_FROM_EMAIL` |
+| AI / media | `OPENAI_API_KEY`, `YOUTUBE_API_KEY` |
+| Telegram | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME`, `TELEGRAM_GROUP_CHAT_ID`, `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_HEALTH_TOKEN` |
+| Himoya | `RECAPTCHA_SITE_KEY`, `RECAPTCHA_SECRET_KEY`, `LOGIN_MAX_ATTEMPTS`, `LOGIN_LOCKOUT_DURATION`, `GAME_HMAC_SECRET` |
+| Tölovlar | `PAYME_*`, `CLICK_*`, `TEZCHECK_*`, `INPAY_*` |
+| OAuth | `GOOGLE_CLIENT_ID/SECRET`, `FACEBOOK_APP_ID/SECRET`, `GITHUB_CLIENT_ID/SECRET` (+ `*_REDIRECT_URI`) |
+| Backup | `BACKUP_TELEGRAM_BOT_TOKEN`, `BACKUP_TELEGRAM_CHAT_ID`, `BACKUP_DIR`, `BACKUP_RETENTION_DAYS`... |
+| Kesh / işçilar | `USE_REDIS_CACHE`, `USE_FILE_CACHE`, `FILE_CACHE_DIR`, `REDIS_*`, `RUN_INPROCESS_WORKERS`, `RUN_STARTUP_TEMPLATE_REPAIR` |
 
-# ═══════════════════════════════════════
-# 🗄 MA'LUMOTLAR BAZASI (Production)
-# ═══════════════════════════════════════
-DB_ENGINE=django.db.backends.postgresql
-DB_NAME=lms_database
-DB_USER=db_user
-DB_PASSWORD=db_password
-DB_HOST=localhost
-DB_PORT=5432
+> `DEBUG=False` va `DJANGO_SECRET_KEY` yöq bölsa — ilova ataylab işga tuşmaydi (`ImproperlyConfigured`).
 
-# ═══════════════════════════════════════
-# 🤖 OPENAI (AI yordamchi uchun)
-# ═══════════════════════════════════════
-OPENAI_API_KEY=sk-proj-your-openai-api-key
+## 📡 REST API
 
-# ═══════════════════════════════════════
-# 📱 TELEGRAM BOT
-# ═══════════════════════════════════════
-TELEGRAM_BOT_TOKEN=your-bot-token
-TELEGRAM_BOT_USERNAME=your_bot_username
-TELEGRAM_GROUP_CHAT_ID=-100xxxxxxxxxx
-TELEGRAM_USE_PREMIUM_EMOJI=true
-TELEGRAM_USE_STICKERS=true
-SITE_URL=https://your-domain.uz
-
-# ═══════════════════════════════════════
-# 🛡 XAVFSIZLIK
-# ═══════════════════════════════════════
-LOGIN_MAX_ATTEMPTS=5
-LOGIN_LOCKOUT_DURATION=15
-GAME_HMAC_SECRET=your-hmac-secret
-
-# ═══════════════════════════════════════
-# 🔑 RECAPTCHA
-# ═══════════════════════════════════════
-RECAPTCHA_SITE_KEY=your-recaptcha-site-key
-RECAPTCHA_SECRET_KEY=your-recaptcha-secret-key
-```
-
----
-
-## 📡 API hujjatlari
-
-### Autentifikatsiya
-
-API **Token** va **Session** autentifikatsiyasini qöllab-quvvatlaydi.
-
-**Token oliş:**
-```http
-POST /api/v1/token/
-Content-Type: application/json
-
-{
-    "username": "student_user",
-    "password": "your_password"
-}
-```
-
-**Javob:**
-```json
-{
-    "token": "abc123def456..."
-}
-```
-
-**Tokenni işlatiş:**
-```http
-GET /api/v1/profile/
-Authorization: Token abc123def456...
-```
-
-### Asosiy endpointlar
+Baza: `/api/v1/` · Auth: `Authorization: Token <token>` yoki session · Default ruxsat: `IsAuthenticated` ·
+Paginatsiya: 20 ta/sahifa · Javob: JSON. **To'liq ro'yxat: [docs/API.md](docs/API.md).**
 
 | Metod | Endpoint | Tavsif |
 |-------|----------|--------|
-| `POST` | `/api/v1/token/` | Auth token oliş |
+| `POST` | `/api/v1/token/` | Token oliş (username + password) |
 | `GET` | `/api/v1/status/` | API holati |
-| `GET` | `/api/v1/profile/` | Profil ma'lumotlari |
-| `PUT` | `/api/v1/profile/complete/` | Profil töldiriş |
-| `GET` | `/api/v1/courses/` | Kurslar röyxati |
-| `GET` | `/api/v1/students/` | Öquvçilar (admin) |
-| `GET/POST` | `/api/v1/coin/` | Coin operatsiyalari |
-| `GET` | `/api/v1/reyting/` | Reyting jadvali |
-
-### Öyin API (taşqi öyinlar uçun)
-
-| Metod | Endpoint | Tavsif |
-|-------|----------|--------|
-| `POST` | `/api/v1/external-game/sso-verify/` | SSO tekşiriş |
-| `POST` | `/api/v1/external-game/result/` | Natija yuboriş |
-| `POST` | `/api/v1/external-game/multiplayer/find/` | Raqib topiş |
-| `GET` | `/api/v1/external-game/multiplayer/state/` | Öyin holati |
-| `POST` | `/api/v1/external-game/multiplayer/move/` | Yuriş |
-| `GET` | `/api/v1/external-game/gamification/profile/` | Öyinçi profili |
-| `GET` | `/api/v1/external-game/gamification/leaderboard/` | Liderlar jadvali |
-
-### Paginatsiya
-
-Barça röyxat endpointlari `PageNumberPagination` işlatadi (har sahifada 20 ta element):
-
-```json
-{
-    "count": 150,
-    "next": "http://example.com/api/v1/courses/?page=2",
-    "previous": null,
-    "results": [...]
-}
-```
-
-### Rate Limiting
-
-| Endpoint | Limit |
-|----------|-------|
-| Coin transfer | 10 sörov/daqiqa |
-
----
+| `GET` | `/api/v1/profile/` | Joriy foydalanuvçi profili |
+| `GET` | `/api/v1/courses/` · `/api/v1/courses/<id>/` | Kurslar |
+| `GET` | `/api/v1/my/enrollments/` · `/my/test-results/` · `/my/certificates/` | Öquvçi ma'lumotlari |
+| `GET` | `/api/v1/admin/students/` | Öquvçilar (admin) |
+| — | `/api/v1/coin/` · `/reyting/` · `/startup/` · `/assistant/` · `/library/` · `/quiz/` | Modul API'lari |
+| — | `/api/v1/app/...` · `/api/v1/parent-app/...` | Mobil ilovalar API |
+| `POST` | `/api/v1/games/external/verify/` · `/result/` · `/mp/*` · `/gx/*` | Taşqi öyinlar API |
 
 ## 🔐 Xavfsizlik
+
+Zaiflikni **ommaviy issue sifatida oçmang** — [SECURITY.md](SECURITY.md) dagi tartib böyiça xabar bering.
 
 ### Middleware zanjiri (tartib böyiça)
 
@@ -576,8 +451,6 @@ Barça röyxat endpointlari `PageNumberPagination` işlatadi (har sahifada 20 ta
 
 Tizim 17 xil xavfsizlik hodisasini 4 darajada (info, warning, error, critical) kuzatadi va `logs/security.log` fayliga yozadi.
 
----
-
 ## 🤖 Telegram bot
 
 ### Imkoniyatlari
@@ -610,66 +483,27 @@ POST https://api.telegram.org/bot<TOKEN>/setWebhook
 ?url=https://your-domain.uz/telegrambotlms/webhook/
 ```
 
----
-
-## 🚀 Deploy qiliş
-
-### Production sozlamalari
-
-1. **`.env` faylini yangilang:**
-
-```env
-DEBUG=False
-ALLOWED_HOSTS=your-domain.uz,www.your-domain.uz
-CSRF_TRUSTED_ORIGINS=https://your-domain.uz,https://www.your-domain.uz
-DJANGO_SECRET_KEY=juda-uzun-va-murakkab-kalit
-```
-
-2. **PostgreSQL ga öting:**
-
-```env
-DB_ENGINE=django.db.backends.postgresql
-DB_NAME=lms_db
-DB_USER=lms_user
-DB_PASSWORD=strong_password
-DB_HOST=localhost
-DB_PORT=5432
-```
-
-3. **Statik fayllarni yiğing:**
+## 🧪 Testlaş
 
 ```bash
-python manage.py collectstatic --noinput
+python manage.py check
+python manage.py test                       # barça Django testlari
+python manage.py test accounts.tests_security accounts.tests_security_payments
+node --test "tests/*.test.cjs"           # JS unit testlar (Node 22+)
 ```
 
-4. **Migratsiyalarni bajaring:**
+Testlar tarmoqqa çiqmasligi kerak: `.env` da real tokenlarni qoldirmang yoki alohida test settings işlating
+([docs/DEVELOPMENT.md](docs/DEVELOPMENT.md#testlar--tests)). CI: `.github/workflows/`.
 
-```bash
-python manage.py migrate
-```
+## 🚀 Deploy
 
-### cPanel / Passenger deploy
+Production hozir cPanel + Passenger muhitida. Server tomonidagi tartib [`deploy.sh`](deploy.sh) da:
+baza zaxirasi → `git pull --ff-only` → (kerak bölsa) `pip install` → `migrate` → `collectstatic` → restart.
 
-Loyiha `passenger_wsgi.py` fayliga ega bölib, cPanel/Passenger muhitida deploy qilişga tayyor:
-
-```python
-# passenger_wsgi.py avtomatik ravishda:
-# - .env faylni yuklaydi
-# - WSGI ilovasini sozlaydi
-# - X-Powered-By va Server headerlarini yashiradi (xavfsizlik)
-```
-
-### Muhim fayllar
-
-| Fayl | Vazifasi |
-|------|----------|
-| `passenger_wsgi.py` | cPanel/Passenger WSGI konfiguratsiya |
-| `.htaccess` | Apache konfiguratsiya |
-| `robots.txt` | Qidiruv tizimi boşqaruvi |
-| `sitemap.xml` | Sayt xaritasi |
-| `requirements.txt` | Python kutubxonalar röyxati |
-
----
+Production `.env` uçun majburiy: `DEBUG=False`, kuçli `DJANGO_SECRET_KEY`, aniq `ALLOWED_HOSTS` va
+`CSRF_TRUSTED_ORIGINS`, `SECURE_SSL_REDIRECT=True`, `SECURE_HSTS_SECONDS>0`. Tekşiriş: `python manage.py check --deploy`.
+Tezlik, Nginx/Passenger va backup: [docs/performance.md](docs/performance.md), [docs/BACKUP.md](docs/BACKUP.md),
+[docs/INSTALLATION.md](docs/INSTALLATION.md#production).
 
 ## 📁 Loyiha tuzilişi
 
@@ -752,13 +586,11 @@ learning-managment-sistem-django/
 ├── manage.py                   # Django boshqaruv skripti
 ├── requirements.txt            # Python kutubxonalar
 ├── passenger_wsgi.py           # cPanel deploy
-├── .env                        # Muhit o'zgaruvchilari
+├── .env.example                # Muhit o'zgaruvchilari namunasi (.env — faqat lokal, git'da emas)
 ├── .htaccess                   # Apache konfiguratsiya
 ├── robots.txt                  # SEO - qidiruv botlari
 └── sitemap.xml                 # SEO - sayt xaritasi
 ```
-
----
 
 ## 📊 URL marşrut xaritasi
 
@@ -777,51 +609,42 @@ learning-managment-sistem-django/
 | `/games/` | `games` | Öyinlar |
 | `/telegrambotlms/` | `telegram_bot` | Telegram webhook |
 
----
+## 📚 Hujjatlar
 
-## 🧪 Testlaş
+| Hujjat | Mazmuni |
+|--------|---------|
+| [docs/INSTALLATION.md](docs/INSTALLATION.md) | Örnatiş (lokal va production) |
+| [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Dasturçi ish oqimi, testlar, demo ma'lumotlar |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Arxitektura, ilovalar, middleware, rollar |
+| [docs/API.md](docs/API.md) | REST API |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Roadmap va open-source rivojlantiriş rejasi |
+| [docs/LICENSING.md](docs/LICENSING.md) | Litsenziya va uçinçi tomon komponentlari |
+| [docs/BACKUP.md](docs/BACKUP.md) · [docs/performance.md](docs/performance.md) | Operatsion qöllanmalar |
+| [docs/EMAIL_SETUP.md](docs/EMAIL_SETUP.md) · [docs/TEZCHECK_SETUP.md](docs/TEZCHECK_SETUP.md) · [docs/INPAY_SETUP.md](docs/INPAY_SETUP.md) | Integratsiyalar |
+| [CHANGELOG.md](CHANGELOG.md) | Özgarişlar tarixi |
 
-```bash
-# Barcha testlarni ishga tushirish
-python manage.py test
+## 🗺 Roadmap
 
-# Alohida app testlari
-python manage.py test accounts
-python manage.py test games
+Qisqaça (batafsil: [docs/ROADMAP.md](docs/ROADMAP.md)):
 
-# Xavfsizlik testlari
-python test_security.py
-```
-
----
-
-## 📈 Kelajakdagi rejalar
-
-- [ ] WebSocket orqali real-time çat (Django Channels)
-- [ ] Mobil ilova (Flutter / React Native)
-- [ ] Video darslarni töğridan-töğri yuklaş (AWS S3)
-- [ ] Köp tilli qöllab-quvvatlash (i18n)
-- [ ] Redis cache integratsiya
-- [ ] Celery — fon vazifalari uçun
-- [ ] Docker konteynerizatsiya
-
----
+- [ ] Maxfiy fayllar va real ma'lumotlarni repodan butunlay olib taşlaş
+- [ ] Django 5.2 LTS va xavfsiz bog'liqlik versiyalariga ötiş
+- [ ] Xavfsiz demo ma'lumot yaratuvçi buyruq (`seed_demo`)
+- [ ] Bazani env orqali sozlaş (SQLite yöli / PostgreSQL)
+- [ ] Docker bilan lokal muhit
+- [ ] Ingliz tilidagi interfeys (i18n) kengaytiriş
+- [x] Android va Windows ilovalar · Redis kesh (ixtiyoriy) · kunlik backup
 
 ## 🤝 Hissa qöşiş
 
-1. Repozitoriyani fork qiling
-2. Yangi branch yarating (`git checkout -b feature/yangi-funksiya`)
-3. Özgarişlarni commit qiling (`git commit -m 'feat: yangi funksiya qo'shildi'`)
-4. Branch'ni push qiling (`git push origin feature/yangi-funksiya`)
-5. Pull Request oçing
-
----
+Hissa qöşmoqçimisiz? **[CONTRIBUTING.md](CONTRIBUTING.md)** ni öqing. Boşlaş uçun
+[`good first issue`](https://github.com/Xusanbek0039/learning-managment-sistem-django/labels/good%20first%20issue)
+belgili vazifalarni qidiring. Barça iştirokçilar [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) ga amal qiladi.
 
 ## 📄 Litsenziya
 
-Bu loyiha [MIT](https://opensource.org/licenses/MIT) litsenziyasi ostida tarqatiladi.
-
----
+Loyiha kodi [MIT litsenziyasi](LICENSE) ostida tarqatiladi. Uçinçi tomon kutubxonalari, şriftlar va
+aktivlar öz litsenziyalariga ega — [docs/LICENSING.md](docs/LICENSING.md).
 
 ## 👨‍💻 Muallif
 
@@ -838,248 +661,6 @@ Bu loyiha [MIT](https://opensource.org/licenses/MIT) litsenziyasi ostida tarqati
 ---
 
 <p align="center">
-  <sub>© 2024-2026 Suyunov Husan | IT Creative Zomin. Barça huquqlar himoyalangan.</sub>
+  <sub>© 2024-2026 Suyunov Husan | IT Creative Zomin. Kod <a href="LICENSE">MIT</a> litsenziyasi ostida.</sub>
 </p>
 
-Claude edit test
-
-## Sayt tezligini oşiriş: Redis, query, Nginx va Passenger
-
-Staging testlari, har bosqiçdan keyin RPS/TTFB ölçovi, cPanel/Engintron
-konfiguratsiya template'lari va rollback amallari: **[docs/performance.md](docs/performance.md)**.
-Mavjud SQLite saqlanadi. Redis default öçiq; avval hostingda mavjudligini
-tekşiring. Shaxsiy/CSRF sahifalar umumiy Nginx cache'ga qöyilmaydi.
-
-```bash
-python -m pip install -r requirements.txt
-python manage.py check --settings=settings.production
-python manage.py test accounts.test_performance config.test_public_cache blog.tests backup.tests telegram_bot.test_startup
-python scripts/benchmark_http.py https://STAGING_DOMAIN/ --requests 50 --concurrency 5
-```
-
-Production profili uçun `.env`da `DEBUG=False` va amaldagi secret/host sozlamalari
-kerak. Haqiqiy `.env` özgartirilmagan. Production deploy/yuklama testi bajarilmagan.
-
-## Har kuni DB backup: Telegram (Ubuntu staging)
-
-### cPanelda avtomatik yuborişni bir marta yoqiş
-
-Fayllarni serverga yuklaş cron jadvalini özi örnatmaydi. Quyidagi installer
-serverdagi loyiha egasining crontab'iga alohida boşqariladigan blok qöşadi:
-
-```bash
-source /home/itcacade/virtualenv/lmsv1/3.10/bin/activate
-cd /home/itcacade/lmsv1
-python manage.py test backup.test_scheduler --verbosity 2
-python manage.py install_backup_cron --preview
-python manage.py install_backup_cron --backup-dir /home/itcacade/private_backups
-crontab -l
-```
-
-`.env`dagi mavjud `TELEGRAM_BOT_TOKEN` va
-`BACKUP_TELEGRAM_CHAT_ID=-1003968166001` işlatiladi. Haqiqiy `.env` repositoryda
-yaratilmaydi. Installer server timezone'iga boğliq bölmagan `* * * * *` jadval
-qöyadi: kiçik `backup/scheduler.py` har daqiqada **Django yuklamasdan** vaqtni
-tekşiradi. Faqat `settings.TIME_ZONE` böyiça 02:00 da `send_backup`ni çaqiradi.
-Hozir loyiha timezone'i `Asia/Tashkent`. Server UTC bölsa ham şu vaqtda işlaydi.
-02:00 dan keyin örnatilsa birinçi avtomatik backup ertasi kuni yuboriladi.
-Cron xizmati işlaşi va hostingda Cron Jobs ruxsati bölişi şart. Server
-02:00 da öçiq yoki cron töxtagan bölsa ötkazib yuborilgan iş avtomatik
-qoplanmaydi. Installer faqat yozilgan jadvalni tekşiradi, cron daemonini yoqmaydi.
-
-Installer boşqa cronlarni saqlaydi, öz blokini qayta örnatganda dublikat
-yaratmaydi. Oldingi qölda yozilgan backup cron mavjud bölsa, dublikat
-yaratmasdan töxtaydi: `crontab -e`da faqat eski backup qatorini olib taşlab,
-installerni qayta işlating. Oldingi crontab private nusxasi installer çiqargan
-yölda saqlanadi. Unda boşqa işlar sirlari bölişi mumkin, nusxani çatga yubormang.
-
-Hozir scheduler orqali haqiqiy backup yuborişni tekşiriş:
-
-```bash
-python backup/scheduler.py --backup-dir /home/itcacade/private_backups --timezone Asia/Tashkent --run-now
-echo $?
-```
-
-Installer körsatgan `schedule.log`dan natijani öqing. Log fayli 1 MB x 3 bilan
-çeklangan; muvaffaqiyat yoki exit code yoziladi. Telegramga batafsil xavfsiz
-xabarni mavjud `send_backup` yuboradi. `--run-now` şu kun uçun avtomatik
-muvaffaqiyat belgisini ham qöyadi; ertasi kuni yana 02:00 da yuboriladi.
-Oddiy jadval bir kunda bir marta muvaffaqiyat belgisini yozadi, lock ikki
-schedulerning birga işlaşiga yöl qöymaydi. Barça Telegram qismlari va yakuniy
-xabar kelganini tekşiring. Şu daqiqada backup allaqaçon mavjud bölsa keyingi
-daqiqada sinang. Xato bilan tugagan scheduled backup öşa kuni qayta urinmaydi;
-sababini tuzatib `--run-now` işlating.
-
-Öchirish/rollback: `crontab -e`da installerga tegişli `BEGIN LMS BACKUP ...`
-va `END LMS BACKUP ...` orasidagi blokni şu markerlari bilan olib taşlang.
-Butun eski crontabni qayta tiklaş boşqa yangi işlarni yöqotişi mumkin;
-boşqa cronlarga tegmang. Ilova/Passenger restart talab qilinmaydi.
-
-Tekşirilgan joylaşuvlar: `manage.py`, `config/settings.py`, `config/urls.py`,
-`requirements.txt`, `passenger_wsgi.py`, `.htaccess`, asosiy `README.md`.
-`config.settings` va Passenger `.env`ni mavjud `python-dotenv` bilan öqiydi;
-qöşimça Python dependency kerak emas. Backup uçun HTTP URL/webhook yoki
-Passenger/Nginx sozlamalarini özgartiriş kerak emas; cron alohida Python commandni işlatadi.
-Serverga ulanilmadi, deploy yoki haqiqiy Telegram upload bajarilmadi.
-
-**Faol settings SQLite işlatadi va backup uni qöllaydi.** Bazani almaştiriş
-kerak emas. SQLite online backup API orqali vaqtinçalik izçil nusxa olinadi
-(WAL'dagi commit qilingan yozuvlar ham kiradi), undan SQL dump va `.sql.gz`
-yaratiladi. Işlayotgan `db.sqlite3` fayli oddiy copy qilinmaydi.
-100 MB va undan katta baza ham qöllanadi: limit asl DBga emas, yuboriladigan
-siqilgan fayl/qismlarga tegişli. Siqiliş nisbati ma’lumotga boğliq;
-49 000 000 baytdan katta gzip avtomatik qismlanadi.
-README'dagi DB env misollari öz-özidan `DATABASES`ni özgartirmaydi.
-Command PostgreSQL va MySQL/MariaDB backendlarini ham aniqlaydi.
-`ENGINE`, `NAME`, `USER`, `PASSWORD`, `HOST`, `PORT`, qöllanadigan `OPTIONS`
-Django sozlamasidan olinadi. Connection string örniga alohida maydonlardan foydalaning.
-PostgreSQL uçun `sslmode`, `sslcert`, `sslkey`, `sslrootcert`, `connect_timeout`
-uzatiladi. MySQL `charset`, `unix_socket`ni uzatadi; `init_command` va
-`isolation_level` Django sessioniga tegişli. Boşqa OPTIONS, MySQL SSL yoki
-PostgreSQL service mapping kerak bölsa command xavfsiz töxtaydi: avval mappingni
-stagingda moslaştiring. MySQL dump InnoDB uçun `--single-transaction` işlatadi;
-MyISAM va parallel DDL paytida izçillik uçun maintenance/DB lock rejasini tuzing.
-DB userga dump qilinadigan barça obyektlar, routines/events uçun zarur ruxsatlar kerak.
-
-1. Staging Ubuntu'da şu loyiha virtualenv'ini işlating. SQLite uçun Pythonning
-   standart `sqlite3` moduli yetarli, taşqi dump binary kerak emas.
-   PostgreSQL/MySQL işlatilsa DBga mos client
-   (`postgresql-client`, yoki `mysql-client`/`mariadb-client`) örnating.
-   `pg_dump` major versiyasi DB serveridan eski bölmasin.
-   MySQL backend uçun serverdagi Django DB driver ham örnatilgan bölişi kerak.
-   Mavjud `.env`ga `.env.example`dagi `BACKUP_*` qiymatlarini administrator kiritsin;
-   token faqat serverdagi himoyalangan `.env`da saqlansin (`chmod 600 .env`).
-   Mavjud `TELEGRAM_BOT_TOKEN` avtomatik işlatiladi. Uni takrorlaş şart emas:
-   `BACKUP_TELEGRAM_BOT_TOKEN`ni böş qoldiring yoki umuman kiritmang.
-   Alohida backup bot kerak bölsagina şu override qiymatini töldiring.
-   Test uçun alohida staging kanal/token işlating; production kanal ID namunasi
-   `-1003968166001`, bot admin bölib hujjat va xabar yubora olişi kerak.
-
-2. Backup papkasini web document root, `media` va `static`dan taşqarida,
-   cron işlaydigan foydalanuvçi nomidan yarating:
-
-   ```bash
-   install -d -m 700 /home/itcreati/private_backups
-   df -h /home/itcreati/private_backups
-   df -i /home/itcreati/private_backups
-   quota -s
-   du -sh /home/itcreati/private_backups
-   ```
-
-   `/`dagi 3.5 TB umumiy va 1.4 TB böş joy hosting hisobining quota'si emas.
-   Tarifdagi 3 GB çegarani cPanel Disk Usage va hosting administratoridan aynan
-   backup papkasi joylaşgan filesystem, user/project quota va inode böyiça
-   tasdiqlang. `quota -s` işlamasa yoki quota körinmasa uni çeksiz deb hisoblamang.
-   377 GiB RAM/233 GiB available ham disk quota'sini oşirmaydi.
-   `BACKUP_MAX_DISK_MB=1024` faqat backup katalogi uçun namunaviy limit;
-   hisobning qolgan fayllari, DB va loglarini ham 3 GB içida hisoblang.
-   `BACKUP_MIN_FREE_MB=100` filesystem böş joy zaxirasi, user quota zaxirasi emas.
-   Haqiqiy quota buzilsa yoziş xatosi commandni töxtatadi.
-
-3. Sozlamalar (MB önlik: 1 MB = 1 000 000 bayt):
-
-   | Qiymat | Vazifasi |
-   |---|---|
-   | `BACKUP_DIR` | Mutlaq, symlink bölmagan, `700` huquqli yopiq katalog |
-   | `BACKUP_RETENTION_DAYS` | Saqlaş kunlari, musbat son; default 7 |
-   | `BACKUP_MAX_DISK_MB` | Şu papkadagi barça fayllar hajmi çegarasi; default 1024 |
-   | `BACKUP_MIN_FREE_MB` | Filesystemda böş qolişi kerak bölgan joy; default 100 |
-   | `BACKUP_DUMP_TIMEOUT` | Dump uçun timeout sekundda; default 1800 |
-   | `BACKUP_HTTP_TIMEOUT` | HTTP socket amallari timeout'i sekundda; default 120 |
-   | `BACKUP_PG_DUMP`, `BACKUP_MYSQLDUMP` | Binary nomi yoki mutlaq yöli; argumentlar yozmang |
-
-   SQL avval vaqtinçalik disk fayliga yoziladi, keyin gzip qilinadi. Şu sabab
-   raw SQL + gzip + bitta 49 MB qismga joy hisoblang. SQLite uçun izçil snapshot
-   + raw SQL bir vaqtda ham joy egallaydi; SQL hajmi asl DBdan kattaroq bölişi
-   mumkin (ayniqsa BLOB ma’lumotlarda). Har blok yozilişidan oldin
-   limit tekşiriladi; zaruratda eng eski boşqariladigan backup öçiriladi,
-   joy baribir yetmasa command xato bilan töxtaydi. Eski backup faqat aniq
-   `backup_YYYY_MM_DD_HH_MM.sql.gz` nomi va command yaratgan `.owned` belgisi
-   mavjud bölsa tozalanadi. Begona fayllar öçirilmaydi, lekin limitda hisoblanadi.
-   Katalog faqat bitta işonçli foydalanuvçiga tegişli bölsin.
-   Eski nusxalar yangi dump muvaffaqiyatsiz bölişidan oldin ham tozalanişi mumkin.
-   Lock faylini öçirmang: Linux `flock` jarayon tugaganda avtomatik böşaydi.
-   SIGKILL/quvvat uzilişidan qolgan `.send-backup-*` kataloglarini avtomatik
-   öçirmaydi; faol jarayon yöqligini tekşirgaç administrator tozalaydi.
-
-4. Staging tekşiruvlari (yöllarni staging joylaşuviga moslang):
-
-   ```bash
-   /path/to/venv/bin/python -m pip install -r requirements.txt
-   /path/to/venv/bin/python -m unittest backup.tests -v
-   /path/to/venv/bin/python manage.py check
-   /path/to/venv/bin/python manage.py send_backup
-   echo $?
-   ```
-
-   Oxirgi buyruq **haqiqiy DB dump va Telegram upload** qiladi. Kanalda barça
-   qismlar va yakuniy muvaffaqiyat xabari bölişini tekşiring; exit code 0
-   bölişi kerak. Alohida stagingda notöğri binary/token, HTTP timeout,
-   kiçik disk limiti va parallel ikkita commandni tekşiring (notöğri binary
-   testi faqat PostgreSQL/MySQLga tegişli): xato uçun exit 1,
-   qisman dump yuborilmasligi va vaqtinçalik fayllar tozalanişi kerak.
-   HTTP/Telegram xatosida allaqaçon yuborilgan qismlar kanalda qolişi mumkin;
-   muvaffaqiyat xabarisiz töplamni tayyor backup deb hisoblamang.
-   Unit testlar tarmoqsiz siqiş, bölish/birlashtirish, retention, xatolar va
-   Linuxda lockni tekşiradi; real DB/Telegram staging sinovi alohida zarur.
-   Django settings yuklanişidan oldingi xatolarda command hali işga tuşmaydi;
-   cron stderr monitoringini ham saqlang.
-
-5. Cron: Django `TIME_ZONE=Asia/Tashkent`; nomdagi vaqt haqiqiy mahalliy
-   vaqt (`backup_2026_10_20_02_00.sql.gz`), qölda işga tuşganda ham 02:00
-   deb qotirilmagan. Şu daqiqada mavjud backup ustiga yozilmaydi.
-   Ubuntu cron **server timezone** böyiça işlaydi:
-
-   ```bash
-   timedatectl
-   date
-   crontab -e
-   ```
-
-   Server timezone Asia/Tashkent bölsa, loyiha egasining crontab'iga:
-
-   ```cron
-   0 2 * * * cd /home/itcreati/itc-academy.uz && /home/itcreati/itc-academy.uz/.venv/bin/python manage.py send_backup >> /home/itcreati/backup-cron.log 2>&1
-   ```
-
-   Server UTC bölsa Tashkent 02:00 uçun `0 21 * * *` işlating (oldingi UTC kun).
-   `TZ` env qiymatini qöyiş Ubuntu cron jadvalini avtomatik özgartiradi deb
-   hisoblamang. Cron uçun Passenger `.htaccess`dagi interpreter va loyiha yölini
-   tekşiring. Log fayliga `600` huquq va logrotate qöying. Engintron/Nginx va
-   Passenger 6.2.0 içida scheduler yoki request orqali backup işga tuşirilmaydi.
-
-### Stagingda tiklaşni tekşiriş
-
-Telegram `sendDocument` rasmiy limit 50 MB:
-https://core.telegram.org/bots/api#senddocument . Command 49 000 000 baytlik
-qismlardan foydalanadi; har qism alohida hujjat va caption'da `qism N/T` bilan
-yuboriladi. RAMga töliq arxiv yuklanmaydi. Qismlar mustaqil gzip emas: avval
-nomdagi raqamlar tartibida birlaştiring. Caption'dagi SHA256 töliq gzipga tegişli.
-
-```bash
-# Bitta backup to‘plamining barcha qismlarini alohida katalogga yuklab oling.
-cat backup_2026_10_20_02_00.sql.gz.part*-of-* > restored.sql.gz
-sha256sum restored.sql.gz
-gzip -t restored.sql.gz
-gzip -dc restored.sql.gz > restored.sql
-# Bitta hujjat bo‘lsa cat kerak emas: o‘sha .sql.gz uchun sha256sum va gzip -t.
-```
-
-SHA256 caption bilan bir xil va barça qismlar mavjudligini tekşiring. Söng
-faqat izolyatsiyalangan staging DBda, parolni command argumentiga yozmasdan:
-
-```bash
-# SQLite: faqat yangi, alohida staging fayliga tiklang, production db.sqlite3ga emas.
-sqlite3 staging_restore.sqlite3 < restored.sql
-sqlite3 staging_restore.sqlite3 'PRAGMA integrity_check;'
-# PostgreSQL: bo‘sh, alohida staging_restore bazasi oldindan yaratiladi.
-psql -W -h localhost -U staging_user -d staging_restore -v ON_ERROR_STOP=1 -f restored.sql
-# MySQL/MariaDB: dump CREATE DATABASE/USE asl nomni saqlaydi!
-# Shu sabab faqat alohida disposable MySQL instance ichida ishga tushiring.
-mysql -h localhost -u staging_user -p < restored.sql
-```
-
-Tiklangan jadvallar va asosiy yozuvlar sonini tekşiring. Dump fayllarida şaxsiy
-ma’lumotlar bölişi mumkin; kanal va server backup katalogiga kirişni çeklang.
-Token, DB paroli, töliq connection string yoki xom HTTP/subprocess xatolari
-command logiga çiqarilmaydi. Haqiqiy `.env` bu özgarişlarda yaratilmaydi.

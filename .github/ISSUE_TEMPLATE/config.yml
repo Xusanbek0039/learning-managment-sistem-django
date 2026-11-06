@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "🔐 Security vulnerability / Xavfsizlik zaifligi"
+    url: https://github.com/Xusanbek0039/learning-managment-sistem-django/blob/main/SECURITY.md
+    about: Please report vulnerabilities privately, never in a public issue.
+  - name: "💬 Questions / Savollar"
+    url: https://t.me/husanbek_coder
+    about: General questions to the maintainer.

@@ -1,0 +1,59 @@
+name: "🐞 Bug report / Xato haqida xabar"
+description: Something does not work as expected. Not for security issues, see SECURITY.md.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Security problem?** Do not open a public issue. Follow [SECURITY.md](../blob/main/SECURITY.md).
+        **Never paste real personal data** (names, phone numbers, passwords, tokens, payment receipts).
+        Xavfsizlik muammosi bölsa ommaviy issue oçmang. Real şaxsiy ma'lumotni yozmang.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area / Bölim
+      options:
+        - Student panel
+        - Teacher panel
+        - Parent portal / parent app
+        - Admin / assistant admin
+        - REST API
+        - Telegram bot
+        - Payments
+        - Games / coins
+        - Installation / local setup
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: role
+    attributes:
+      label: Role used / Qaysi rol bilan
+      options: [student, teacher, parent, assistant_admin, admin, not logged in, not applicable]
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce / Qayta takrorlaş qadamlari
+      placeholder: |
+        1. Log in as a demo teacher
+        2. Open /attendance/group/1/report/
+        3. Click "Excel"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual / Kutilgan va haqiqiy natija
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error output or screenshot / Xato matni yoki skrinşot
+      description: Remove tokens, cookies, phone numbers and names first.
+      render: text
+  - type: input
+    id: env
+    attributes:
+      label: Environment / Muhit
+      placeholder: "local (Windows 11, Python 3.12) / commit abc1234 / browser"

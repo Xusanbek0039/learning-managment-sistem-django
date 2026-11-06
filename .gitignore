@@ -135,3 +135,6 @@ desktop.ini
 /navigation-preview
 /staticfiles
 .staticfiles
+# Local-only security audit (contains internal findings, never commit)
+/SECURITY_AUDIT.md
+*.tmp.py

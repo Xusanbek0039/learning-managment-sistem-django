@@ -1,0 +1,30 @@
+name: "✨ Feature request / Yangi imkoniyat"
+description: Suggest an improvement or a new feature.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / Muammo
+      description: Which user (student, teacher, parent, admin) needs this, and why?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution / Taklif
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered / Boşqa variantlar
+  - type: checkboxes
+    id: impact
+    attributes:
+      label: Impact / Ta'sir
+      options:
+        - label: Needs a database migration
+        - label: Needs a new external service or paid API
+        - label: Changes permissions or authentication
+        - label: I would like to implement this myself

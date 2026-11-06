@@ -18988,4 +18988,53 @@ def attendance_report_excel(request, group_pk):
     first_data_row = header_row + 1
     for row_number, row in enumerate(report['rows'], first_data_row):
         student = row['student']
-        student_name = stude
+        student_name = student.get_full_name() or student.username
+        values = [row_number - header_row, student_name]
+        values.extend(
+            status_labels.get(cell['attendance'].status, '') if cell['attendance'] else ''
+            for cell in row['cells']
+        )
+        values.extend([
+            row['totals']['present'],
+            row['totals']['absent'],
+            row['totals']['late'],
+            row['totals']['sick'],
+            row['totals']['excused'],
+            row['avg_score'],
+        ])
+        for column, value in enumerate(values, 1):
+            cell = ws.cell(row=row_number, column=column, value=value)
+            cell.border = border
+            cell.alignment = Alignment(
+                horizontal='left' if column == 2 else 'center',
+                vertical='center',
+                wrap_text=True,
+            )
+
+        for offset, attendance_cell in enumerate(row['cells'], 3):
+            attendance = attendance_cell['attendance']
+            if attendance:
+                ws.cell(row=row_number, column=offset).fill = status_fills[attendance.status]
+                if attendance.note:
+                    ws.cell(row=row_number, column=offset).comment = Comment(attendance.note, 'LMS')
+
+    ws.freeze_panes = 'C5'
+    ws.auto_filter.ref = f'A4:{last_column}{max(header_row, ws.max_row)}'
+    ws.column_dimensions['A'].width = 6
+    ws.column_dimensions['B'].width = 30
+    for column in range(3, 3 + len(report['day_dates'])):
+        ws.column_dimensions[get_column_letter(column)].width = 13
+    for column in range(3 + len(report['day_dates']), len(headers) + 1):
+        ws.column_dimensions[get_column_letter(column)].width = 12
+    ws.page_setup.orientation = 'landscape'
+    ws.page_setup.fitToWidth = 1
+    ws.sheet_properties.pageSetUpPr.fitToPage = True
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = (
+        f'attachment; filename="davomat_guruh_{group.pk}_{report["year"]}_{report["month"]:02d}.xlsx"'
+    )
+    wb.save(response)
+    return response

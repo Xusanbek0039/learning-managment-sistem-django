@@ -1,0 +1,63 @@
+name: Django tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  django:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      # Throwaway values only. Real secrets never belong in CI for this project.
+      DEBUG: "False"
+      TELEGRAM_BOT_TOKEN: "123456:FAKE_TOKEN_FOR_TESTS_ONLY"
+      OPENAI_API_KEY: ""
+      EMAIL_BACKEND: django.core.mail.backends.locmem.EmailBackend
+      RUN_INPROCESS_WORKERS: "false"
+      RUN_STARTUP_TEMPLATE_REPAIR: "false"
+      USE_FILE_CACHE: "false"
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"   # same as the production host
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate a one-off SECRET_KEY
+        run: echo "DJANGO_SECRET_KEY=ci-$(python -c 'import secrets; print(secrets.token_urlsafe(48))')" >> "$GITHUB_ENV"
+
+      - name: Django system checks
+        run: python manage.py check
+
+      - name: Django tests
+        # The test runner uses an in-memory SQLite database; the tracked db.sqlite3 is not touched.
+        run: python manage.py test --noinput
+
+  javascript:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Node unit tests
+        run: node --test "tests/*.test.cjs"
